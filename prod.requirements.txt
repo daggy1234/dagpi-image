@@ -1,0 +1,4 @@
+Wand==0.6.3
+httptools==0.1.1
+async-timeout==3.0.1
+httpx==0.16.1
