@@ -5,18 +5,22 @@ from ..utils.client import Client
 
 
 async def auth_check(request: Request, call_next):
-    try:
-        token = request.headers['Authorization']
-    except KeyError:
-        return JSONResponse({'message': 'Unauthorized'}, status_code=403)
-    print(token)
-    tok = await Client.auth(token)
-    print(tok.auth)
-    if tok.auth:
-        if not tok.ratelimited:
-            response = await call_next(request)
-            return response
+    if (request.url.path != "/") and (request.url.path != "/metrics/"):
+        try:
+            token = request.headers['Authorization']
+        except KeyError:
+            return JSONResponse({'message': 'Unauthorized'}, status_code=403)
+        print(token)
+        tok = await Client.auth(token)
+        print(tok.auth)
+        if tok.auth:
+            if not tok.ratelimited:
+                response = await call_next(request)
+                return response
+            else:
+                return JSONResponse({'message': 'Ratelimited'}, status_code=429)
         else:
-            return JSONResponse({'message': 'Ratelimited'}, status_code=429)
+            return JSONResponse({'message': 'Unauthorized'}, status_code=403)
     else:
-        return JSONResponse({'message': 'Unauthorized'}, status_code=403)
+        response = await call_next(request)
+        return response
