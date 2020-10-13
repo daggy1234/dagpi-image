@@ -5,7 +5,10 @@ from ..utils.client import Client
 
 
 async def auth_check(request: Request, call_next):
-    if (request.url.path != "/") and (request.url.path != "/metrics/"):
+    if (request.url.path == "/") or (request.url.path == "/metrics/"):
+        response = await call_next(request)
+        return response
+    else:
         try:
             token = request.headers['Authorization']
         except KeyError:
@@ -21,6 +24,4 @@ async def auth_check(request: Request, call_next):
                 return JSONResponse({'message': 'Ratelimited'}, status_code=429)
         else:
             return JSONResponse({'message': 'Unauthorized'}, status_code=403)
-    else:
-        response = await call_next(request)
-        return response
+        
