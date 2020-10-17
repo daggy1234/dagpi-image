@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, UnidentifiedImageError
 
-from ..exceptions.errors import BadImage, FileLarge
+from app.exceptions.errors import BadImage, FileLarge
 
 
 class NumpyManip:

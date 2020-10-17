@@ -1,5 +1,4 @@
 import os
-
 import uvicorn
 
 host = os.getenv("HOST", "0.0.0.0")
