@@ -20,6 +20,5 @@ async def auth_check(request: Request, call_next):
                 response = await call_next(request)
                 return response
             return JSONResponse({'message': 'Ratelimited'}, status_code=429)
-        
+
         return JSONResponse({'message': 'Unauthorized'}, status_code=403)
-        

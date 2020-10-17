@@ -10,6 +10,7 @@ from app.exceptions.errors import ParameterError
 
 __all__ = ('tweet_gen', 'quote', )
 
+
 @executor
 @static_pil
 def tweet_gen(image, username: str, text: str):

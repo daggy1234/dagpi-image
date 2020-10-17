@@ -12,8 +12,8 @@ from app.exceptions.errors import ParameterError
 
 __all__ = (
     "angel", "ascii_image", "bad_img", "blur", "deepfry",
-    "five_guys_one_girl", "gay", "htiler", "invert", "jail", 
-    "obama", "pixelate", "satan", "sithlord", "thought_image", 
+    "five_guys_one_girl", "gay", "htiler", "invert", "jail",
+    "obama", "pixelate", "satan", "sithlord", "thought_image",
     "top5colors", "trash", "triggered", "wanted", "wasted", "why_are_you_gay"
 )
 

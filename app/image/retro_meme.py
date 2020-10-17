@@ -5,6 +5,7 @@ from app.image.decorators import executor
 
 __all__ = ('retromeme_gen', )
 
+
 class Meme:
     def __init__(self, text):
 

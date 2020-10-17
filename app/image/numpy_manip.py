@@ -13,6 +13,7 @@ from app.image.decorators import executor
 
 __all__ = ('get_sobel', 'hog_process', 'rgb_graph',)
 
+
 @executor
 @numpy
 def get_sobel(img):

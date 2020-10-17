@@ -7,6 +7,7 @@ __all__ = (
     "paint", "polaroid", "poster", "sepia", "solar"
 )
 
+
 @executor
 @wand
 def sepia(image):
