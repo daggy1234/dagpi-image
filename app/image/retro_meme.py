@@ -1,7 +1,9 @@
 import textwrap
+
 from PIL import ImageDraw, ImageFont
-from app.image.PILManip import pil
+
 from app.image.decorators import executor
+from app.image.PILManip import pil
 
 __all__ = ("retromeme_gen",)
 

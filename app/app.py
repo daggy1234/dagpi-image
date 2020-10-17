@@ -5,16 +5,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette_prometheus import metrics, PrometheusMiddleware
-from app.exceptions.errors import (
-    BadImage,
-    BadUrl,
-    FileLarge,
-    ManipulationError,
-    NoImageFound,
-    ParameterError,
-    ServerTimeout,
-)
+from starlette_prometheus import PrometheusMiddleware, metrics
+
+from app.exceptions.errors import (BadImage, BadUrl, FileLarge,
+                                   ManipulationError, NoImageFound,
+                                   ParameterError, ServerTimeout)
 from app.middleware import add_process_time_header, auth_check
 from app.routes import image_routes
 

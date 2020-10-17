@@ -1,7 +1,9 @@
 import functools
 from io import BytesIO
 from typing import List
+
 from PIL import Image, ImageSequence, UnidentifiedImageError
+
 from app.exceptions.errors import BadImage, FileLarge
 
 

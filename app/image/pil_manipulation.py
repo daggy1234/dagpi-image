@@ -5,10 +5,9 @@ from PIL import Image
 from PIL import Image as PILImage
 from PIL import ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
-from app.image.PILManip import PILManip, double_image, pil, static_pil
-from app.image.decorators import executor
 from app.exceptions.errors import ParameterError
-
+from app.image.decorators import executor
+from app.image.PILManip import PILManip, double_image, pil, static_pil
 
 __all__ = (
     "angel",
