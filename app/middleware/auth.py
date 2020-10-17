@@ -10,16 +10,15 @@ async def auth_check(request: Request, call_next):
         return response
     else:
         try:
-            token = request.headers['Authorization']
+            token = request.headers["Authorization"]
         except KeyError:
-            return JSONResponse({'message': 'Unauthorized'}, status_code=403)
+            return JSONResponse({"message": "Unauthorized"}, status_code=403)
 
         tok = await Client.auth(token)
         if tok.auth:
             if not tok.ratelimited:
                 response = await call_next(request)
                 return response
-            return JSONResponse({'message': 'Ratelimited'}, status_code=429)
-        
-        return JSONResponse({'message': 'Unauthorized'}, status_code=403)
-        
+            return JSONResponse({"message": "Ratelimited"}, status_code=429)
+
+        return JSONResponse({"message": "Unauthorized"}, status_code=403)

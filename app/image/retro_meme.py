@@ -1,9 +1,13 @@
 import textwrap
-from PIL import ImageDraw, ImageFont
-from app.image.PILManip import pil
-from app.image.decorators import executor
 
-__all__ = ('retromeme_gen', )
+from PIL import ImageDraw
+from PIL import ImageFont
+
+from app.image.decorators import executor
+from app.image.PILManip import pil
+
+__all__ = ("retromeme_gen", )
+
 
 class Meme:
     def __init__(self, text):
@@ -33,9 +37,9 @@ class Meme:
         longest_width = 0
         longest_line = ""
         for line in text:
-            width = self.draw.textsize(
-                line, font=ImageFont.truetype(self.font_path, 20)
-            )[0]
+            width = self.draw.textsize(line,
+                                       font=ImageFont.truetype(
+                                           self.font_path, 20))[0]
             if width > longest_width:
                 longest_width = width
                 longest_line = line
@@ -63,15 +67,17 @@ class Meme:
         perfect_ratio = min_ratio + (max_ratio - min_ratio) / 2
         ratio = 0
 
-        while (ratio < min_ratio or ratio > max_ratio) and len(
-                font_size_range) > 2:
+        while (ratio < min_ratio
+               or ratio > max_ratio) and len(font_size_range) > 2:
             measures = {
-                "top": self.get_font_measures(
+                "top":
+                self.get_font_measures(
                     text=longest_text_line,
                     font_size=font_size_range[-1],
                     ratio=perfect_ratio,
                 ),
-                "low": self.get_font_measures(
+                "low":
+                self.get_font_measures(
                     text=longest_text_line,
                     font_size=font_size_range[0],
                     ratio=perfect_ratio,
@@ -81,7 +87,7 @@ class Meme:
             half_index = len(font_size_range) // 2
             if measures["top"]["ratio_diff"] < measures["low"]["ratio_diff"]:
                 closer = "top"
-                font_size_range = font_size_range[int(half_index): -1]
+                font_size_range = font_size_range[int(half_index):-1]
             else:
                 closer = "low"
                 font_size_range = font_size_range[0:half_index]
@@ -124,10 +130,16 @@ class Meme:
         )
 
         for xy in xys:
-            self.draw.multiline_text(xy, text, fill="black", font=font,
+            self.draw.multiline_text(xy,
+                                     text,
+                                     fill="black",
+                                     font=font,
                                      align="center")
 
-        self.draw.multiline_text((x, y), text, fill="white", font=font,
+        self.draw.multiline_text((x, y),
+                                 text,
+                                 fill="white",
+                                 font=font,
                                  align="center")
 
     def draw_meme(self):
@@ -148,8 +160,9 @@ class Meme:
                 text_bottom)
             bottom_x = (self.image.width - text_bottom_width) / 2
             bottom_y_multiplier = len(text_bottom.split("\n")) - margin_xy[1]
-            bottom_y = self.image.height - bottom_font.getsize(text_bottom)[
-                1] * bottom_y_multiplier
+            bottom_y = (
+                self.image.height -
+                bottom_font.getsize(text_bottom)[1] * bottom_y_multiplier)
             bottom_xy = [
                 bottom_x,
                 bottom_y,

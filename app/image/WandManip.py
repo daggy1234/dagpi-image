@@ -4,14 +4,14 @@ from io import BytesIO
 from wand.exceptions import TypeError
 from wand.image import Image
 
-from app.exceptions.errors import BadImage, FileLarge
+from app.exceptions.errors import BadImage
+from app.exceptions.errors import FileLarge
 
 
 class WandManip:
-
     @staticmethod
     def wand_open(byt: bytes) -> Image:
-        if byt.__sizeof__() > 10 * (2 ** 20):
+        if byt.__sizeof__() > 10 * (2**20):
             raise FileLarge
         try:
             return Image(blob=byt)

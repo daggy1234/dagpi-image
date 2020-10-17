@@ -1,21 +1,27 @@
 from datetime import datetime
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from PIL import ImageOps
 
-from app.image.PILManip import static_pil
-from app.image.decorators import executor
-from app.image.writetext import WriteText
 from app.exceptions.errors import ParameterError
+from app.image.decorators import executor
+from app.image.PILManip import static_pil
+from app.image.writetext import WriteText
 
+__all__ = (
+    "tweet_gen",
+    "quote",
+)
 
-__all__ = ('tweet_gen', 'quote', )
 
 @executor
 @static_pil
 def tweet_gen(image, username: str, text: str):
     print(len(text))
     if len(text) > 180:
-        raise ParameterError('Text supplied is too long')
+        raise ParameterError("Text supplied is too long")
     today = datetime.today()
     m_list = [
         "January",
@@ -40,7 +46,7 @@ def tweet_gen(image, username: str, text: str):
         su = "AM"
     y = str(today.day).strip("0")
     t_string = f"{h}:{today.minute} {su} - {y} {mo} {today.year}"
-    tweet = Image.open("app/image/assets/tweet.png").convert('RGBA')
+    tweet = Image.open("app/image/assets/tweet.png").convert("RGBA")
     st = username
     lst = st.lower()
     to_pa = image.resize((150, 150), 5)
@@ -55,15 +61,22 @@ def tweet_gen(image, username: str, text: str):
     fnth = ImageFont.truetype("app/image/assets/HelveticaNeue Light.ttf", 25)
     fntt = ImageFont.truetype("app/image/assets/HelveticaNeue Light.ttf", 18)
     d.multiline_text((140, 35), st, font=fntna, fill=(0, 0, 0))
-    d.multiline_text((143, 60), f"@{lst}", font=fnth,
+    d.multiline_text((143, 60),
+                     f"@{lst}",
+                     font=fnth,
                      fill=(101, 119, 134, 178))
     d.multiline_text((30, 320), t_string, font=fntt, fill=(101, 119, 134, 178))
     margin = 30
     offset = 100
     img_wrap = WriteText(tweet)
     img_wrap.write_text_box(
-        margin, offset, text, 630, "app/image/assets/HelveticaNeue Medium.ttf",
-        30, (0, 0, 0)
+        margin,
+        offset,
+        text,
+        630,
+        "app/image/assets/HelveticaNeue Medium.ttf",
+        30,
+        (0, 0, 0),
     )
     return img_wrap.ret_img()
 
@@ -98,8 +111,13 @@ def quote(image, username: str, text: str):
         d.text((310 + wi[0], 80), t_string, color=(114, 118, 125), font=fntt)
         wrap = WriteText(y)
         f = wrap.write_text_box(
-            260, 80, text, 2120, "app/image/assets/whitney-medium.ttf", 50,
-            color=(256, 256, 256)
+            260,
+            80,
+            text,
+            2120,
+            "app/image/assets/whitney-medium.ttf",
+            50,
+            color=(256, 256, 256),
         )
         print(f)
         im = wrap.ret_img()

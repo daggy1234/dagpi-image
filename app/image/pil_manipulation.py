@@ -3,18 +3,41 @@ import random
 import numpy as np
 from PIL import Image
 from PIL import Image as PILImage
-from PIL import ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
+from PIL import ImageDraw
+from PIL import ImageEnhance
+from PIL import ImageFilter
+from PIL import ImageFont
+from PIL import ImageOps
 
-from app.image.PILManip import PILManip, double_image, pil, static_pil
-from app.image.decorators import executor
 from app.exceptions.errors import ParameterError
-
+from app.image.decorators import executor
+from app.image.PILManip import double_image
+from app.image.PILManip import pil
+from app.image.PILManip import PILManip
+from app.image.PILManip import static_pil
 
 __all__ = (
-    "angel", "ascii_image", "bad_img", "blur", "deepfry",
-    "five_guys_one_girl", "gay", "htiler", "invert", "jail", 
-    "obama", "pixelate", "satan", "sithlord", "thought_image", 
-    "top5colors", "trash", "triggered", "wanted", "wasted", "why_are_you_gay"
+    "angel",
+    "ascii_image",
+    "bad_img",
+    "blur",
+    "deepfry",
+    "five_guys_one_girl",
+    "gay",
+    "htiler",
+    "invert",
+    "jail",
+    "obama",
+    "pixelate",
+    "satan",
+    "sithlord",
+    "thought_image",
+    "top5colors",
+    "trash",
+    "triggered",
+    "wanted",
+    "wasted",
+    "why_are_you_gay",
 )
 
 
@@ -80,15 +103,12 @@ def deepfry(image):
     colours = ((254, 0, 2), (255, 255, 15))
     img = image.convert("RGB")
     width, height = img.width, img.height
-    img = img.resize(
-        (int(width ** 0.75), int(height ** 0.75)), resample=Image.LANCZOS
-    )
-    img = img.resize(
-        (int(width ** 0.88), int(height ** 0.88)), resample=Image.BILINEAR
-    )
-    img = img.resize(
-        (int(width ** 0.9), int(height ** 0.9)), resample=Image.BICUBIC
-    )
+    img = img.resize((int(width**0.75), int(height**0.75)),
+                     resample=Image.LANCZOS)
+    img = img.resize((int(width**0.88), int(height**0.88)),
+                     resample=Image.BILINEAR)
+    img = img.resize((int(width**0.9), int(height**0.9)),
+                     resample=Image.BICUBIC)
     img = img.resize((width, height), resample=Image.BICUBIC)
     img = ImageOps.posterize(img, 4)
     r = img.split()[0]
@@ -157,7 +177,7 @@ def wasted(image):
     w, h = image.size
     fil = Image.open("app/image/assets/wasted.png")
     fil_r = fil.resize((w, h), 5)
-    conv_im = image.convert('RGBA')
+    conv_im = image.convert("RGBA")
     conv_im.paste(fil_r, mask=fil_r)
     return conv_im
 
@@ -166,14 +186,14 @@ def wasted(image):
 def triggered(byt: bytes):
     im = PILManip.pil_image(byt)
     im = im.resize((500, 500), 1)
-    overlay = Image.open('app/image/assets/triggered.png')
+    overlay = Image.open("app/image/assets/triggered.png")
     ml = []
     for i in range(0, 30):
-        blank = Image.new('RGBA', (400, 400))
+        blank = Image.new("RGBA", (400, 400))
         x = -1 * (random.randint(50, 100))
         y = -1 * (random.randint(50, 100))
         blank.paste(im, (x, y))
-        rm = Image.new('RGBA', (400, 400), color=(255, 0, 0, 80))
+        rm = Image.new("RGBA", (400, 400), color=(255, 0, 0, 80))
         blank.paste(rm, mask=rm)
         blank.paste(overlay, mask=overlay)
         ml.append(blank)
@@ -183,7 +203,7 @@ def triggered(byt: bytes):
 @executor
 @double_image
 def five_guys_one_girl(im, im2):
-    back = Image.open('app/image/assets/5g1g.png')
+    back = Image.open("app/image/assets/5g1g.png")
     im = im.resize((150, 150), 1)
     back.paste(im, (80, 100))
     back.paste(im, (320, 10))
@@ -198,7 +218,7 @@ def five_guys_one_girl(im, im2):
 @executor
 @double_image
 def why_are_you_gay(gay_image, av_image):
-    im = Image.open('app/image/assets/whyareyougay.png')
+    im = Image.open("app/image/assets/whyareyougay.png")
     mp = av_image.resize((150, 150), 0)
     op = gay_image.resize((150, 150), 0)
     im.paste(op, (550, 100))
@@ -210,15 +230,15 @@ def why_are_you_gay(gay_image, av_image):
 @static_pil
 def top5colors(image):
     def rgb_to_hex(rgb):
-        return ('#%02x%02x%02x' % rgb).upper()
+        return ("#%02x%02x%02x" % rgb).upper()
 
     w, h = image.size
-    font = ImageFont.truetype('app/image/assets/Helvetica Neu Bold.ttf',
+    font = ImageFont.truetype("app/image/assets/Helvetica Neu Bold.ttf",
                               size=30)
     im = image.resize((int(w * (256 / h)), 256), 1)
     q = im.quantize(colors=5, method=2)
-    pal = (q.getpalette())
-    back = Image.new('RGBA', (int(w * (256 / h)) + 200, 256),
+    pal = q.getpalette()
+    back = Image.new("RGBA", (int(w * (256 / h)) + 200, 256),
                      color=(0, 0, 0, 0))
     d = ImageDraw.Draw(back)
     d.rectangle([10, 10, 40, 40], fill=(pal[0], pal[1], pal[2]))
@@ -243,13 +263,14 @@ def ascii_image(image):
     gcf = 2
     bgcolor = (13, 2, 8)
     re_list = list(
-        " .'`^\,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$")
+        " .'`^\,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+    )
     chars = np.asarray(re_list)
     font = ImageFont.load_default()
     letter_width = font.getsize("x")[0]
     letter_height = font.getsize("x")[1]
     wcf = letter_height / letter_width
-    img = image.convert('RGB')
+    img = image.convert("RGB")
 
     width_by_letter = round(img.size[0] * sc * wcf)
     height_by_letter = round(img.size[1] * sc)
@@ -257,9 +278,9 @@ def ascii_image(image):
     img = img.resize(s)
     img = np.sum(np.asarray(img), axis=2)
     img -= img.min()
-    img = (1.0 - img / img.max()) ** gcf * (chars.size - 1)
-    lines = ("\n".join(("".join(r) for r in chars[img.astype(int)]))).split(
-        "\n")
+    img = (1.0 - img / img.max())**gcf * (chars.size - 1)
+    lines = ("\n".join(
+        ("".join(r) for r in chars[img.astype(int)]))).split("\n")
     new_img_width = letter_width * width_by_letter
     new_img_height = letter_height * height_by_letter
     new_img = Image.new("RGBA", (new_img_width, new_img_height), bgcolor)
@@ -298,7 +319,7 @@ def wanted(image):
 @executor
 @pil
 def obama(image):
-    obama_pic = Image.open('app/image/assets/obama.png')
+    obama_pic = Image.open("app/image/assets/obama.png")
     y = image.resize((300, 300), 1)
     obama_pic.paste(y, (250, 100))
     obama_pic.paste(y, (650, 0))
