@@ -13,7 +13,7 @@ from app.exceptions.errors import FileLarge
 class PILManip:
     @staticmethod
     def pil_image(image: bytes) -> Image:
-        if image.__sizeof__() > 8 * (2 ** 20):
+        if image.__sizeof__() > 8 * (2**20):
             raise FileLarge()
         try:
             io = BytesIO(image)
@@ -32,7 +32,10 @@ class PILManip:
     @staticmethod
     def pil_gif_save(frames: List) -> BytesIO:
         image_bytes = BytesIO()
-        frames[0].save(image_bytes, format="gif", save_all=True, append_images=frames)
+        frames[0].save(image_bytes,
+                       format="gif",
+                       save_all=True,
+                       append_images=frames)
         image_bytes.seek(0)
         return image_bytes
 

@@ -11,7 +11,7 @@ from app.exceptions.errors import FileLarge
 class WandManip:
     @staticmethod
     def wand_open(byt: bytes) -> Image:
-        if byt.__sizeof__() > 10 * (2 ** 20):
+        if byt.__sizeof__() > 10 * (2**20):
             raise FileLarge
         try:
             return Image(blob=byt)

@@ -61,7 +61,10 @@ def tweet_gen(image, username: str, text: str):
     fnth = ImageFont.truetype("app/image/assets/HelveticaNeue Light.ttf", 25)
     fntt = ImageFont.truetype("app/image/assets/HelveticaNeue Light.ttf", 18)
     d.multiline_text((140, 35), st, font=fntna, fill=(0, 0, 0))
-    d.multiline_text((143, 60), f"@{lst}", font=fnth, fill=(101, 119, 134, 178))
+    d.multiline_text((143, 60),
+                     f"@{lst}",
+                     font=fnth,
+                     fill=(101, 119, 134, 178))
     d.multiline_text((30, 320), t_string, font=fntt, fill=(101, 119, 134, 178))
     margin = 30
     offset = 100

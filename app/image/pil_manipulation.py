@@ -61,7 +61,8 @@ def pixelate(image):
 def thought_image(image, file: str):
     im = Image.open("app/image/assets/speech.jpg")
     if len(file) > 200:
-        raise ParameterError(f"Your text is too long {len(file)} is greater than 200")
+        raise ParameterError(
+            f"Your text is too long {len(file)} is greater than 200")
     else:
         if len(file) > 151:
             fo = file[:50] + "\n" + file[50:]
@@ -89,7 +90,8 @@ def thought_image(image, file: str):
         fim.paste(pfp, area)
         base = fim.convert("RGBA")
         txt = Image.new("RGBA", base.size, (255, 255, 255, 0))
-        fnt = ImageFont.truetype("app/image/assets/Helvetica-Bold-Font.ttf", size)
+        fnt = ImageFont.truetype("app/image/assets/Helvetica-Bold-Font.ttf",
+                                 size)
         d = ImageDraw.Draw(txt)
         d.text((400, 150), f"{ff}", font=fnt, fill=(0, 0, 0, 255))
         return Image.alpha_composite(base, txt)
@@ -101,9 +103,12 @@ def deepfry(image):
     colours = ((254, 0, 2), (255, 255, 15))
     img = image.convert("RGB")
     width, height = img.width, img.height
-    img = img.resize((int(width ** 0.75), int(height ** 0.75)), resample=Image.LANCZOS)
-    img = img.resize((int(width ** 0.88), int(height ** 0.88)), resample=Image.BILINEAR)
-    img = img.resize((int(width ** 0.9), int(height ** 0.9)), resample=Image.BICUBIC)
+    img = img.resize((int(width**0.75), int(height**0.75)),
+                     resample=Image.LANCZOS)
+    img = img.resize((int(width**0.88), int(height**0.88)),
+                     resample=Image.BILINEAR)
+    img = img.resize((int(width**0.9), int(height**0.9)),
+                     resample=Image.BICUBIC)
     img = img.resize((width, height), resample=Image.BICUBIC)
     img = ImageOps.posterize(img, 4)
     r = img.split()[0]
@@ -228,11 +233,13 @@ def top5colors(image):
         return ("#%02x%02x%02x" % rgb).upper()
 
     w, h = image.size
-    font = ImageFont.truetype("app/image/assets/Helvetica Neu Bold.ttf", size=30)
+    font = ImageFont.truetype("app/image/assets/Helvetica Neu Bold.ttf",
+                              size=30)
     im = image.resize((int(w * (256 / h)), 256), 1)
     q = im.quantize(colors=5, method=2)
     pal = q.getpalette()
-    back = Image.new("RGBA", (int(w * (256 / h)) + 200, 256), color=(0, 0, 0, 0))
+    back = Image.new("RGBA", (int(w * (256 / h)) + 200, 256),
+                     color=(0, 0, 0, 0))
     d = ImageDraw.Draw(back)
     d.rectangle([10, 10, 40, 40], fill=(pal[0], pal[1], pal[2]))
     d.text((50, 10), rgb_to_hex((pal[0], pal[1], pal[2])), font=font)
@@ -271,8 +278,9 @@ def ascii_image(image):
     img = img.resize(s)
     img = np.sum(np.asarray(img), axis=2)
     img -= img.min()
-    img = (1.0 - img / img.max()) ** gcf * (chars.size - 1)
-    lines = ("\n".join(("".join(r) for r in chars[img.astype(int)]))).split("\n")
+    img = (1.0 - img / img.max())**gcf * (chars.size - 1)
+    lines = ("\n".join(
+        ("".join(r) for r in chars[img.astype(int)]))).split("\n")
     new_img_width = letter_width * width_by_letter
     new_img_height = letter_height * height_by_letter
     new_img = Image.new("RGBA", (new_img_width, new_img_height), bgcolor)

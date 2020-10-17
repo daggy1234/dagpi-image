@@ -35,20 +35,20 @@ app.add_route("/metrics/", metrics)
 @app.exception_handler(NoImageFound)
 async def no_image_found(_request: Request, _exc: NoImageFound):
     return JSONResponse(
-        status_code=415, content={"message": "No image found at your destination"}
-    )
+        status_code=415,
+        content={"message": "No image found at your destination"})
 
 
 @app.exception_handler(BadUrl)
 async def bad_url(_request: Request, _exc: BadUrl):
-    return JSONResponse(
-        status_code=400, content={"message": "Your ImageUrl is badly frames"}
-    )
+    return JSONResponse(status_code=400,
+                        content={"message": "Your ImageUrl is badly frames"})
 
 
 @app.exception_handler(ParameterError)
 async def param_error(_request: Request, _exc: ParameterError):
-    return JSONResponse(status_code=400, content={"message": f"{str(ParameterError)}"})
+    return JSONResponse(status_code=400,
+                        content={"message": f"{str(ParameterError)}"})
 
 
 @app.exception_handler(ManipulationError)
@@ -71,7 +71,9 @@ async def size_error(_request: Request, _exc: FileLarge):
 async def bad_image(_request: Request, _exc: BadImage):
     return JSONResponse(
         status_code=415,
-        content={"message": "File found was not of the Appropriate image type"},
+        content={
+            "message": "File found was not of the Appropriate image type"
+        },
     )
 
 
