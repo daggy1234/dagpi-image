@@ -1,7 +1,7 @@
 import asyncio
 import functools
 
-from ..exceptions.errors import ManipulationError
+from app.exceptions.errors import ManipulationError
 
 
 def executor(function):
@@ -13,7 +13,6 @@ def executor(function):
             future = loop.run_in_executor(None, partial)
             return future
         except Exception as e:
-            print(repr(e))
             raise ManipulationError()
 
     return decorator

@@ -1,10 +1,9 @@
 import textwrap
-
 from PIL import ImageDraw, ImageFont
+from app.image.PILManip import pil
+from app.image.decorators import executor
 
-from .PILManip import pil
-from .decorators import executor
-
+__all__ = ('retromeme_gen', )
 
 class Meme:
     def __init__(self, text):

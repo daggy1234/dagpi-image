@@ -1,10 +1,8 @@
 import functools
 from io import BytesIO
 from typing import List
-
 from PIL import Image, ImageSequence, UnidentifiedImageError
-
-from ..exceptions.errors import BadImage, FileLarge
+from app.exceptions.errors import BadImage, FileLarge
 
 
 class PILManip:

@@ -1,18 +1,11 @@
 from fastapi import APIRouter, Response
 
-from ..image.numpy_manip import get_sobel, hog_process, rgb_graph
-from ..image.pil_manipulation import (angel, ascii_image, bad_img, blur,
-                                      deepfry, five_guys_one_girl, gay, htiler,
-                                      invert, jail, obama, pixelate, satan,
-                                      sithlord, thought_image, top5colors,
-                                      trash, triggered, wanted, wasted,
-                                      why_are_you_gay)
-from ..image.retro_meme import retromeme_gen
-from ..image.text_images import quote, tweet_gen
-from ..image.wand_manipulation import (charcoal, floor, grayscale, night,
-                                       paint, polaroid, poster, sepia, solar,
-                                       swirl)
-from ..utils.client import Client
+from app.image.retro_meme import *
+from app.image.numpy_manip import *
+from app.image.text_images import *
+from app.image.pil_manipulation import *
+from app.image.wand_manipulation import *
+from app.utils.client import Client
 
 router = APIRouter()
 
