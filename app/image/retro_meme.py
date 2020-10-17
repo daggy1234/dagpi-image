@@ -3,7 +3,7 @@ from PIL import ImageDraw, ImageFont
 from app.image.PILManip import pil
 from app.image.decorators import executor
 
-__all__ = ('retromeme_gen', )
+__all__ = ("retromeme_gen",)
 
 
 class Meme:
@@ -64,8 +64,7 @@ class Meme:
         perfect_ratio = min_ratio + (max_ratio - min_ratio) / 2
         ratio = 0
 
-        while (ratio < min_ratio or ratio > max_ratio) and len(
-                font_size_range) > 2:
+        while (ratio < min_ratio or ratio > max_ratio) and len(font_size_range) > 2:
             measures = {
                 "top": self.get_font_measures(
                     text=longest_text_line,
@@ -82,7 +81,7 @@ class Meme:
             half_index = len(font_size_range) // 2
             if measures["top"]["ratio_diff"] < measures["low"]["ratio_diff"]:
                 closer = "top"
-                font_size_range = font_size_range[int(half_index): -1]
+                font_size_range = font_size_range[int(half_index) : -1]
             else:
                 closer = "low"
                 font_size_range = font_size_range[0:half_index]
@@ -125,11 +124,9 @@ class Meme:
         )
 
         for xy in xys:
-            self.draw.multiline_text(xy, text, fill="black", font=font,
-                                     align="center")
+            self.draw.multiline_text(xy, text, fill="black", font=font, align="center")
 
-        self.draw.multiline_text((x, y), text, fill="white", font=font,
-                                 align="center")
+        self.draw.multiline_text((x, y), text, fill="white", font=font, align="center")
 
     def draw_meme(self):
         self.draw = ImageDraw.Draw(self.image)
@@ -145,12 +142,13 @@ class Meme:
 
         text_bottom = self.text.split("|")[1:]
         if text_bottom:
-            text_bottom, text_bottom_width, bottom_font = self.prepare_text(
-                text_bottom)
+            text_bottom, text_bottom_width, bottom_font = self.prepare_text(text_bottom)
             bottom_x = (self.image.width - text_bottom_width) / 2
             bottom_y_multiplier = len(text_bottom.split("\n")) - margin_xy[1]
-            bottom_y = self.image.height - bottom_font.getsize(text_bottom)[
-                1] * bottom_y_multiplier
+            bottom_y = (
+                self.image.height
+                - bottom_font.getsize(text_bottom)[1] * bottom_y_multiplier
+            )
             bottom_xy = [
                 bottom_x,
                 bottom_y,

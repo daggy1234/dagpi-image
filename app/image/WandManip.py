@@ -8,7 +8,6 @@ from app.exceptions.errors import BadImage, FileLarge
 
 
 class WandManip:
-
     @staticmethod
     def wand_open(byt: bytes) -> Image:
         if byt.__sizeof__() > 10 * (2 ** 20):

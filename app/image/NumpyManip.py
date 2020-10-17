@@ -9,7 +9,6 @@ from app.exceptions.errors import BadImage, FileLarge
 
 
 class NumpyManip:
-
     @staticmethod
     def image_read(image: bytes) -> np.ndarray:
         if image.__sizeof__() > 8 * (2 ** 20):
