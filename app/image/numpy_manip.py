@@ -2,12 +2,14 @@ from io import BytesIO
 
 import matplotlib.pyplot as plt
 import skimage
-from skimage.color.adapt_rgb import adapt_rgb, each_channel
+from skimage.color.adapt_rgb import adapt_rgb
+from skimage.color.adapt_rgb import each_channel
 from skimage.exposure import rescale_intensity
 from skimage.feature import hog
 
 from app.image.decorators import executor
-from app.image.NumpyManip import NumpyManip, numpy
+from app.image.NumpyManip import numpy
+from app.image.NumpyManip import NumpyManip
 from app.image.PILManip import PILManip
 
 __all__ = (

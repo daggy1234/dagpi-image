@@ -1,6 +1,9 @@
 from datetime import datetime
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from PIL import ImageOps
 
 from app.exceptions.errors import ParameterError
 from app.image.decorators import executor

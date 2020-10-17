@@ -4,7 +4,8 @@ from io import BytesIO
 from wand.exceptions import TypeError
 from wand.image import Image
 
-from app.exceptions.errors import BadImage, FileLarge
+from app.exceptions.errors import BadImage
+from app.exceptions.errors import FileLarge
 
 
 class WandManip:

@@ -3,11 +3,18 @@ import random
 import numpy as np
 from PIL import Image
 from PIL import Image as PILImage
-from PIL import ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
+from PIL import ImageDraw
+from PIL import ImageEnhance
+from PIL import ImageFilter
+from PIL import ImageFont
+from PIL import ImageOps
 
 from app.exceptions.errors import ParameterError
 from app.image.decorators import executor
-from app.image.PILManip import PILManip, double_image, pil, static_pil
+from app.image.PILManip import double_image
+from app.image.PILManip import pil
+from app.image.PILManip import PILManip
+from app.image.PILManip import static_pil
 
 __all__ = (
     "angel",

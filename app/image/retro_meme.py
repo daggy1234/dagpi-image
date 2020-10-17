@@ -1,6 +1,7 @@
 import textwrap
 
-from PIL import ImageDraw, ImageFont
+from PIL import ImageDraw
+from PIL import ImageFont
 
 from app.image.decorators import executor
 from app.image.PILManip import pil

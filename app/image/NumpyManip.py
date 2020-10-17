@@ -3,9 +3,11 @@ from io import BytesIO
 
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
+from PIL import UnidentifiedImageError
 
-from app.exceptions.errors import BadImage, FileLarge
+from app.exceptions.errors import BadImage
+from app.exceptions.errors import FileLarge
 
 
 class NumpyManip:

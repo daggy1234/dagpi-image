@@ -2,9 +2,12 @@ import functools
 from io import BytesIO
 from typing import List
 
-from PIL import Image, ImageSequence, UnidentifiedImageError
+from PIL import Image
+from PIL import ImageSequence
+from PIL import UnidentifiedImageError
 
-from app.exceptions.errors import BadImage, FileLarge
+from app.exceptions.errors import BadImage
+from app.exceptions.errors import FileLarge
 
 
 class PILManip:
