@@ -35,6 +35,7 @@ class PILManip:
         frames[0].save(image_bytes,
                        format="gif",
                        save_all=True,
+                       loop=0,
                        append_images=frames)
         image_bytes.seek(0)
         return image_bytes

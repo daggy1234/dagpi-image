@@ -34,15 +34,14 @@ class Client:
     async def auth(token: str):
         session = await get_session()
         r = await session.get(f"{base_url}/auth/{token}")
-        print(r.json())
         return AuthModel(r.json())
 
     @staticmethod
     async def image_bytes(url: str):
-        print(url)
         regex = re.compile(
             r'^(?:http|ftp)s?://'  # http:// or https://
-            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)'
+            r'+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'
             r'localhost|'
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             r'(?::\d+)?'
@@ -53,11 +52,14 @@ class Client:
         session = await get_session()
         try:
             async with timeout(10):
-                r = await session.get(url)
-                if r.status_code == 200:
-                    byt: bytes = r.read()
-                    return byt
-                else:
+                try:
+                    r = await session.get(url)
+                    if r.status_code == 200:
+                        byt: bytes = r.read()
+                        return byt
+                    else:
+                        raise NoImageFound()
+                except httpx.RequestError:
                     raise NoImageFound()
         except asyncio.TimeoutError:
             raise ServerTimeout()

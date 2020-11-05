@@ -19,9 +19,18 @@ async def color_image(url: str):
 
 
 @router.get("/retromeme/")
-async def retro_meme(url: str, text: str):
+async def retro_meme(url: str, top_text: str, bottom_text: str):
     byt = await Client.image_bytes(url)
+    text = top_text + "| " + bottom_text
+    print(text)
     img, image_format = await retromeme_gen(byt, text)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/modernmeme/")
+async def modern_meme(url: str, text: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await memegen(byt, text)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
@@ -74,6 +83,13 @@ async def sobel_image(url: str):
 async def hog_image(url: str):
     byt = await Client.image_bytes(url)
     img = await hog_process(byt)
+    return Response(img.read(), media_type="image/png")
+
+
+@router.get("/triangle/")
+async def triange(url: str):
+    byt = await Client.image_bytes(url)
+    img = await triangle_manip(byt)
     return Response(img.read(), media_type="image/png")
 
 
@@ -257,6 +273,20 @@ async def tweet(url: str, username: str, text: str):
     byt = await Client.image_bytes(url)
     img = await tweet_gen(byt, username, text)
     return Response(img.read(), media_type="image/png")
+
+
+@router.get("/rainbow/")
+async def rainbow_manip(url: str):
+    byt = await Client.image_bytes(url)
+    img, img_format = await rainbow(byt)
+    return Response(img.read(), media_type=f"image/{img_format}")
+
+
+@router.get("/magik/")
+async def magic(url: str, scale: int = None):
+    byt = await Client.image_bytes(url)
+    img, img_format = await magik(byt, scale)
+    return Response(img.read(), media_type=f"image/{img_format}")
 
 
 @router.get("/discord/")

@@ -12,7 +12,7 @@ def executor(function):
             loop = asyncio.get_event_loop()
             future = loop.run_in_executor(None, partial)
             return future
-        except Exception as e:
+        except Exception:
             raise ManipulationError()
 
     return decorator

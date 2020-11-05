@@ -12,6 +12,8 @@ __all__ = (
     "poster",
     "sepia",
     "solar",
+    "rainbow",
+    "magik"
 )
 
 
@@ -19,6 +21,17 @@ __all__ = (
 @wand
 def sepia(image):
     image.sepia_tone(threshold=0.8)
+    return image
+
+
+@executor
+@wand
+def rainbow(image):
+    frequency = 3
+    phase_shift = -90
+    amplitude = 0.2
+    bias = 0.7
+    image.function('sinusoid', [frequency, phase_shift, amplitude, bias])
     return image
 
 
@@ -97,4 +110,22 @@ def edge(image):
 @wand
 def night(image):
     image.blue_shift(factor=1.25)
+    return image
+
+
+@executor
+@wand
+def magik(image, scale: int = None):
+    """
+    https://github.com/lolaristocrat/magik/blob/master/magik.py
+    Heavily inspired by this
+    """
+    image.liquid_rescale(width=int(image.width * 0.5),
+                         height=int(image.height * 0.5),
+                         delta_x=int(0.5 * scale) if scale else 1,
+                         rigidity=0)
+    image.liquid_rescale(width=int(image.width * 1.5),
+                         height=int(image.height * 1.5),
+                         delta_x=scale if scale else 2,
+                         rigidity=0)
     return image

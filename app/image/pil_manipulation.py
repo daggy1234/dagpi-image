@@ -15,6 +15,7 @@ from app.image.PILManip import double_image
 from app.image.PILManip import pil
 from app.image.PILManip import PILManip
 from app.image.PILManip import static_pil
+from app.image.writetext import WriteText
 
 __all__ = (
     "angel",
@@ -38,6 +39,7 @@ __all__ = (
     "wanted",
     "wasted",
     "why_are_you_gay",
+    "memegen"
 )
 
 
@@ -263,7 +265,8 @@ def ascii_image(image):
     gcf = 2
     bgcolor = (13, 2, 8)
     re_list = list(
-        " .'`^\,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+        r" .'`^\,:;Il!i><~+_-?][}{1)(|\/tfjrxn"
+        r"uvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
     )
     chars = np.asarray(re_list)
     font = ImageFont.load_default()
@@ -373,3 +376,78 @@ def angel(image):
     area = (250, 130)
     fim.paste(base, area)
     return fim
+
+
+@executor
+@pil
+def memegen(tv, text: str):
+    wid = tv.size[0]
+    hei = tv.size[0]
+    if 0 < wid < 200:
+        sfm = [25, 15, 10, 5]
+        mplier = 0.1
+        hply = 0.1
+    elif 400 > wid >= 200:
+        sfm = [30, 20, 10, 5]
+        mplier = 0.075
+        hply = 0.2
+    elif 400 <= wid < 600:
+        sfm = [50, 30, 20, 10]
+        mplier = 0.05
+        hply = 0.3
+    elif 800 > wid >= 600:
+        sfm = [70, 50, 30, 20]
+        mplier = 0.025
+        hply = 0.4
+    elif 1000 > wid >= 800:
+        sfm = [80, 60, 40, 30]
+        mplier = 0.01
+        hply = 0.5
+    elif 1500 > wid >= 1000:
+        sfm = [100, 80, 60, 40]
+        mplier = 0.01
+        hply = 0.6
+    elif 2000 > wid >= 1400:
+        sfm = [120, 100, 80, 60]
+        mplier = 0.01
+        hply = 0.6
+    elif 2000 <= wid < 3000:
+        sfm = [140, 120, 100, 80]
+        mplier = 0.01
+        hply = 0.6
+    elif wid >= 3000:
+        sfm = [180, 160, 140, 120]
+        mplier = 0.01
+        hply = 0.6
+    else:
+        raise ParameterError("Image is too large")
+    x_pos = int(mplier * wid)
+    y_pos = int(-1 * (mplier * hply * 10) * hei)
+    print(y_pos)
+    if 50 > len(text) > 0:
+        size = sfm[1]
+    elif 100 > len(text) > 50:
+        size = sfm[1]
+    elif 100 < len(text) < 250:
+        size = sfm[2]
+    elif len(text) > 250 and len(text) > 500:
+        size = sfm[3]
+    elif 500 < len(text) < 1000:
+        size = sfm[4]
+    else:
+        raise ParameterError("text is too long")
+    y = Image.new("RGBA", (tv.size[0], 800), (256, 256, 256))
+    wra = WriteText(y)
+    f = wra.write_text_box(
+        x_pos, -10, text, tv.size[0] - 40,
+        "app/image/assets/whitney-medium.ttf",
+        size, color=(0, 0, 0)
+    )
+    t = f
+    im = wra.ret_img()
+    # im = Image.open(bt)
+    ima = im.crop((0, 0, tv.size[0], t))
+    bcan = Image.new("RGBA", (tv.size[0], tv.size[1] + t), (0, 0, 0, 0))
+    bcan.paste(ima)
+    bcan.paste(tv, (0, t))
+    return bcan

@@ -2,21 +2,41 @@ from io import BytesIO
 
 import matplotlib.pyplot as plt
 import skimage
-from skimage.color.adapt_rgb import adapt_rgb
-from skimage.color.adapt_rgb import each_channel
+from app.image.decorators import executor
+from app.image.NumpyManip import NumpyManip, numpy
+from app.image.PILManip import PILManip
+from skimage.color.adapt_rgb import adapt_rgb, each_channel
 from skimage.exposure import rescale_intensity
 from skimage.feature import hog
+from skimage import segmentation, future
 
-from app.image.decorators import executor
-from app.image.NumpyManip import numpy
-from app.image.NumpyManip import NumpyManip
-from app.image.PILManip import PILManip
 
 __all__ = (
     "get_sobel",
     "hog_process",
     "rgb_graph",
+    "triangle_manip"
 )
+
+
+@executor
+def triangle_manip(byt: bytes) -> BytesIO:
+    img = NumpyManip.image_read(byt)
+    gimg = skimage.color.rgb2gray(img)
+    labels = segmentation.slic(img, compactness=30, n_segments=400,
+                               start_label=1)
+    edges = skimage.filters.sobel(gimg)
+    edges_rgb = skimage.color.gray2rgb(edges)
+
+    g = future.graph.rag_boundary(labels, edges)
+    lc = future.graph.show_rag(labels, g, edges_rgb, img_cmap=None,
+                               edge_cmap='viridis', edge_width=1.2)
+    plt.colorbar(lc, fraction=0.03)
+    plt.tight_layout()
+    byt = BytesIO()
+    plt.savefig(byt)
+    byt.seek(0)
+    return byt
 
 
 @executor
