@@ -10,11 +10,11 @@ from PIL import ImageFont
 from PIL import ImageOps
 
 from app.exceptions.errors import ParameterError
-from app.image.decorators import executor
+from app.image.PILManip import PILManip
 from app.image.PILManip import double_image
 from app.image.PILManip import pil
-from app.image.PILManip import PILManip
 from app.image.PILManip import static_pil
+from app.image.decorators import executor
 from app.image.writetext import WriteText
 
 __all__ = (
@@ -105,11 +105,11 @@ def deepfry(image):
     colours = ((254, 0, 2), (255, 255, 15))
     img = image.convert("RGB")
     width, height = img.width, img.height
-    img = img.resize((int(width**0.75), int(height**0.75)),
+    img = img.resize((int(width ** 0.75), int(height ** 0.75)),
                      resample=Image.LANCZOS)
-    img = img.resize((int(width**0.88), int(height**0.88)),
+    img = img.resize((int(width ** 0.88), int(height ** 0.88)),
                      resample=Image.BILINEAR)
-    img = img.resize((int(width**0.9), int(height**0.9)),
+    img = img.resize((int(width ** 0.9), int(height ** 0.9)),
                      resample=Image.BICUBIC)
     img = img.resize((width, height), resample=Image.BICUBIC)
     img = ImageOps.posterize(img, 4)
@@ -281,7 +281,7 @@ def ascii_image(image):
     img = img.resize(s)
     img = np.sum(np.asarray(img), axis=2)
     img -= img.min()
-    img = (1.0 - img / img.max())**gcf * (chars.size - 1)
+    img = (1.0 - img / img.max()) ** gcf * (chars.size - 1)
     lines = ("\n".join(
         ("".join(r) for r in chars[img.astype(int)]))).split("\n")
     new_img_width = letter_width * width_by_letter

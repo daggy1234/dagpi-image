@@ -2,10 +2,10 @@ import textwrap
 
 from PIL import ImageDraw, Image, ImageFont
 
-from app.image.decorators import executor
 from app.image.PILManip import pil
+from app.image.decorators import executor
 
-__all__ = ("retromeme_gen", )
+__all__ = ("retromeme_gen",)
 
 
 class Meme:
@@ -57,7 +57,7 @@ class Meme:
         ratio = 0
 
         while (ratio < min_ratio or ratio > max_ratio) and \
-              (len(font_size_range) > 2):
+                (len(font_size_range) > 2):
             measures = {
                 "top": self.get_font_measures(
                     text=longest_text_line,
@@ -151,7 +151,7 @@ class Meme:
                 text_bottom)
             bottom_xy = [
                 ((self.image.width - text_bottom_width) / 2),
-                (self.image.height - bottom_font.getsize(text_bottom)[1] * 
+                (self.image.height - bottom_font.getsize(text_bottom)[1] *
                  len(text_bottom.split("\n")) - margin_xy[1]), ]
             self.draw_text(bottom_xy, text_bottom, bottom_font)
 

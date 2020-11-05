@@ -13,7 +13,7 @@ from app.exceptions.errors import FileLarge
 class NumpyManip:
     @staticmethod
     def image_read(image: bytes) -> np.ndarray:
-        if image.__sizeof__() > 8 * (2**20):
+        if image.__sizeof__() > 8 * (2 ** 20):
             raise FileLarge()
         try:
             io = BytesIO(image)

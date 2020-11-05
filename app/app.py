@@ -6,8 +6,8 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette_prometheus import metrics
 from starlette_prometheus import PrometheusMiddleware
+from starlette_prometheus import metrics
 
 from app.exceptions.errors import BadImage
 from app.exceptions.errors import BadUrl

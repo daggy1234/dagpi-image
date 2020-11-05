@@ -6,8 +6,8 @@ from PIL import ImageFont
 from PIL import ImageOps
 
 from app.exceptions.errors import ParameterError
-from app.image.decorators import executor
 from app.image.PILManip import static_pil
+from app.image.decorators import executor
 from app.image.writetext import WriteText
 
 __all__ = (

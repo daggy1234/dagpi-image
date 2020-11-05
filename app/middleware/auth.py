@@ -6,7 +6,7 @@ from app.utils.client import Client
 
 async def auth_check(request: Request, call_next):
     if (request.url.path == "/") or (request.url.path == "/metrics/") or \
-       (request.url == "/redoc"):
+            (request.url == "/redoc"):
         response = await call_next(request)
         return response
     else:
