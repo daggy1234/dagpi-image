@@ -43,7 +43,7 @@ class PILManip:
 
 def pil(function):
     @functools.wraps(function)
-    def wrapper(image, *args, **kwargs):
+    def wrapper(image, *args, **kwargs) -> BytesIO:
         img = PILManip.pil_image(image)
         if img.format == "GIF":
             frames = []
@@ -60,7 +60,7 @@ def pil(function):
 
 def double_image(function):
     @functools.wraps(function)
-    def wrapper(image_a, image_b, *args, **kwargs):
+    def wrapper(image_a, image_b, *args, **kwargs) -> BytesIO:
         image_a = PILManip.pil_image(image_a)
         image_b = PILManip.pil_image(image_b)
         img = function(image_a, image_b, *args, **kwargs)
@@ -71,7 +71,7 @@ def double_image(function):
 
 def static_pil(function):
     @functools.wraps(function)
-    def wrapper(image, *args, **kwargs):
+    def wrapper(image, *args, **kwargs) -> BytesIO:
         img = PILManip.pil_image(image)
         img = function(img, *args, **kwargs)
         return PILManip.pil_image_save(img)

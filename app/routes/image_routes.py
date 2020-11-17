@@ -260,6 +260,17 @@ async def solar_image(url: str):
     img, img_format = await solar(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
+@router.get("/america/")
+async def america_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await america(byt)
+    return Response(img.read(), media_type=f"image/gif")
+
+@router.get("/communism/")
+async def commie_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await communism(byt)
+    return Response(img.read(), media_type=f"image/gif")
 
 @router.get("/thoughtimage/")
 async def get_thought_image(url: str, text: str):

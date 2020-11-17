@@ -133,3 +133,6 @@ dmypy.json
 
 #pycharm
 .idea
+
+#venv
+pythonenv3.8

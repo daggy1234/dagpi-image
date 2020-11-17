@@ -1,3 +1,4 @@
+from io import BytesIO
 import random
 
 import numpy as np
@@ -6,6 +7,7 @@ from PIL import Image as PILImage
 from PIL import ImageDraw
 from PIL import ImageEnhance
 from PIL import ImageFilter
+from PIL import ImageSequence
 from PIL import ImageFont
 from PIL import ImageOps
 
@@ -39,7 +41,9 @@ __all__ = (
     "wanted",
     "wasted",
     "why_are_you_gay",
-    "memegen"
+    "memegen",
+    "america",
+    "communism"
 )
 
 
@@ -350,7 +354,7 @@ def trash(image):
     wthf = image.resize((200, 150), 5)
     width = 800
     height = 600
-    fim = im.resize((width, height), 4)
+    fim = im.resize((width, height), 5)
     area = (500, 250)
     fim.paste(wthf, area)
     return fim
@@ -451,3 +455,35 @@ def memegen(tv, text: str):
     bcan.paste(ima)
     bcan.paste(tv, (0, t))
     return bcan
+
+@executor
+def america(byt: bytes) -> BytesIO:
+    img = PILManip.pil_image(byt)
+    image = img.convert("RGBA").resize((480,480),5)
+    image.putalpha(96)
+    flag = Image.open("app/image/assets/america.gif")
+    frame_list = list()
+    for frame in ImageSequence.Iterator(flag):
+        frame.paste(frame,(0,0),frame)
+        frame_list.append(frame)
+    obj = BytesIO()
+    frame_list[0].save(obj, format='gif', save_all=True, append_images=frame_list[1:], loop=0, disposal=2, optimize=True)
+    obj.seek(0)
+    return obj
+
+
+@executor
+def communism(byt: bytes) -> BytesIO:
+    img = PILManip.pil_image(byt)
+    image = img.convert("RGBA").resize((480,480),5)
+    image.putalpha(96)
+    flag = Image.open("app/image/assets/communism.gif")
+    frame_list = list()
+    for frame in ImageSequence.Iterator(flag):
+        frame = frame.resize((480,480),5)
+        frame.paste(frame,(0,0),frame)
+        frame_list.append(frame)
+    obj = BytesIO()
+    frame_list[0].save(obj, format='gif', save_all=True, append_images=frame_list[1:], loop=0, disposal=2, optimize=True)
+    obj.seek(0)
+    return obj
