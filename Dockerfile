@@ -23,7 +23,7 @@ RUN git clone https://github.com/carlobaldassi/liblqr && \
     
 
 RUN curl https://imagemagick.org/download/ImageMagick.tar.gz | tar -xz && \
-    cd ImageMagick-7.0.10-35 && \
+    cd ImageMagick-7.0.10-38 && \
     ./configure --with-lqr && \
     make && \
     make install && \
