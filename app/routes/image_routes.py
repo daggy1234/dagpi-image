@@ -6,19 +6,21 @@ from app.image.pil_manipulation import *
 from app.image.retro_meme import *
 from app.image.text_images import *
 from app.image.wand_manipulation import *
+from app.routes.responses import gif_response_only, \
+    static_response_only, normal_response
 from app.utils.client import Client
 
 router = APIRouter()
 
 
-@router.get("/colors/")
+@router.get("/colors/", responses=static_response_only)
 async def color_image(url: str):
     byt = await Client.image_bytes(url)
     img = await top5colors(byt)
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/retromeme/")
+@router.get("/retromeme/", responses=static_response_only)
 async def retro_meme(url: str, top_text: str, bottom_text: str):
     byt = await Client.image_bytes(url)
     text = top_text + "| " + bottom_text
@@ -27,21 +29,21 @@ async def retro_meme(url: str, top_text: str, bottom_text: str):
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/modernmeme/")
+@router.get("/modernmeme/", responses=normal_response)
 async def modern_meme(url: str, text: str):
     byt = await Client.image_bytes(url)
     img, image_format = await memegen(byt, text)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/triggered/")
+@router.get("/triggered/", responses=gif_response_only)
 async def trigger_image(url: str):
     byt = await Client.image_bytes(url)
     img = await triggered(byt)
     return Response(img.read(), media_type="image/gif")
 
 
-@router.get("/wasted/")
+@router.get("/wasted/", responses=normal_response)
 async def wasted_image(url: str):
     byt = await Client.image_bytes(url)
     img, _image_format = await grayscale(byt)
@@ -49,7 +51,7 @@ async def wasted_image(url: str):
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/5g1g/")
+@router.get("/5g1g/", responses=static_response_only)
 async def get_5g1g(url: str, url2: str):
     byt = await Client.image_bytes(url)
     byt_b = await Client.image_bytes(url2)
@@ -57,7 +59,7 @@ async def get_5g1g(url: str, url2: str):
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/whyareyougay/")
+@router.get("/whyareyougay/", responses=static_response_only)
 async def get_why_are_you_gay(url: str, url2: str):
     byt = await Client.image_bytes(url)
     byt_b = await Client.image_bytes(url2)
@@ -65,242 +67,259 @@ async def get_why_are_you_gay(url: str, url2: str):
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/invert/")
+@router.get("/invert/", responses=normal_response)
 async def invert_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await invert(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/sobel/")
+@router.get("/sobel/", responses=static_response_only)
 async def sobel_image(url: str):
     byt = await Client.image_bytes(url)
     img = await get_sobel(byt)
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/hog/")
+@router.get("/hog/", responses=static_response_only)
 async def hog_image(url: str):
     byt = await Client.image_bytes(url)
     img = await hog_process(byt)
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/triangle/")
+@router.get("/triangle/", responses=static_response_only)
 async def triange(url: str):
     byt = await Client.image_bytes(url)
     img = await triangle_manip(byt)
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/blur/")
+@router.get("/blur/", responses=normal_response)
 async def blur_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await blur(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/rgb/")
+@router.get("/rgb/", responses=static_response_only)
 async def rgb_image(url: str):
     byt = await Client.image_bytes(url)
     img = await rgb_graph(byt)
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/angel/")
+@router.get("/angel/", responses=normal_response)
 async def angel_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await angel(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/satan/")
+@router.get("/satan/", responses=normal_response)
 async def sat_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await satan(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/hitler/")
+@router.get("/hitler/", responses=normal_response)
 async def hit_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await htiler(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/obama/")
+@router.get("/obama/", responses=normal_response)
 async def obama_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await obama(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/wanted/")
+@router.get("/wanted/", responses=normal_response)
 async def wanted_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await wanted(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/bad/")
+@router.get("/bad/", responses=normal_response)
 async def bad_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await bad_img(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/sith/")
+@router.get("/sith/", responses=normal_response)
 async def sith_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await sithlord(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/jail/")
+@router.get("/jail/", responses=normal_response)
 async def jail_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await jail(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/gay/")
+@router.get("/gay/", responses=normal_response)
 async def gay_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await gay(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/trash/")
+@router.get("/pride/", responses=normal_response)
+async def pride_image(url: str, flag: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await pride(byt, flag)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/trash/", responses=normal_response)
 async def trash_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await trash(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/pixel/")
+@router.get("/delete/", responses=normal_response)
+async def delete_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await delete(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/pixel/", responses=normal_response)
 async def pixel_route(url: str = "https://dagbot-is.the-be.st/logo.png"):
     byt = await Client.image_bytes(url)
     img, image_format = await pixelate(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/deepfry/")
+@router.get("/deepfry/", responses=normal_response)
 async def test_app(url: str = "https://dagbot-is.the-be.st/logo.png"):
     byt = await Client.image_bytes(url)
     img, image_format = await deepfry(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
-@router.get("/ascii/")
+@router.get("/ascii/", responses=static_response_only)
 async def asc_image(url: str):
     byt = await Client.image_bytes(url)
     img = await ascii_image(byt)
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/floor/")
+@router.get("/floor/", responses=normal_response)
 async def floor_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await floor(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/charcoal/")
+@router.get("/charcoal/", responses=normal_response)
 async def charcoal_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await charcoal(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/poster/")
+@router.get("/poster/", responses=normal_response)
 async def poster_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await poster(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/sepia/")
+@router.get("/sepia/", responses=normal_response)
 async def sepia_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await sepia(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/polaroid/")
+@router.get("/polaroid/", responses=normal_response)
 async def polar_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await polaroid(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/swirl/")
+@router.get("/swirl/", responses=normal_response)
 async def swirl_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await swirl(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/paint/")
+@router.get("/paint/", responses=normal_response)
 async def paint_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await paint(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/night/")
+@router.get("/night/", responses=normal_response)
 async def night_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await night(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/solar/")
+@router.get("/solar/", responses=normal_response)
 async def solar_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await solar(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
-@router.get("/america/")
+
+@router.get("/america/", responses=gif_response_only)
 async def america_image(url: str):
     byt = await Client.image_bytes(url)
     img = await america(byt)
-    return Response(img.read(), media_type=f"image/gif")
+    return Response(img.read(), media_type="image/gif")
 
-@router.get("/communism/")
+
+@router.get("/communism/", responses=gif_response_only)
 async def commie_image(url: str):
     byt = await Client.image_bytes(url)
     img = await communism(byt)
-    return Response(img.read(), media_type=f"image/gif")
+    return Response(img.read(), media_type="image/gif")
 
-@router.get("/thoughtimage/")
+
+@router.get("/thoughtimage/", responses=normal_response)
 async def get_thought_image(url: str, text: str):
     byt = await Client.image_bytes(url)
     img, img_format = await thought_image(byt, text)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/tweet/")
+@router.get("/tweet/", responses=static_response_only)
 async def tweet(url: str, username: str, text: str):
     byt = await Client.image_bytes(url)
     img = await tweet_gen(byt, username, text)
     return Response(img.read(), media_type="image/png")
 
 
-@router.get("/rainbow/")
+@router.get("/rainbow/", responses=normal_response)
 async def rainbow_manip(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await rainbow(byt)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/magik/")
+@router.get("/magik/", responses=normal_response)
 async def magic(url: str, scale: int = None):
     byt = await Client.image_bytes(url)
     img, img_format = await magik(byt, scale)
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/discord/")
+@router.get("/discord/", responses=static_response_only)
 async def discord_quote(url: str, username: str, text: str):
     byt = await Client.image_bytes(url)
     img = await quote(byt, username, text)

@@ -1,5 +1,5 @@
-from io import BytesIO
 import random
+from io import BytesIO
 
 import numpy as np
 from PIL import Image
@@ -7,9 +7,9 @@ from PIL import Image as PILImage
 from PIL import ImageDraw
 from PIL import ImageEnhance
 from PIL import ImageFilter
-from PIL import ImageSequence
 from PIL import ImageFont
 from PIL import ImageOps
+from PIL import ImageSequence
 
 from app.exceptions.errors import ParameterError
 from app.image.PILManip import PILManip
@@ -43,7 +43,10 @@ __all__ = (
     "why_are_you_gay",
     "memegen",
     "america",
-    "communism"
+    "communism",
+    "pride",
+    "delete",
+    "shatter"
 )
 
 
@@ -175,6 +178,30 @@ def gay(image):
     ci = image.convert("RGBA")
     ci.paste(filled, mask=filled)
     return ci
+
+
+@executor
+@pil
+def pride(image, flag: str):
+    try:
+        im = Image.open(f"app/image/assets/pride/{flag}.png").convert(
+            "RGBA").resize((300, 300))
+    except FileNotFoundError:
+        raise ParameterError(f"Invalid Pride Filter {flag}")
+    ima = image.resize((300, 300)).convert("RGBA")
+    im.putalpha(175)
+    ima.paste(im, (0, 0), mask=im)
+    return ima
+
+
+@executor
+@pil
+def shatter(image):
+    im = Image.open("app/image/assets/glass.png").convert(
+        "RGBA").resize((300, 300))
+    ima = image.resize((300, 300)).convert("RGBA")
+    ima.paste(im, (0, 0), mask=im)
+    return ima
 
 
 @executor
@@ -312,6 +339,15 @@ def satan(image):
     area = (250, 100)
     fim.paste(base, area)
     return fim
+
+
+@executor
+@pil
+def delete(img):
+    im = Image.open("app/image/assets/delete.BMP").convert("RGBA")
+    ima = img.resize((195, 195)).convert("RGBA")
+    im.paste(ima, (120, 135), ima)
+    return im
 
 
 @executor
@@ -456,18 +492,21 @@ def memegen(tv, text: str):
     bcan.paste(tv, (0, t))
     return bcan
 
+
 @executor
 def america(byt: bytes) -> BytesIO:
     img = PILManip.pil_image(byt)
-    image = img.convert("RGBA").resize((480,480),5)
+    image = img.convert("RGBA").resize((480, 480), 5)
     image.putalpha(96)
     flag = Image.open("app/image/assets/america.gif")
     frame_list = list()
     for frame in ImageSequence.Iterator(flag):
-        frame.paste(frame,(0,0),frame)
+        frame.paste(frame, (0, 0), frame)
         frame_list.append(frame)
     obj = BytesIO()
-    frame_list[0].save(obj, format='gif', save_all=True, append_images=frame_list[1:], loop=0, disposal=2, optimize=True)
+    frame_list[0].save(obj, format='gif', save_all=True,
+                       append_images=frame_list[1:], loop=0, disposal=2,
+                       optimize=True)
     obj.seek(0)
     return obj
 
@@ -475,15 +514,17 @@ def america(byt: bytes) -> BytesIO:
 @executor
 def communism(byt: bytes) -> BytesIO:
     img = PILManip.pil_image(byt)
-    image = img.convert("RGBA").resize((480,480),5)
+    image = img.convert("RGBA").resize((480, 480), 5)
     image.putalpha(96)
     flag = Image.open("app/image/assets/communism.gif")
     frame_list = list()
     for frame in ImageSequence.Iterator(flag):
-        frame = frame.resize((480,480),5)
-        frame.paste(frame,(0,0),frame)
+        frame = frame.resize((480, 480), 5)
+        frame.paste(frame, (0, 0), frame)
         frame_list.append(frame)
     obj = BytesIO()
-    frame_list[0].save(obj, format='gif', save_all=True, append_images=frame_list[1:], loop=0, disposal=2, optimize=True)
+    frame_list[0].save(obj, format='gif', save_all=True,
+                       append_images=frame_list[1:], loop=0, disposal=2,
+                       optimize=True)
     obj.seek(0)
     return obj

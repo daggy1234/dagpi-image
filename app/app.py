@@ -3,6 +3,7 @@ import os
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -14,7 +15,7 @@ from app.exceptions.errors import BadUrl
 from app.exceptions.errors import FileLarge
 from app.exceptions.errors import ManipulationError
 from app.exceptions.errors import NoImageFound
-from app.exceptions.errors import ParameterError
+from app.exceptions.errors import ParameterError, Unauthorised, RateLimit
 from app.exceptions.errors import ServerTimeout
 from app.middleware import add_process_time_header
 from app.middleware import auth_check
@@ -23,7 +24,7 @@ from app.routes import image_routes
 sentry = os.getenv("SENTRY")
 sentry_sdk.init(dsn=sentry)
 
-app = FastAPI()
+app = FastAPI(docs_url="/playground", redoc_url="/docs")
 asgi_app = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
@@ -85,6 +86,41 @@ async def timeout_error(_request: Request, _exc: ServerTimeout):
     )
 
 
+@app.exception_handler(Unauthorised)
+async def unauth_error(_request: Request, exc: Unauthorised):
+    return JSONResponse(
+        status_code=403,
+        content={"message": str(exc)},
+    )
+
+
+@app.exception_handler(RateLimit)
+async def rate_error(_request: Request, _exc: RateLimit):
+    return JSONResponse(
+        status_code=429,
+        content={"message": "Ratelimited"},
+    )
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Dagpi",
+        version="1.0",
+        description="The Number 1 Image generation api",
+        routes=app.routes
+    )
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
+               "dagpib.png"}
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi

@@ -6,6 +6,7 @@ from skimage import segmentation, future
 from skimage.color.adapt_rgb import adapt_rgb, each_channel
 from skimage.exposure import rescale_intensity
 from skimage.feature import hog
+from skimage.filters import sobel
 
 from app.image.NumpyManip import NumpyManip, numpy
 from app.image.PILManip import PILManip
@@ -25,7 +26,7 @@ def triangle_manip(byt: bytes) -> BytesIO:
     gimg = skimage.color.rgb2gray(img)
     labels = segmentation.slic(img, compactness=30, n_segments=400,
                                start_label=1)
-    edges = skimage.filters.sobel(gimg)
+    edges = sobel(gimg)
     edges_rgb = skimage.color.gray2rgb(edges)
 
     g = future.graph.rag_boundary(labels, edges)

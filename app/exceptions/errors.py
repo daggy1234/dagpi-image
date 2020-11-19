@@ -7,35 +7,35 @@ class DagpiException(Exception):
         return self.text
 
 
-class BadUrl(Exception):
+class BadUrl(DagpiException):
     pass
 
 
-class NoImageFound(Exception):
+class NoImageFound(DagpiException):
     pass
 
 
-class InvalidToken(Exception):
+class Unauthorised(DagpiException):
     pass
 
 
-class RateLimit(Exception):
+class RateLimit(DagpiException):
     pass
 
 
-class BadImage(Exception):
+class BadImage(DagpiException):
     pass
 
 
-class FileLarge(Exception):
+class FileLarge(DagpiException):
     pass
 
 
-class ServerTimeout(Exception):
+class ServerTimeout(DagpiException):
     pass
 
 
-class ManipulationError(Exception):
+class ManipulationError(DagpiException):
     pass
 
 
