@@ -13,8 +13,19 @@ from app.exceptions.errors import FileLarge
 class PILManip:
     @staticmethod
     def pil_image(image: bytes) -> Image:
-        if image.__sizeof__() > 8 * (2 ** 20):
-            raise FileLarge()
+        if image.__sizeof__() > 10 * (2 ** 20):
+            raise FileLarge("Exceeds 10MB")
+        try:
+            io = BytesIO(image)
+            io.seek(0)
+            return Image.open(io)
+        except UnidentifiedImageError:
+            raise BadImage("Unable to use Image")
+
+    @staticmethod
+    def static_pil_image(image: bytes) -> Image:
+        if image.__sizeof__() > 15 * (2 ** 20):
+            raise FileLarge("File Exceeds 15 Mb")
         try:
             io = BytesIO(image)
             io.seek(0)
@@ -61,8 +72,8 @@ def pil(function):
 def double_image(function):
     @functools.wraps(function)
     def wrapper(image_a, image_b, *args, **kwargs) -> BytesIO:
-        image_a = PILManip.pil_image(image_a)
-        image_b = PILManip.pil_image(image_b)
+        image_a = PILManip.static_pil_image(image_a)
+        image_b = PILManip.static_pil_image(image_b)
         img = function(image_a, image_b, *args, **kwargs)
         return PILManip.pil_image_save(img)
 
@@ -72,7 +83,7 @@ def double_image(function):
 def static_pil(function):
     @functools.wraps(function)
     def wrapper(image, *args, **kwargs) -> BytesIO:
-        img = PILManip.pil_image(image)
+        img = PILManip.static_pil_image(image)
         img = function(img, *args, **kwargs)
         return PILManip.pil_image_save(img)
 

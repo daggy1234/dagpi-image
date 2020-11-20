@@ -495,13 +495,14 @@ def memegen(tv, text: str):
 
 @executor
 def america(byt: bytes) -> BytesIO:
-    img = PILManip.pil_image(byt)
+    img = PILManip.static_pil_image(byt)
     image = img.convert("RGBA").resize((480, 480), 5)
-    image.putalpha(96)
     flag = Image.open("app/image/assets/america.gif")
+    image.putalpha(96)
     frame_list = list()
     for frame in ImageSequence.Iterator(flag):
-        frame.paste(frame, (0, 0), frame)
+        frame = frame.resize((480, 480), 5).convert("RGBA")
+        frame.paste(image, (0, 0), image)
         frame_list.append(frame)
     obj = BytesIO()
     frame_list[0].save(obj, format='gif', save_all=True,
@@ -513,18 +514,18 @@ def america(byt: bytes) -> BytesIO:
 
 @executor
 def communism(byt: bytes) -> BytesIO:
-    img = PILManip.pil_image(byt)
+    img = PILManip.static_pil_image(byt)
     image = img.convert("RGBA").resize((480, 480), 5)
-    image.putalpha(96)
     flag = Image.open("app/image/assets/communism.gif")
+    image.putalpha(96)
     frame_list = list()
     for frame in ImageSequence.Iterator(flag):
-        frame = frame.resize((480, 480), 5)
-        frame.paste(frame, (0, 0), frame)
+        frame = frame.resize((480, 480), 5).convert("RGBA")
+        frame.paste(image, (0, 0), image)
         frame_list.append(frame)
     obj = BytesIO()
     frame_list[0].save(obj, format='gif', save_all=True,
-                       append_images=frame_list[1:], loop=0, disposal=2,
+                       append_images=frame_list, loop=0, disposal=2,
                        optimize=True)
     obj.seek(0)
     return obj

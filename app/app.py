@@ -15,8 +15,10 @@ from app.exceptions.errors import BadUrl
 from app.exceptions.errors import FileLarge
 from app.exceptions.errors import ManipulationError
 from app.exceptions.errors import NoImageFound
-from app.exceptions.errors import ParameterError, Unauthorised, RateLimit
+from app.exceptions.errors import ParameterError
+from app.exceptions.errors import RateLimit
 from app.exceptions.errors import ServerTimeout
+from app.exceptions.errors import Unauthorised
 from app.middleware import add_process_time_header
 from app.middleware import auth_check
 from app.routes import image_routes
@@ -116,9 +118,28 @@ def custom_openapi():
         description="The Number 1 Image generation api",
         routes=app.routes
     )
-    openapi_schema["info"]["x-logo"] = {
-        "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
-               "dagpib.png"}
+    openapi_schema["info"] = {
+        "title": "Dagpi",
+        "description": " A fast and powerful image manipulation api",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Daggy1234",
+            "url": "https://dagpi.xyz",
+            "email": "contact@dagpi.xyz"
+        },
+        "license": {
+            "name": "AGPLv3",
+            "url": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+        },
+        "x-logo": {
+            "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
+                   "dagpib.png"}}
+    for endpoint in openapi_schema["paths"].keys():
+        if not endpoint == "/":
+            openapi_schema["paths"][endpoint]["get"]["parameters"].append(
+                {"required": True,
+                 "schema": {"title": "Authorization", "type": "string"},
+                 "name": "Authorization", "in": "header"})
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 

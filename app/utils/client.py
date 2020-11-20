@@ -1,6 +1,7 @@
 import asyncio
 import os
 import re
+import urllib.parse
 from typing import Dict
 
 import httpx
@@ -33,11 +34,13 @@ class Client:
     @staticmethod
     async def auth(token: str):
         session = await get_session()
+        print(f"{base_url}/auth/{token}")
         r = await session.get(f"{base_url}/auth/{token}")
         return AuthModel(r.json())
 
     @staticmethod
     async def image_bytes(url: str):
+        url = urllib.parse.unquote(url)
         regex = re.compile(
             r'^(?:http|ftp)s?://'  # http:// or https://
             r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)'
