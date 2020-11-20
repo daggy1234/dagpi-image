@@ -46,7 +46,8 @@ __all__ = (
     "communism",
     "pride",
     "delete",
-    "shatter"
+    "shatter",
+    "fedora"
 )
 
 
@@ -403,6 +404,17 @@ def bad_img(image) -> Image:
     t = image.resize((200, 200), 5)
     back.paste(t, (20, 150))
     return back
+
+
+@executor
+@pil
+def fedora(image):
+    img = Image.open('app/image/assets/fedora.bmp').convert('RGBA')
+    av = image.resize((275,275)).convert('RGBA')
+    final = Image.new('RGBA', img.size)
+    final.paste(av, (112, 101), av)
+    final.paste(img, (0, 0), img)
+    return final
 
 
 @executor

@@ -24,9 +24,15 @@ async def color_image(url: str):
 async def retro_meme(url: str, top_text: str, bottom_text: str):
     byt = await Client.image_bytes(url)
     text = top_text + "| " + bottom_text
-    print(text)
     img, image_format = await retromeme_gen(byt, text)
     return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/motiv/", responses=static_response_only)
+async def motiv_meme(url: str, top_text: str, bottom_text: str):
+    byt = await Client.image_bytes(url)
+    img = await motiv(byt, top_text, bottom_text)
+    return Response(img.read(), media_type=f"image/png")
 
 
 @router.get("/modernmeme/", responses=normal_response)
@@ -185,6 +191,13 @@ async def trash_image(url: str):
     img, image_format = await trash(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
+
+
+@router.get("/fedora/", responses=normal_response)
+async def fedora_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await fedora(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
 
 @router.get("/delete/", responses=normal_response)
 async def delete_image(url: str):

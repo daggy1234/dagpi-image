@@ -13,6 +13,7 @@ from app.image.writetext import WriteText
 __all__ = (
     "tweet_gen",
     "quote",
+    "motiv"
 )
 
 
@@ -79,6 +80,23 @@ def tweet_gen(image, username: str, text: str):
         (0, 0, 0),
     )
     return img_wrap.ret_img()
+
+
+@executor
+@static_pil
+def motiv(img, top_text: str, bottom_text: str):
+    im = img.convert("RGBA")
+    new_h, new_w = im.height + im.height * 100, im.width + 200
+    white_bg = Image.new("RGBA",(im.width + 10,im.height + 10),(255,255,255))
+    base = Image.new("RGBA",(new_w,new_h),(0,0,0))
+    white_bg.paste(im, (5,5), im)
+    base.paste(white_bg,(100,100),white_bg)
+    wt = WriteText(base)
+    pos = im.height + 100 + im.height/100
+    text_h = wt.write_text_box(100,pos,top_text, im.width, "app/image/assets/times-new-roman.ttf", im.height//5, (255,255,255), place="center", justify_last_line=True)
+    text_h_t = wt.write_text_box(100,text_h,bottom_text, im.width, "app/image/assets/times-new-roman.ttf", (2*(im.height//10))//3, (255,255,255), place="center", justify_last_line=True)
+    ret = wt.ret_img()
+    return ret.crop((0, 0,new_w,text_h_t + 30))
 
 
 @executor
