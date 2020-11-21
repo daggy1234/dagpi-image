@@ -27,7 +27,11 @@ RUN curl https://imagemagick.org/download/ImageMagick-7.0.10-40.tar.gz | tar -xz
     ./configure --with-lqr && \
     make && \
     make install && \
-    apk del .build-deps 
+    cd .. && \
+    rm -R ImageMagick-7.0.10-40 && \
+    cd .. && \
+    rm -R liblqr && \
+    apk del .build-deps
     
 #ENV MAGICK_HOME=/usr
 

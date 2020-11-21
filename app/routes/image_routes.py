@@ -333,7 +333,7 @@ async def magic(url: str, scale: int = None):
 
 
 @router.get("/discord/", responses=static_response_only)
-async def discord_quote(url: str, username: str, text: str):
+async def discord_quote(url: str, username: str, text: str,dark: bool= True):
     byt = await Client.image_bytes(url)
-    img = await quote(byt, username, text)
+    img = await quote(byt, username, text, dark)
     return Response(img.read(), media_type="image/png")

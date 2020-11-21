@@ -103,7 +103,8 @@ def motiv(img, top_text: str, bottom_text: str):
 @static_pil
 def quote(image, username: str, text: str, dark: bool):
     today = datetime.today()
-    y = Image.new("RGBA", (2400, 800), (0, 0, 0, 0))
+    bg = (54,57,63) if dark else (256,256,256)  
+    y = Image.new("RGBA", (2400, 800),bg)
     to_pa = image.resize((150, 150), 5)
     size = (150, 150)
     mask = Image.new("L", size, 0)
@@ -119,18 +120,19 @@ def quote(image, username: str, text: str, dark: bool):
         su = "AM"
     t_string = f"Today at {h}:{today.minute} {su}"
     d = ImageDraw.Draw(y)
-    fntd = ImageFont.truetype("app/image/assets/whitney-medium.ttf", 80)
-    fntt = ImageFont.truetype("app/image/assets/whitney-medium.ttf", 40)
+    fntd = ImageFont.truetype("app/image/assets/whitney-medium.ttf", 60)
+    fntt = ImageFont.truetype("app/image/assets/whitney-medium.ttf", 30)
     if len(text) > 1000:
         print("text too long")
     else:
-        d.text((260, 50), username, color=(256, 256, 256), font=fntd)
+        user_color = (256,256,256) if dark else (6,6,7) 
+        d.text((260, 70), username, fill=user_color, font=fntd)
         wi = fntd.getsize(username)
         ##72767d
-        d.text((310 + wi[0], 80), t_string, color=(114, 118, 125, 200), font=fntt)
+        d.text((300 + wi[0], 87), t_string, fill=(114, 118, 125, 50), font=fntt)
         wrap = WriteText(y)
         #dark: #ffffff light:
-        text_color = (46,51,56) if not dark else (256,256,256)
+        text_color = (256,256,256) if dark else (46,51,56) 
         f = wrap.write_text_box(
             260,
             80,
@@ -143,7 +145,5 @@ def quote(image, username: str, text: str, dark: bool):
         print(f)
         im = wrap.ret_img()
         #dark: #36393f or lighr; #ffffff
-        bg = (256,256,256)  if not dark else (54,57,63)
         ima = im.crop((0, 0, 2400, (f + 90)))
-        top = Image.new("RGBA", ima.size, bg)
-        return Image.alpha_composite(top, ima)
+        return ima
