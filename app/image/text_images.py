@@ -101,7 +101,7 @@ def motiv(img, top_text: str, bottom_text: str):
 
 @executor
 @static_pil
-def quote(image, username: str, text: str):
+def quote(image, username: str, text: str, dark: bool):
     today = datetime.today()
     y = Image.new("RGBA", (2400, 800), (0, 0, 0, 0))
     to_pa = image.resize((150, 150), 5)
@@ -126,8 +126,11 @@ def quote(image, username: str, text: str):
     else:
         d.text((260, 50), username, color=(256, 256, 256), font=fntd)
         wi = fntd.getsize(username)
-        d.text((310 + wi[0], 80), t_string, color=(114, 118, 125), font=fntt)
+        ##72767d
+        d.text((310 + wi[0], 80), t_string, color=(114, 118, 125, 200), font=fntt)
         wrap = WriteText(y)
+        #dark: #ffffff light:
+        text_color = (46,51,56) if not dark else (256,256,256)
         f = wrap.write_text_box(
             260,
             80,
@@ -135,10 +138,12 @@ def quote(image, username: str, text: str):
             2120,
             "app/image/assets/whitney-medium.ttf",
             50,
-            color=(256, 256, 256),
+            color=text_color,
         )
         print(f)
         im = wrap.ret_img()
+        #dark: #36393f or lighr; #ffffff
+        bg = (256,256,256)  if not dark else (54,57,63)
         ima = im.crop((0, 0, 2400, (f + 90)))
-        top = Image.new("RGBA", ima.size, (0, 0, 0, 0))
+        top = Image.new("RGBA", ima.size, bg)
         return Image.alpha_composite(top, ima)
