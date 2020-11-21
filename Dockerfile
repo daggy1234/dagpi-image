@@ -22,13 +22,13 @@ RUN git clone https://github.com/carlobaldassi/liblqr && \
     make install 
     
 
-RUN curl https://imagemagick.org/download/ImageMagick-7.0.10-40.tar.gz | tar -xz && \
-    cd ImageMagick-7.0.10-40 && \
+RUN curl https://imagemagick.org/download/releases/ImageMagick-7.0.10-41.tar.gz | tar -xz && \
+    cd ImageMagick-7.0.10-41 && \
     ./configure --with-lqr && \
     make && \
     make install && \
     cd .. && \
-    rm -R ImageMagick-7.0.10-40 && \
+    rm -R ImageMagick-7.0.10-41 && \
     cd .. && \
     rm -R liblqr && \
     apk del .build-deps
