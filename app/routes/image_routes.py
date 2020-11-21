@@ -311,6 +311,14 @@ async def get_thought_image(url: str, text: str):
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
+
+@router.get("/captcha/", responses=normal_response)
+async def get_captcha_image(url: str, text: str):
+    byt = await Client.image_bytes(url)
+    img = await captcha(byt, text)
+    return Response(img.read(), media_type=f"image/png")
+
+
 @router.get("/tweet/", responses=static_response_only)
 async def tweet(url: str, username: str, text: str):
     byt = await Client.image_bytes(url)
@@ -336,4 +344,11 @@ async def magic(url: str, scale: int = None):
 async def discord_quote(url: str, username: str, text: str,dark: bool= True):
     byt = await Client.image_bytes(url)
     img = await quote(byt, username, text, dark)
+    return Response(img.read(), media_type="image/png")
+
+
+@router.get("/yt/", responses=static_response_only)
+async def discord_quote(url: str, username: str, text: str,dark: bool= True):
+    byt = await Client.image_bytes(url)
+    img = await yt_comment(byt, username, text, dark)
     return Response(img.read(), media_type="image/png")
