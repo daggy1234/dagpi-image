@@ -1,5 +1,5 @@
-from datetime import datetime
 import random
+from datetime import datetime
 
 from PIL import Image
 from PIL import ImageDraw
@@ -25,16 +25,17 @@ __all__ = (
 def captcha(img, text: str):
     if len(text) > 30:
         raise ParameterError("text should be less than 30 characters")
-    im = img.convert("RGBA").resize((765,780))
+    im = img.convert("RGBA").resize((765, 780))
     base = Image.open("app/image/assets/captcha.png").convert("RGBA")
-    base.paste(im,(15,240),im)
+    base.paste(im, (15, 240), im)
     im = ImageDraw.Draw(base)
-    for y in range(240,1020,195):
-        im.line([(0,y),(796,y)],fill=(255,255,255),width=10)
-    for x in range(218,810,203):
-        im.line([(x,240),(x,1020)],fill=(255,255,255),width=10)
+    for y in range(240, 1020, 195):
+        im.line([(0, y), (796, y)], fill=(255, 255, 255), width=10)
+    for x in range(218, 810, 203):
+        im.line([(x, 240), (x, 1020)], fill=(255, 255, 255), width=10)
     wt = WriteText(base)
-    wt.write_text_box(50,35,text,750, "app/image/assets/Roboto-Black.ttf",80,(255,255,255))
+    wt.write_text_box(50, 35, text, 750, "app/image/assets/Roboto-Black.ttf",
+                      80, (255, 255, 255))
     return wt.ret_img()
 
 
@@ -108,23 +109,30 @@ def tweet_gen(image, username: str, text: str):
 def motiv(img, top_text: str, bottom_text: str):
     im = img.convert("RGBA")
     new_h, new_w = im.height + im.height * 100, im.width + 200
-    white_bg = Image.new("RGBA",(im.width + 10,im.height + 10),(255,255,255))
-    base = Image.new("RGBA",(new_w,new_h),(0,0,0))
-    white_bg.paste(im, (5,5), im)
-    base.paste(white_bg,(100,100),white_bg)
+    white_bg = Image.new("RGBA", (im.width + 10, im.height + 10),
+                         (255, 255, 255))
+    base = Image.new("RGBA", (new_w, new_h), (0, 0, 0))
+    white_bg.paste(im, (5, 5), im)
+    base.paste(white_bg, (100, 100), white_bg)
     wt = WriteText(base)
-    pos = im.height + 100 + im.height/100
-    text_h = wt.write_text_box(100,pos,top_text, im.width, "app/image/assets/times-new-roman.ttf", im.height//5, (255,255,255), place="center", justify_last_line=True)
-    text_h_t = wt.write_text_box(100,text_h,bottom_text, im.width, "app/image/assets/times-new-roman.ttf", (2*(im.height//10))//3, (255,255,255), place="center", justify_last_line=True)
+    pos = im.height + 100 + im.height / 100
+    text_h = wt.write_text_box(100, pos, top_text, im.width,
+                               "app/image/assets/times-new-roman.ttf",
+                               im.height // 5, (255, 255, 255), place="center",
+                               justify_last_line=True)
+    text_h_t = wt.write_text_box(100, text_h, bottom_text, im.width,
+                                 "app/image/assets/times-new-roman.ttf",
+                                 (2 * (im.height // 10)) // 3, (255, 255, 255),
+                                 place="center", justify_last_line=True)
     ret = wt.ret_img()
-    return ret.crop((0, 0,new_w,text_h_t + 30))
+    return ret.crop((0, 0, new_w, text_h_t + 30))
 
 
 @executor
 @static_pil
 def yt_comment(image, username: str, text: str, dark: bool):
-    bg = (24,24,24) if dark else (249,249,249)
-    im = Image.new("RGBA",(800,800),bg)
+    bg = (24, 24, 24) if dark else (249, 249, 249)
+    im = Image.new("RGBA", (800, 800), bg)
     com_com = "yt-dark.png" if dark else "yt-light.png"
     com = Image.open(f"app/image/assets/{com_com}").convert("RGBA")
     to_pa = image.resize((150, 150), 5)
@@ -133,28 +141,30 @@ def yt_comment(image, username: str, text: str, dark: bool):
     draw_mask = ImageDraw.Draw(mask)
     draw_mask.ellipse((0, 0) + size, fill=255)
     avatar = ImageOps.fit(to_pa, mask.size, centering=(0.5, 0.5))
-    im.paste(avatar,(100,100),mask=mask)
+    im.paste(avatar, (100, 100), mask=mask)
     d = ImageDraw.Draw(im)
-    fn_name = ImageFont.truetype("app/image/assets/Roboto-Medium.ttf",size=25)
-    t_c = (255,255,255) if dark else (3,3,3)
-    d.text((190,100),username,fill=t_c,font=fn_name)
+    fn_name = ImageFont.truetype("app/image/assets/Roboto-Medium.ttf", size=25)
+    t_c = (255, 255, 255) if dark else (3, 3, 3)
+    d.text((190, 100), username, fill=t_c, font=fn_name)
     buff = fn_name.getsize(username)[0] + 190 + 10
-    fn_time = ImageFont.truetype("app/image/assets/Roboto-Regular.ttf",size=15)
-    num = random.randint(2,60)
-    period = random.choice(["seconds","minutes","days"])
-    d.text((buff, 108),f"{num} {period} ago", fill=(96,96,96),font=fn_time)
+    fn_time = ImageFont.truetype("app/image/assets/Roboto-Regular.ttf",
+                                 size=15)
+    num = random.randint(2, 60)
+    period = random.choice(["seconds", "minutes", "days"])
+    d.text((buff, 108), f"{num} {period} ago", fill=(96, 96, 96), font=fn_time)
     wt = WriteText(im)
-    t_h = wt.write_text_box(190,110,text,500,"app/image/assets/Roboto-Regular.ttf",20,t_c)
-    im.paste(com, (190,t_h) ,com)
-    return im.crop([75,75,750,t_h + com.size[1]])
+    t_h = wt.write_text_box(190, 110, text, 500,
+                            "app/image/assets/Roboto-Regular.ttf", 20, t_c)
+    im.paste(com, (190, t_h), com)
+    return im.crop([75, 75, 750, t_h + com.size[1]])
 
 
 @executor
 @static_pil
 def quote(image, username: str, text: str, dark: bool):
     today = datetime.today()
-    bg = (54,57,63) if dark else (256,256,256)  
-    y = Image.new("RGBA", (2400, 800),bg)
+    bg = (54, 57, 63) if dark else (256, 256, 256)
+    y = Image.new("RGBA", (2400, 800), bg)
     to_pa = image.resize((150, 150), 5)
     size = (150, 150)
     mask = Image.new("L", size, 0)
@@ -175,14 +185,14 @@ def quote(image, username: str, text: str, dark: bool):
     if len(text) > 1000:
         raise ParameterError("text too long")
     else:
-        user_color = (256,256,256) if dark else (6,6,7) 
+        user_color = (256, 256, 256) if dark else (6, 6, 7)
         d.text((260, 70), username, fill=user_color, font=fntd)
         wi = fntd.getsize(username)
         ##72767d
         d.text((300 + wi[0], 92), t_string, fill=(114, 118, 125), font=fntt)
         wrap = WriteText(y)
-        #dark: #ffffff light:
-        text_color = (256,256,256) if dark else (46,51,56) 
+        # dark: #ffffff light:
+        text_color = (256, 256, 256) if dark else (46, 51, 56)
         f = wrap.write_text_box(
             260,
             90,
@@ -193,6 +203,6 @@ def quote(image, username: str, text: str, dark: bool):
             color=text_color,
         )
         im = wrap.ret_img()
-        #dark: #36393f or lighr; #ffffff
+        # dark: #36393f or lighr; #ffffff
         ima = im.crop((0, 0, 2400, (f + 90)))
         return ima

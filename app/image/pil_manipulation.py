@@ -410,7 +410,7 @@ def bad_img(image) -> Image:
 @pil
 def fedora(image):
     img = Image.open('app/image/assets/fedora.bmp').convert('RGBA')
-    av = image.resize((275,275)).convert('RGBA')
+    av = image.resize((275, 275)).convert('RGBA')
     final = Image.new('RGBA', img.size)
     final.paste(av, (112, 101), av)
     final.paste(img, (0, 0), img)
