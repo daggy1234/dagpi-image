@@ -134,6 +134,9 @@ def custom_openapi():
         "x-logo": {
             "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
                    "dagpib.png"}}
+    openapi_schema["servers"] = [{
+        "url": "https://api.dagpi.xyz/image/openapi.json"
+    }]
     for endpoint in openapi_schema["paths"].keys():
         if not endpoint == "/":
             openapi_schema["paths"][endpoint]["get"]["parameters"].append(
