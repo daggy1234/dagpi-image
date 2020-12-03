@@ -118,6 +118,9 @@ def custom_openapi():
         description="The Number 1 Image generation api",
         routes=app.routes
     )
+    openapi_schema["servers"] = [{
+        "url": "/image"
+    }]
     openapi_schema["info"] = {
         "title": "Dagpi",
         "description": " A fast and powerful image manipulation api",
