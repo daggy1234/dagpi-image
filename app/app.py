@@ -26,7 +26,7 @@ from app.routes import image_routes
 sentry = os.getenv("SENTRY")
 sentry_sdk.init(dsn=sentry)
 
-app = FastAPI(docs_url="/playground", redoc_url="/docs",openapi_url="/image/openapi.json")
+app = FastAPI(docs_url="/playground", redoc_url="/docs")
 asgi_app = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
@@ -134,9 +134,6 @@ def custom_openapi():
         "x-logo": {
             "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
                    "dagpib.png"}}
-    openapi_schema["servers"] = [{
-        "url": "https://api.dagpi.xyz/image/openapi.json"
-    }]
     for endpoint in openapi_schema["paths"].keys():
         if not endpoint == "/":
             openapi_schema["paths"][endpoint]["get"]["parameters"].append(
