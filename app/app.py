@@ -26,7 +26,7 @@ from app.routes import image_routes
 sentry = os.getenv("SENTRY")
 sentry_sdk.init(dsn=sentry)
 
-app = FastAPI(docs_url="/playground", redoc_url="/docs")
+app = FastAPI(docs_url="/playground", redoc_url="/docs",openapi_url="/image/openapi.json")
 asgi_app = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
