@@ -26,7 +26,7 @@ from app.routes import image_routes
 sentry = os.getenv("SENTRY")
 sentry_sdk.init(dsn=sentry)
 
-app = FastAPI(docs_url="/playground", redoc_url="/docs")
+app = FastAPI(docs_url="/playground", redoc_url="/docs",root_path="/image")
 asgi_app = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
@@ -118,9 +118,6 @@ def custom_openapi():
         description="The Number 1 Image generation api",
         routes=app.routes
     )
-    openapi_schema["servers"] = [{
-        "url": "/image"
-    }]
     openapi_schema["info"] = {
         "title": "Dagpi",
         "description": " A fast and powerful image manipulation api",
