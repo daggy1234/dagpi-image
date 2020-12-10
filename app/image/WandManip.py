@@ -12,11 +12,11 @@ class WandManip:
     @staticmethod
     def wand_open(byt: bytes) -> Image:
         if byt.__sizeof__() > 10 * (2 ** 20):
-            raise FileLarge
+            raise FileLarge("Large file")
         try:
             return Image(blob=byt)
         except TypeError:
-            raise BadImage
+            raise BadImage("Invalid Format")
 
     @staticmethod
     def wand_save(byt: bytes) -> BytesIO:
@@ -35,9 +35,11 @@ def wand(function):
                     frame = function(frame, *args, **kwargs)
                     dst_image.sequence.append(frame)
                 byt = dst_image.make_blob()
-        else:
+        elif img.format == "PNG" or img.format=="GIF":
             dst_image = function(img, *args, **kwargs)
             byt = dst_image.make_blob()
+        else:
+            raise BadImage("Inavlid Format")
         return WandManip.wand_save(byt), img.format
 
     return wrapper

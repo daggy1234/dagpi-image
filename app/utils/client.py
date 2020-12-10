@@ -9,7 +9,7 @@ from async_timeout import timeout
 
 from ..exceptions.errors import BadUrl, NoImageFound, ServerTimeout
 
-headers = {'Authorization': os.getenv("TOKEN")}
+headers = {'Authorization': os.getenv("TOKEN","No")}
 base_url = os.getenv("BASE_URL")
 print(headers, base_url)
 _session = None

@@ -49,9 +49,9 @@ async def bad_url(_request: Request, _exc: BadUrl):
 
 
 @app.exception_handler(ParameterError)
-async def param_error(_request: Request, _exc: ParameterError):
+async def param_error(_request: Request, exc: ParameterError):
     return JSONResponse(status_code=400,
-                        content={"message": f"{str(ParameterError)}"})
+                        content={"message": f"{str(exc)}"})
 
 
 @app.exception_handler(ManipulationError)
@@ -118,6 +118,14 @@ def custom_openapi():
         description="The Number 1 Image generation api",
         routes=app.routes
     )
+    openapi_schema["securityDefinitions"] = {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "Authorization" 
+            }
+        }
+    openapi_schema["security"] = [{"ApiKeyAuth": []}]
     openapi_schema["info"] = {
         "title": "Dagpi",
         "description": " A fast and powerful image manipulation api",

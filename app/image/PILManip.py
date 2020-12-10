@@ -65,6 +65,8 @@ def pil(function):
         elif img.format == "PNG" or img.format == "JPEG":
             img = function(img, *args, **kwargs)
             return PILManip.pil_image_save(img), "png"
+        else:
+            raise BadImage("Bad Format")
 
     return wrapper
 
