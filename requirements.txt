@@ -11,7 +11,7 @@ httpx==0.16.1
 idna==2.10
 imageio==2.9.0
 kiwisolver==1.2.0
-matplotlib==3.3.2
+matplotlib==3.3.3
 networkx==2.5
 numpy==1.19.2
 Pillow==7.2.0
