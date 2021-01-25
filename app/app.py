@@ -98,7 +98,7 @@ async def rate_error(_request: Request, _exc: RateLimit):
 
 @app.exception_handler(500)
 async def internal_server_error(req, exc):
-    e_str = repr(exc)
+    e_str = str(exc)
     return JSONResponse(
         status_code=500,
         content={"message": "Internal Server Error", "error": e_str}

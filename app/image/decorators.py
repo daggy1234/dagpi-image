@@ -13,6 +13,6 @@ def executor(function):
             future = loop.run_in_executor(None, partial)
             return future
         except Exception:
-            raise ManipulationError()
+            raise ManipulationError("Uanble To Manipulate Image")
 
     return decorator

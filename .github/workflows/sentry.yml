@@ -3,7 +3,7 @@ name: Sentry Version
 on:
     push:
         branches:
-            - master
+            - main
 
 jobs:
     sentry:

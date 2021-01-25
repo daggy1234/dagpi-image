@@ -12,7 +12,7 @@ class NumpyManip:
     @staticmethod
     def image_read(image: bytes) -> np.ndarray:
         if image.__sizeof__() > 10 * (2 ** 20):
-            raise FileLarge()
+            raise FileLarge("Image Exceeds maximum size")
         try:
             io = BytesIO(image)
             io.seek(0)
