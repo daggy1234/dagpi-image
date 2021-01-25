@@ -1,9 +1,10 @@
+import random
 import textwrap
 
-from PIL import ImageDraw, Image, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
-from app.image.PILManip import pil
 from app.image.decorators import executor
+from app.image.PILManip import pil
 
 __all__ = ("retromeme_gen",)
 
@@ -158,8 +159,7 @@ class Meme:
     def make_meme(self):
         if self.image:
             self.draw_meme()
-            im = self.store_image()
-            return im
+            return self.image
         else:
             return False
 
@@ -167,5 +167,5 @@ class Meme:
 @executor
 @pil
 def retromeme_gen(image, text: str):
-    mem = Meme(text, image)
+    mem = Meme(text, image.convert("RGBA"))
     return mem.make_meme()

@@ -1,30 +1,22 @@
 import os
 
 import sentry_sdk
-from fastapi import FastAPI
-from fastapi import Request
+from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette_prometheus import PrometheusMiddleware
-from starlette_prometheus import metrics
+from starlette_prometheus import PrometheusMiddleware, metrics
 
-from app.exceptions.errors import BadImage
-from app.exceptions.errors import BadUrl
-from app.exceptions.errors import FileLarge
-from app.exceptions.errors import ManipulationError
-from app.exceptions.errors import NoImageFound
-from app.exceptions.errors import ParameterError
-from app.exceptions.errors import RateLimit
-from app.exceptions.errors import ServerTimeout
-from app.exceptions.errors import Unauthorised
-from app.middleware import add_process_time_header
-from app.middleware import auth_check
+from app.exceptions.errors import (BadImage, BadUrl, FileLarge,
+                                   ManipulationError, NoImageFound,
+                                   ParameterError, RateLimit, ServerTimeout,
+                                   Unauthorised)
+from app.middleware import add_process_time_header, auth_check
 from app.routes import image_routes
 
 sentry = os.getenv("SENTRY")
-sentry_sdk.init(dsn=sentry)
+sentry_sdk.init(dsn=sentry,release="dagpi-image@1.7.1")
 
 app = FastAPI(docs_url="/playground", redoc_url="/docs")
 asgi_app = SentryAsgiMiddleware(app)
@@ -104,9 +96,23 @@ async def rate_error(_request: Request, _exc: RateLimit):
     )
 
 
+@app.exception_handler(500)
+async def internal_server_error(req, exc):
+    e_str = repr(exc)
+    return JSONResponse(
+        status_code=500,
+        content={"message": "Internal Server Error", "error": e_str}
+    )
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+@app.get("/image/openapi.json")
+async def openapi():
+    return RedirectResponse("/openapi.json")
 
 
 def custom_openapi():
@@ -119,12 +125,12 @@ def custom_openapi():
         routes=app.routes
     )
     openapi_schema["securityDefinitions"] = {
-            "ApiKeyAuth": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "Authorization" 
-            }
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
         }
+    }
     openapi_schema["security"] = [{"ApiKeyAuth": []}]
     openapi_schema["info"] = {
         "title": "Dagpi",
@@ -143,7 +149,7 @@ def custom_openapi():
             "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
                    "dagpib.png"}}
     for endpoint in openapi_schema["paths"].keys():
-        if not endpoint == "/":
+        if not (endpoint == "/" or endpoint == "/image/openapi.json"):
             openapi_schema["paths"][endpoint]["get"]["parameters"].append(
                 {"required": True,
                  "schema": {"title": "Authorization", "type": "string"},

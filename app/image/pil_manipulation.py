@@ -4,19 +4,12 @@ from io import BytesIO
 import numpy as np
 from PIL import Image
 from PIL import Image as PILImage
-from PIL import ImageDraw
-from PIL import ImageEnhance
-from PIL import ImageFilter
-from PIL import ImageFont
-from PIL import ImageOps
-from PIL import ImageSequence
+from PIL import (ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps,
+                 ImageSequence)
 
 from app.exceptions.errors import ParameterError
-from app.image.PILManip import PILManip
-from app.image.PILManip import double_image
-from app.image.PILManip import pil
-from app.image.PILManip import static_pil
 from app.image.decorators import executor
+from app.image.PILManip import PILManip, double_image, pil, static_pil
 from app.image.writetext import WriteText
 
 __all__ = (
@@ -47,7 +40,9 @@ __all__ = (
     "pride",
     "delete",
     "shatter",
-    "fedora"
+    "fedora",
+    "stringify",
+    "mosiac"
 )
 
 
@@ -428,6 +423,68 @@ def angel(image):
     area = (250, 130)
     fim.paste(base, area)
     return fim
+
+
+@executor
+@static_pil
+def stringify(im):
+    im = im.convert("L")
+    im.thumbnail((50, 50))
+    brightest = int(
+        (sorted(np.array(im).flatten(), reverse=True)[0] / 255) * 100)
+    width, height = im.size
+    canvas = Image.new("L", (width * 100 - 100, height * 100))
+    arr = np.flipud(np.rot90(np.array(im)))
+    draw = ImageDraw.Draw(canvas)
+
+    every_first = arr[::1, ::1]
+    every_second = arr[1::1, ::1]
+
+    for row_index, (row1, row2) in enumerate(zip(every_first, every_second)):
+        for column_index, (color1, color2) in enumerate(zip(row1, row2)):
+            height1 = 2 * ((int((color1 / 255) * 100) * 100) / brightest)
+            height2 = 2 * ((int((color2 / 255) * 100) * 100) / brightest)
+
+            draw.polygon(
+                (
+                    (row_index * 100, column_index * 100 + 100),
+                    (row_index * 100, column_index * 100 + height1),
+                    (row_index * 100 + 100, column_index * 100 + height2),
+                    (row_index * 100 + 100, column_index * 100 + 100)
+                ),
+                fill="black")
+
+            for offset in range(3):
+                draw.line(
+                    (
+                        (row_index * 100, column_index *
+                         100 + height1 + offset * 3),
+                        (row_index * 100 + 100, column_index *
+                         100 + height2 + offset * 3)
+                    ),
+                    fill="white", width=12, joint="curve")
+    return canvas
+
+
+@executor
+@pil
+def mosiac(img, pixels: int = None):
+    """
+    Heavily Inspired by the code used by
+    https://github.com/TrustyJAID/Trusty-cogs/blob/a236336034c981d8ea25155ef0c8f3f9d3fc4132/notsobot/notsobot.py#L1238-L1262
+    """
+    print(img.size)
+    img = img.convert("RGBA").resize((int(img.size[0] / pixels), int(img.size[1] / pixels)), 5).resize(
+        (int(img.size[0] * pixels), int(img.size[1] * pixels)), 5)
+    bg = (0, 0, 0)
+    width, height = img.size
+    load = img.load()
+    for i in range(0, width, pixels):
+        for j in range(0, height, pixels):
+            for r in range(pixels):
+                load[i + r, j] = bg
+                load[i, j + r] = bg
+    return img
 
 
 @executor

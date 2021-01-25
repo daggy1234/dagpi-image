@@ -1,5 +1,5 @@
-from app.image.WandManip import wand
 from app.image.decorators import executor
+from app.image.WandManip import wand
 
 __all__ = (
     "charcoal",

@@ -4,8 +4,7 @@ from io import BytesIO
 from wand.exceptions import TypeError
 from wand.image import Image
 
-from app.exceptions.errors import BadImage
-from app.exceptions.errors import FileLarge
+from app.exceptions.errors import BadImage, FileLarge
 
 
 class WandManip:
@@ -35,7 +34,7 @@ def wand(function):
                     frame = function(frame, *args, **kwargs)
                     dst_image.sequence.append(frame)
                 byt = dst_image.make_blob()
-        elif img.format == "PNG" or img.format=="GIF":
+        elif img.format == "PNG" or img.format == "GIF":
             dst_image = function(img, *args, **kwargs)
             byt = dst_image.make_blob()
         else:

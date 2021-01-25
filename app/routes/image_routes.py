@@ -1,13 +1,12 @@
-from fastapi import APIRouter
-from fastapi import Response
+from fastapi import APIRouter, Response
 
 from app.image.numpy_manip import *
 from app.image.pil_manipulation import *
 from app.image.retro_meme import *
 from app.image.text_images import *
 from app.image.wand_manipulation import *
-from app.routes.responses import gif_response_only, \
-    static_response_only, normal_response
+from app.routes.responses import (gif_response_only, normal_response,
+                                  static_response_only)
 from app.utils.client import Client
 
 router = APIRouter()
@@ -207,16 +206,23 @@ async def delete_image(url: str):
 
 
 @router.get("/pixel/", responses=normal_response)
-async def pixel_route(url: str = "https://dagbot-is.the-be.st/logo.png"):
+async def pixel_route(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await pixelate(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
 @router.get("/deepfry/", responses=normal_response)
-async def test_app(url: str = "https://dagbot-is.the-be.st/logo.png"):
+async def test_app(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await deepfry(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/mosiac/", responses=normal_response)
+async def mosiac_manip(url: str, pixels: int = 16):
+    byt = await Client.image_bytes(url)
+    img, image_format = await mosiac(byt, pixels)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
@@ -224,6 +230,13 @@ async def test_app(url: str = "https://dagbot-is.the-be.st/logo.png"):
 async def asc_image(url: str):
     byt = await Client.image_bytes(url)
     img = await ascii_image(byt)
+    return Response(img.read(), media_type="image/png")
+
+
+@router.get("/stringify/", responses=static_response_only)
+async def stri_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await stringify(byt)
     return Response(img.read(), media_type="image/png")
 
 

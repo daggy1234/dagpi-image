@@ -8,6 +8,7 @@ async def auth_check(request: Request, call_next):
     if (request.url.path == "/") or (request.url.path == "/metrics/") or \
             (request.url.path == "/docs") or \
             (request.url.path == "/openapi.json") or \
+            (request.url.path == "/image/openapi.json") or \
             (request.url.path == "/playground"):
         response = await call_next(request)
         return response

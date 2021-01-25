@@ -9,8 +9,8 @@ from async_timeout import timeout
 
 from ..exceptions.errors import BadUrl, NoImageFound, ServerTimeout
 
-headers = {'Authorization': os.getenv("TOKEN")}
-base_url = os.getenv("BASE_URL")
+headers = {'Authorization': os.getenv("TOKEN", "What")}
+base_url = os.getenv("BASE_URL", "https://dagbot.daggy.tech")
 print(headers, base_url)
 _session = None
 
@@ -61,8 +61,8 @@ class Client:
                         byt: bytes = r.read()
                         return byt
                     else:
-                        raise NoImageFound()
+                        raise NoImageFound("Non 200 Status Code")
                 except httpx.RequestError:
-                    raise NoImageFound()
+                    raise NoImageFound("Requesting Error")
         except asyncio.TimeoutError:
-            raise ServerTimeout()
+            raise ServerTimeout("Server Timed Out")

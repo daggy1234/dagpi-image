@@ -1,14 +1,11 @@
 import random
 from datetime import datetime
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
-from PIL import ImageOps
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from app.exceptions.errors import ParameterError
-from app.image.PILManip import static_pil
 from app.image.decorators import executor
+from app.image.PILManip import static_pil
 from app.image.writetext import WriteText
 
 __all__ = (
@@ -188,7 +185,7 @@ def quote(image, username: str, text: str, dark: bool):
         user_color = (256, 256, 256) if dark else (6, 6, 7)
         d.text((260, 70), username, fill=user_color, font=fntd)
         wi = fntd.getsize(username)
-        ##72767d
+        # 72767d
         d.text((300 + wi[0], 92), t_string, fill=(114, 118, 125), font=fntt)
         wrap = WriteText(y)
         # dark: #ffffff light:
