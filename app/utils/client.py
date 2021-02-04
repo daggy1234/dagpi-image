@@ -27,6 +27,9 @@ class AuthModel:
     def __init__(self, obj: Dict):
         self.auth = obj.get("auth")
         self.ratelimited = obj.get("ratelimited")
+        self.premium = obj.get("premium")
+        self.ratelimit = int(obj.get("ratelimit"))
+        self.left = int(obj.get("left"))
 
 
 class Client:

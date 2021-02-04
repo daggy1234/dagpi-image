@@ -22,7 +22,9 @@ async def auth_check(request: Request, call_next):
         if tok.auth:
             if not tok.ratelimited:
                 response = await call_next(request)
+                response.headers["X-Ratelimit-Limit"] = str(tok.ratelimit)
+                response.headers['X-Ratelimit-Remaining'] = str(tok.left)
                 return response
-            return JSONResponse({"message": "Ratelimited"}, status_code=429)
+            return JSONResponse({"message": "Ratelimited"}, headers={'X-Ratelimit-Limit': str(tok.ratelimit), 'X-Ratelimit-Remaining': str(tok.left)},status_code=429)
 
         return JSONResponse({"message": "Unauthorized"}, status_code=403)
