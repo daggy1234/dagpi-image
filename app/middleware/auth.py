@@ -1,8 +1,12 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from starlette.background import BackgroundTasks
 
 from app.utils.client import Client
 
+
+async def post_stat(route: str, token: str, ua: str):
+    await Client.post_stat(route, token, ua)
 
 async def auth_check(request: Request, call_next):
     if (request.url.path == "/") or (request.url.path == "/metrics/") or \
@@ -24,6 +28,13 @@ async def auth_check(request: Request, call_next):
                 response = await call_next(request)
                 response.headers["X-Ratelimit-Limit"] = str(tok.ratelimit)
                 response.headers['X-Ratelimit-Remaining'] = str(tok.left)
+                t = BackgroundTasks()
+                try:
+                    ua = request.headers.get("user-agent")
+                except KeyError:
+                    ua = "No User Agent"
+                t.add_task(post_stat, route=request.url.path,token=token,ua=ua)
+                response.background = t
                 return response
             return JSONResponse({"message": "Ratelimited"}, headers={'X-Ratelimit-Limit': str(tok.ratelimit), 'X-Ratelimit-Remaining': str(tok.left)},status_code=429)
 

@@ -42,6 +42,19 @@ class Client:
         return AuthModel(r.json())
 
     @staticmethod
+    async def post_stat(route: str, token: str, ua: str):
+        session = await get_session()
+        js = {
+            "api": "image",
+            "route": route,
+            "token": token,
+            "user_agent": ua
+
+        }
+        r = await session.post(f"{base_url}/statpost", json=js)
+        print(r.status_code)
+
+    @staticmethod
     async def image_bytes(url: str):
         url = urllib.parse.unquote(url)
         regex = re.compile(
