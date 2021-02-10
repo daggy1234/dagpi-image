@@ -1,5 +1,5 @@
-from app.image.decorators import executor
 from app.image.WandManip import wand
+from app.image.decorators import executor
 
 __all__ = (
     "charcoal",
@@ -13,8 +13,7 @@ __all__ = (
     "sepia",
     "solar",
     "rainbow",
-    "magik"
-)
+    "magik",)
 
 
 @executor

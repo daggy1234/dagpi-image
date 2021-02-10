@@ -8,9 +8,9 @@ from skimage.exposure import rescale_intensity
 from skimage.feature import hog
 from skimage.filters import sobel
 
-from app.image.decorators import executor
 from app.image.NumpyManip import NumpyManip, numpy
 from app.image.PILManip import PILManip
+from app.image.decorators import executor
 
 __all__ = (
     "get_sobel",

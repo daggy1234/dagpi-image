@@ -364,3 +364,17 @@ async def discord_quote(url: str, username: str, text: str, dark: bool = True):
     byt = await Client.image_bytes(url)
     img = await yt_comment(byt, username, text, dark)
     return Response(img.read(), media_type="image/png")
+
+@router.get("/neon/", responses=gif_response_only)
+async def neon_image(url: str, sharp: bool = True, soft: bool = True, overlay: bool=False, gradient: int=0, multi:bool=False,
+                     per_color: int = 6,
+                     colors=None):
+    if colors is None:
+        colors =  [(244, 40, 43),
+                  (241, 196, 15),
+                  (56, 244, 120),
+                  (52, 152, 249),
+                  (180, 49, 182)]
+    byt = await Client.image_bytes(url)
+    img = await neon_static(byt, sharp, soft,  overlay, gradient,multi, per_color, colors)
+    return Response(img.read(), media_type="image/gif")

@@ -21,6 +21,7 @@ matplotlib = "3.3.2"
 scikit-image = "0.17.2"
 numpy = "1.19.4"
 gunicorn = "^20.0.4"
+polaroid = "^0.2.10"
 
 [tool.poetry.dev-dependencies]
 

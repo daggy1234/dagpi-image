@@ -1,10 +1,9 @@
-import random
 import textwrap
 
 from PIL import Image, ImageDraw, ImageFont
 
-from app.image.decorators import executor
 from app.image.PILManip import pil
+from app.image.decorators import executor
 
 __all__ = ("retromeme_gen",)
 

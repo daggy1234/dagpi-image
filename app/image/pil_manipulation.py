@@ -5,11 +5,11 @@ import numpy as np
 from PIL import Image
 from PIL import Image as PILImage
 from PIL import (ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps,
-                 ImageSequence)
+                 ImageSequence, ImageChops)
 
 from app.exceptions.errors import ParameterError
-from app.image.decorators import executor
 from app.image.PILManip import PILManip, double_image, pil, static_pil
+from app.image.decorators import executor
 from app.image.writetext import WriteText
 
 __all__ = (
@@ -42,7 +42,8 @@ __all__ = (
     "shatter",
     "fedora",
     "stringify",
-    "mosiac"
+    "mosiac",
+    "neon_static"
 )
 
 
@@ -474,7 +475,8 @@ def mosiac(img, pixels: int = None):
     https://github.com/TrustyJAID/Trusty-cogs/blob/a236336034c981d8ea25155ef0c8f3f9d3fc4132/notsobot/notsobot.py#L1238-L1262
     """
     print(img.size)
-    img = img.convert("RGBA").resize((int(img.size[0] / pixels), int(img.size[1] / pixels)), 5).resize(
+    img = img.convert("RGBA").resize(
+        (int(img.size[0] / pixels), int(img.size[1] / pixels)), 5).resize(
         (int(img.size[0] * pixels), int(img.size[1] * pixels)), 5)
     bg = (0, 0, 0)
     width, height = img.size
@@ -595,6 +597,133 @@ def communism(byt: bytes) -> BytesIO:
     obj = BytesIO()
     frame_list[0].save(obj, format='gif', save_all=True,
                        append_images=frame_list, loop=0, disposal=2,
+                       optimize=True)
+    obj.seek(0)
+    return obj
+
+
+def preprocess_neon(im, *, single, **kwargs):
+    sharpen = kwargs.get('sharpen', None)
+    saturation = kwargs.get('saturation', None)
+    overlay = kwargs.get('overlay', False)
+    im = im.convert('RGBA')
+    maxsize = kwargs.get('maxsize', 512 if single else 256)
+    size = max(im.size)
+    if size > maxsize:
+        ratio = size / maxsize
+        im = im.resize((int(im.width / ratio), int(im.height / ratio)))
+    else:
+        im = im
+    if sharpen is not None:
+        filters = (ImageFilter.SHARPEN, ImageFilter.EDGE_ENHANCE,
+                   ImageFilter.EDGE_ENHANCE_MORE)
+        try:
+            im = im.filter(filters[sharpen])
+        except IndexError:
+            pass
+    if overlay:
+        enhance = ImageEnhance.Brightness(im)
+        im = enhance.enhance(0.85)
+    if saturation is not None:
+        enhancer = ImageEnhance.Color(im)
+
+        im = enhancer.enhance(saturation)
+
+    return im
+
+
+def create_soft_outline(outline, single, multi):
+    soft = outline.filter(ImageFilter.GaussianBlur(10))
+    enhancer = ImageEnhance.Brightness(soft)
+    soft = enhancer.enhance(1.9 if single and not multi else 1.5)
+    return soft
+
+
+def create_sharp_outline(im, single, multi):
+    countour_outline = ImageChops.invert(
+        im.filter(ImageFilter.CONTOUR).convert('L'))
+    enhancer = ImageEnhance.Brightness(countour_outline)
+    countour_outline = enhancer.enhance(3.0 if single and not multi else 2.0)
+    width, height = countour_outline.size
+    width -= 1
+    height -= 1
+    draw = ImageDraw.Draw(countour_outline)
+    draw.line((0, 0, 0, height), 0, 1)
+    draw.line((0, 0, width, 0), 0, 1)
+    draw.line((width, height, 0, height), 0, 1)
+    draw.line((width, height, width, 0), 0, 1)
+    return countour_outline
+
+
+def color_range(start, end, steps):
+    delta = tuple((cur - nc) / steps for cur, nc in zip(start, end))
+    for i in range(steps):
+        yield tuple(cur - int(d * i) for cur, d in zip(start, delta))
+
+
+def neon_static_breathing(im, mask, colors, single, *, overlay,
+                          per_color) -> list:
+    if single:
+        with Image.new('RGB', im.size, colors) as paste:
+            temp = im if overlay else Image.new('RGBA', im.size, (0, 0, 0, 0))
+            temp.paste(paste, mask=mask)
+        return [temp]
+    else:
+        frames = []
+        iter_colors = iter(colors + type(colors)((colors[0],)))
+        next_color = next(iter_colors)
+        while True:
+            try:
+                current = next_color
+                next_color = next(iter_colors)
+            except StopIteration:
+                break
+            for color in color_range(current, next_color, per_color):
+                with Image.new('RGB', im.size, color) as paste:
+                    temp = im.copy() if overlay else Image.new('RGBA', im.size,
+                                                               (0, 0, 0, 0))
+                    temp.paste(paste, mask=mask)
+                frames.append(temp)
+        return frames
+
+
+@executor
+def neon_static(byt, sharp, soft, overlay, gradient, multi, per_color, colors,
+                **kwargs) -> BytesIO:
+    image = PILManip.static_pil_image(byt)
+    if not (sharp or soft):
+        raise ParameterError("both sharp and soft can't be false")
+    if all(isinstance(c, (tuple, list)) for c in colors):
+        if len(colors) == 1:
+            single = True
+            colors = tuple(colors[0])
+        else:
+            if gradient in (0, 1, 2):
+                single = gradient == 1
+            else:
+                raise ParameterError('gradient must be between 0 <= x <= 2')
+    elif all(isinstance(c, int) for c in colors) and len(colors) == 3:
+        single = True
+    else:
+        raise ParameterError(
+            'colors must be a tuple/list of RGB tuples or RGB tuple')
+    im = preprocess_neon(image, single=single, **kwargs)
+    outline = create_sharp_outline(im, single, multi)
+    with Image.new('RGBA', im.size, (0, 0, 0, 0)) as mask:
+        if soft:
+            with create_soft_outline(outline, single, multi) as soft:
+                mask.paste(soft, mask=soft)
+        if sharp:
+            mask.paste(outline, mask=outline)
+            outline.close()
+        frame_list = neon_static_breathing(im, mask, colors, single,
+
+                                           overlay=overlay,
+
+                                           per_color=per_color)
+    obj = BytesIO()
+    frame_list[0].save(obj, format='gif', save_all=True,
+                       append_images=frame_list, loop=0,
                        optimize=True)
     obj.seek(0)
     return obj

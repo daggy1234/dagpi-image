@@ -218,6 +218,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "polaroid"
+version = "0.2.10"
+description = "Hyper Fast and safe image manipulation library for python. Powered by rust."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "prometheus-client"
 version = "0.7.1"
 description = "Python client for the Prometheus monitoring system."
@@ -429,14 +437,6 @@ h11 = ">=0.8"
 standard = ["websockets (>=8.0.0,<9.0.0)", "watchgod (>=0.6,<0.7)", "python-dotenv (>=0.13)", "PyYAML (>=5.1)", "httptools (>=0.1.0,<0.2.0)", "uvloop (>=0.14.0)", "colorama (>=0.4)"]
 
 [[package]]
-name = "uvloop"
-version = "0.14.0"
-description = "Fast implementation of asyncio event loop on top of libuv"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "wand"
 version = "0.6.3"
 description = "Ctypes-based simple MagickWand API binding for Python"
@@ -451,7 +451,7 @@ test = ["pytest (>=5.3.5)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9e06acb93f019f6a6f95a70ba665370aef7622ab853cd15770183f42708df69e"
+content-hash = "2a07c7d47b8975c56cf0492d524ec0b5e87133e448b64ac7abe5da230e29b8c1"
 
 [metadata.files]
 async-timeout = [
@@ -640,6 +640,35 @@ pillow = [
     {file = "Pillow-7.2.0-pp36-pypy36_pp73-win32.whl", hash = "sha256:25930fadde8019f374400f7986e8404c8b781ce519da27792cbe46eabec00c4d"},
     {file = "Pillow-7.2.0.tar.gz", hash = "sha256:97f9e7953a77d5a70f49b9a48da7776dc51e9b738151b22dacf101641594a626"},
 ]
+polaroid = [
+    {file = "polaroid-0.2.10-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:24cbdb6c929312a4e506069169e42835c02b288e27e3f24b78ab76a8b61d5c72"},
+    {file = "polaroid-0.2.10-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:cecf038e0f11c0ad31409d824827c11cc615c6f0febad0032e2263366e07ce80"},
+    {file = "polaroid-0.2.10-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:50d743f4ee4f70ca18a5628bb95978ada1f56a30f2072fcdb28a71b14e0976a7"},
+    {file = "polaroid-0.2.10-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:9702f29cfe750044e40c81743530ce9a9dd8659a55a11137b80f74b848d0a2a6"},
+    {file = "polaroid-0.2.10-cp36-cp36m-manylinux2014_aarch64.whl", hash = "sha256:abbafee6d4a0b6ed65279d1738227171b02dc0c8c6b8bee5eea1e106f292979e"},
+    {file = "polaroid-0.2.10-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:81d952a284131c2231cb9b837bfbb223a947714736357f42490fec99a8373b6f"},
+    {file = "polaroid-0.2.10-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:6e0161668837ce2a6d7a7db8e4cde1eebf22c73528bb8796eb284664e6719f8b"},
+    {file = "polaroid-0.2.10-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:5721108ea06ae14767f6a5e5312b820b2c4227c2dbf1e50d9acd9bc7f0c2ad01"},
+    {file = "polaroid-0.2.10-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:a40fb6596721efda0e724cf02892ae5c121aab75d4d9ce0c7960f815dd6e8672"},
+    {file = "polaroid-0.2.10-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:d04d7f519968019c927a0ea23da4e1effad762f173e895fb4220475719a852f0"},
+    {file = "polaroid-0.2.10-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:7d170ea681cea9a8e641492e3e64ce28254d8ccb722c93bf4d21b4a4e24c9e4e"},
+    {file = "polaroid-0.2.10-cp37-cp37m-win_amd64.whl", hash = "sha256:c25148532f3c18da8dbb87cca77513de34db5556e7beb10e54e4163c955340eb"},
+    {file = "polaroid-0.2.10-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:fb7af200b9389f6747d055dde70f1cdf93ebf4340d2413a5437dab39a0a1bc84"},
+    {file = "polaroid-0.2.10-cp38-cp38-manylinux1_i686.whl", hash = "sha256:27a2b29d4b47300cd1f07a69b81160a9a1c79b8e353b40c7faef4796ccfe7862"},
+    {file = "polaroid-0.2.10-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:9db95226bd16b3569bf578a89dd5857b0ffa2485185cbc3fb004fbcbae11a7e5"},
+    {file = "polaroid-0.2.10-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:e469f078bada9e5075c86d38cb5bd7e01e20c2cca6d268424960becf8eb9ff90"},
+    {file = "polaroid-0.2.10-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:2b6c0e65f2ddd0939d10c6b25ef1d4ce356dd0ecd5d3e0d9e9029e7e18c199c4"},
+    {file = "polaroid-0.2.10-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:a2d716cd8a198662ff187319f596b9f037729110b9422ab31f7e6e21baa1966a"},
+    {file = "polaroid-0.2.10-cp38-cp38-win_amd64.whl", hash = "sha256:b1d2132876da8a868f7c508ff5425e51f3b916b2057ab339685d207ba4a9d848"},
+    {file = "polaroid-0.2.10-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:d59ac50fef3471309493b468a720fc9813edf187faf2f7ec9378f92ce5f22673"},
+    {file = "polaroid-0.2.10-cp39-cp39-manylinux1_i686.whl", hash = "sha256:e624a6b70b618e581948e053f3bbf79b78a8eb13a91d129cf620369613d095a6"},
+    {file = "polaroid-0.2.10-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:2d843da6532cf488346d129e63f943f50bc3970d9b0f2952e5ab336ad93bc0d8"},
+    {file = "polaroid-0.2.10-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:1fd5dd5ead5722ce5ade485ce9bb4c6c94e66f91f2cadeec7f40f2def87b1cff"},
+    {file = "polaroid-0.2.10-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:9063313904a9dca7ee0687837ef57406691b0249a068dd3fcee578b0ce16993b"},
+    {file = "polaroid-0.2.10-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:753131115a0ce8fa4b0d2dc0869cb4ef1412c0b2773d44486b778f2a39a66bc3"},
+    {file = "polaroid-0.2.10-cp39-cp39-win_amd64.whl", hash = "sha256:a9bc5d74b241bc47ca90a8b8b90a627cba5006e63841cdaf87c1efad2dad274b"},
+    {file = "polaroid-0.2.10.tar.gz", hash = "sha256:78cba85e9fec8d09f1e878c3ac7c46495d12cff7e4c172234413496eea19930b"},
+]
 prometheus-client = [
     {file = "prometheus_client-0.7.1.tar.gz", hash = "sha256:71cd24a2b3eb335cb800c7159f423df1bd4dcd5171b234be15e3f31ec9f622da"},
 ]
@@ -775,17 +804,6 @@ urllib3 = [
 uvicorn = [
     {file = "uvicorn-0.12.1-py3-none-any.whl", hash = "sha256:d06a25caa8dc680ad92eb3ec67363f5281c092059613a1cc0100acba37fc0f45"},
     {file = "uvicorn-0.12.1.tar.gz", hash = "sha256:a461e76406088f448f36323f5ac774d50e5a552b6ccb54e4fca8d83ef614a7c2"},
-]
-uvloop = [
-    {file = "uvloop-0.14.0-cp35-cp35m-macosx_10_11_x86_64.whl", hash = "sha256:08b109f0213af392150e2fe6f81d33261bb5ce968a288eb698aad4f46eb711bd"},
-    {file = "uvloop-0.14.0-cp35-cp35m-manylinux2010_x86_64.whl", hash = "sha256:4544dcf77d74f3a84f03dd6278174575c44c67d7165d4c42c71db3fdc3860726"},
-    {file = "uvloop-0.14.0-cp36-cp36m-macosx_10_11_x86_64.whl", hash = "sha256:b4f591aa4b3fa7f32fb51e2ee9fea1b495eb75b0b3c8d0ca52514ad675ae63f7"},
-    {file = "uvloop-0.14.0-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:f07909cd9fc08c52d294b1570bba92186181ca01fe3dc9ffba68955273dd7362"},
-    {file = "uvloop-0.14.0-cp37-cp37m-macosx_10_11_x86_64.whl", hash = "sha256:afd5513c0ae414ec71d24f6f123614a80f3d27ca655a4fcf6cabe50994cc1891"},
-    {file = "uvloop-0.14.0-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:e7514d7a48c063226b7d06617cbb12a14278d4323a065a8d46a7962686ce2e95"},
-    {file = "uvloop-0.14.0-cp38-cp38-macosx_10_11_x86_64.whl", hash = "sha256:bcac356d62edd330080aed082e78d4b580ff260a677508718f88016333e2c9c5"},
-    {file = "uvloop-0.14.0-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:4315d2ec3ca393dd5bc0b0089d23101276778c304d42faff5dc4579cb6caef09"},
-    {file = "uvloop-0.14.0.tar.gz", hash = "sha256:123ac9c0c7dd71464f58f1b4ee0bbd81285d96cdda8bc3519281b8973e3a461e"},
 ]
 wand = [
     {file = "Wand-0.6.3-py2.py3-none-any.whl", hash = "sha256:566b3d049858efa879096a7ab2e0516d67a240e6c3ffd7a267298c41e81c14b7"},
