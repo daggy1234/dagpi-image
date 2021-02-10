@@ -601,6 +601,10 @@ def communism(byt: bytes) -> BytesIO:
     obj.seek(0)
     return obj
 
+# Following Code by discord user z03h#6375
+# Was provided by him and is also AGPLv3 Licensed
+# View him here and give him a follow https://github.com/z03h
+
 
 def preprocess_neon(im, *, single, **kwargs):
     sharpen = kwargs.get('sharpen', None)
