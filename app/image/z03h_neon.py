@@ -122,14 +122,14 @@ def neon_static( oim, **kwargs):
     soft_brightness: :class:`float`
         How much to adjust the sharp outline brghtneess.
         Default is 3 for static and 2 for animated
-    soft_softness: :class:`float`
+    soft_softness: :class:`int`
         How much to blur the soft outline
     overlay: :class:`bool`
         Whether outline is overlaid on top of the original image.
         Default is ``False``.
     brightness: :class:`float`
         Brightness of original image if overlaid. Default is ``0.85``
-    colors: Union[List[Tuple]]
+    colors: Union[List[Tuple]], Tuple[Tuple]]
         List of RGB tuples.
         Ex.  ``[(255,0,0), (0,0,255)]``
     per_color: :class:`int`
@@ -457,14 +457,14 @@ async def _neon(oim, colors, **kwargs):
     soft_brightness: :class:`float`
         How much to adjust the sharp outline brghtneess.
         Default is 3 for static and 2 for animated
-    soft_softness: :class:`float`
+    soft_softness: :class:`int`
         How much to blur soft outline
     overlay: :class:`bool`
         Whether outline is overlaid on top of the original image.
         Default is ``False``.
     brightness: :class:`float`
         Brightness of original image if overlaid. Default is ``0.85``
-    colors: Union[List[Tuple]]
+    colors: Union[List[Tuple]], Tuple[Tuple]]
         List of RGB tuples.
         Ex.  ``[(255,0,0), (0,0,255)]``
     per_color: :class:`int`
