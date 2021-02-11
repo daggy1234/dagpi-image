@@ -1,4 +1,5 @@
 # Copyright (C) z03h https://github.com/z03h
+# 2021 - Present
 
 import io
 
@@ -121,6 +122,8 @@ def neon_static( oim, **kwargs):
     soft_brightness: :class:`float`
         How much to adjust the sharp outline brghtneess.
         Default is 3 for static and 2 for animated
+    soft_softness: :class:`float`
+        How much to blur the soft outline
     overlay: :class:`bool`
         Whether outline is overlaid on top of the original image.
         Default is ``False``.
@@ -454,6 +457,8 @@ async def _neon(oim, colors, **kwargs):
     soft_brightness: :class:`float`
         How much to adjust the sharp outline brghtneess.
         Default is 3 for static and 2 for animated
+    soft_softness: :class:`float`
+        How much to blur soft outline
     overlay: :class:`bool`
         Whether outline is overlaid on top of the original image.
         Default is ``False``.
