@@ -8,6 +8,8 @@ import numpy as np
 from wand.image import Image as wImage
 from PIL import Image, ImageSequence, ImageFilter, ImageChops, ImageEnhance, ImageDraw
 
+__all__ = ('neon', 'a_neon')
+
 def gif_a_neon(oim, **kwargs):
     """Specific function for animated source and animated gradient
     kwargs are similar to neon_static
@@ -446,11 +448,13 @@ def create_gradient(im, colors, single, gradient_direction, horizontal, colors_p
 
     # get pil image from stacked arrays
     if gradient_direction == 5:
+        # create radial gradient
         with wImage.from_array(stack(arrays)) as wim:
             wim.virtual_pixel = 'edge'
             wim.distort('arc', (360,))
             paste = Image.fromarray(np.array(wim))
     else:
+        # combine into horizontal/vertical gradient
         paste = Image.fromarray(stack(arrays if single else [*arrays, *arrays]))
 
     if (single and gradient_direction in (1,2)) or gradient_direction==5:
@@ -474,7 +478,7 @@ def process_gradient(paste, mask, position, gradient_direction):
     return temp_paste
 
 
-def _neon(oim, colors, **kwargs):
+def neon(oim, colors, **kwargs):
     """Handles static source neon images
 
     Parameters
@@ -566,8 +570,10 @@ def _neon(oim, colors, **kwargs):
     return final
 
 
-def _a_neon(oim, colors, **kwargs):
-    """Handles animated souce to neon images"""
+def a_neon(oim, colors, **kwargs):
+    """Handles animated souce to neon images
+    Refer to :func:`neon` for kwarg info
+    """
     gradient = kwargs.pop('gradient', 0)
     overlay = kwargs.pop('overlay', False)
 
