@@ -595,9 +595,9 @@ def a_neon(oim, colors, **kwargs):
         # another animated check
         total_frames = oim.n_frames
         if total_frames < 2:
-            raise BadImage('oim not animated')
+            raise BadImage('Image not animated')
     except AttributeError:
-        raise BadImage('oim not animated')
+        raise BadImage('Image not animated')
 
     if not gradient and len(colors) > 1:
         # create the colors for breathing
