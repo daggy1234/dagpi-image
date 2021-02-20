@@ -8,6 +8,8 @@ import numpy as np
 from wand.image import Image as wImage
 from PIL import Image, ImageSequence, ImageFilter, ImageChops, ImageEnhance, ImageDraw
 
+from app.exceptions.errors import BadImage, ParameterError, ManipulationError
+
 __all__ = ('neon', 'a_neon')
 
 def gif_a_neon(oim, **kwargs):
@@ -19,7 +21,7 @@ def gif_a_neon(oim, **kwargs):
     sharp = kwargs.get('sharp', True)
     soft = kwargs.get('soft', True)
     if not (sharp or soft):
-        raise ValueError('sharp and soft both cannot be False')
+        raise ParameterError('sharp and soft both cannot be False')
     overlay = kwargs.get('overlay', False)
     gradient = kwargs.get('gradient', 0)
     multi = True
@@ -30,10 +32,10 @@ def gif_a_neon(oim, **kwargs):
         colors_per_frame = kwargs.get('colors_per_frame') or 3
         gradient_direction = kwargs.get('gradient_direction', 1)
     except KeyError:
-        raise ValueError('Must set "colors"')
+        raise ParameterError('Must set "colors"')
 
     if not all(isinstance(c, (tuple,list)) for c in colors):
-        raise TypeError('colors must be a tuple/list of RGB tuples')
+        raise ParameterError('colors must be a tuple/list of RGB tuples')
 
     horizontal = gradient_direction % 2
     # create the gradient
@@ -180,14 +182,14 @@ def neon_static(oim, **kwargs):
     sharp = kwargs.get('sharp', True)
     soft = kwargs.get('soft', True)
     if not (sharp or soft):
-        raise ValueError('sharp and soft both cannot be False')
+        raise ParameterError('sharp and soft both cannot be False')
     overlay = kwargs.get('overlay', False)
     gradient = kwargs.get('gradient', 0)
     multi = kwargs.get('multi', False)
     try:
         colors = kwargs['colors']
     except KeyError:
-        raise ValueError('Must set "colors"')
+        raise ParameterError('Must set "colors"')
     else:
         per_color = kwargs.get('per_color') or 6
         if all(isinstance(c, (tuple,list)) for c in colors):
@@ -209,13 +211,14 @@ def neon_static(oim, **kwargs):
                     colors_per_frame = kwargs.get('colors_per_frame') or 3
                     gradient_direction = kwargs.get('gradient_direction', 1)
                 else:
-                    raise ValueError('gradient must be 0, 1, or 2')
+                    raise ParameterError('gradient must be 0, 1, or 2')
 
         elif all(isinstance(c, int) for c in colors) and len(colors) == 3:
             # colors is tuple of (r,g,b) instead of nested tuple ((r,g,b),)
+            gradient = 0
             single = True
         else:
-            raise TypeError('colors must be a tuple/list of RGB tuples or RGB tuple')
+            raise ParameterError('colors must be a tuple/list of RGB tuples or RGB tuple')
 
     # Actual processing
     im = preprocess_neon(oim, single=single, **kwargs)
@@ -592,16 +595,16 @@ def a_neon(oim, colors, **kwargs):
         # another animated check
         total_frames = oim.n_frames
         if total_frames < 2:
-            raise TypeError('oim not animated')
+            raise BadImage('oim not animated')
     except AttributeError:
-        raise TypeError('oim not animated')
+        raise BadImage('oim not animated')
 
     if not gradient and len(colors) > 1:
         # create the colors for breathing
 
         #check # of colors to frames
         if len(colors) >= total_frames:
-            raise ValueError('Too many colors to source image frames')
+            raise ParameterError('Too many colors')
 
         # divmod to evenly distribute frames per colors
         # and match original frame count
@@ -660,6 +663,6 @@ def a_neon(oim, colors, **kwargs):
         ext = 'gif'
         image[0].save(final, format=ext, save_all=True, dispose=2, append_images=image[1:], duration=durations, loop=0)
     else:
-        raise TypeError(f'Got {type(image)} instead of list of PIL.Image')
+        raise ManipulationError(f'Got {type(image)} instead of list of PIL.Image')
     final.seek(0)
     return final
