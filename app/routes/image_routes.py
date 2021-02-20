@@ -378,4 +378,4 @@ async def neon_image(url: str, sharp: bool = True, soft: bool = True, overlay: b
     animated = multi or len(colors) > 1
     byt = await Client.image_bytes(url)
     img = await neon(byt, colors, multi, sharp, soft, overlay, direction, gradient, per_color)
-    return Response(img.read(), media_type=f"image/{'gif' if animated else 'png'})
+    return Response(img.read(), media_type=f"image/{'gif' if animated else 'png'}")
