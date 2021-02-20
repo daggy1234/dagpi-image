@@ -44,7 +44,7 @@ __all__ = (
     "fedora",
     "stringify",
     "mosiac",
-    "neon_static"
+    "neon"
 )
 
 
