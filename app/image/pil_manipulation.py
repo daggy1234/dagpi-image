@@ -610,3 +610,39 @@ def neon(byt: bytes, colors, *, multi=False, **kwargs) -> BytesIO:
     img = PILManip.pil_image(byt)
     neon_func = _neon.a_neon if multi else _neon.neon
     return neon_func(img, colors, **kwargs)
+
+# Made by isirk#0001
+## > https://github.com/isirk
+@executor
+def quantize(byt: bytes) -> BytesIO:
+    image = PILManip.static_pil_image(byt)
+    siz = 300
+    newsize = (siz,siz)
+    w, h = image.size
+    if w > h:
+      the_key = w / siz
+      image = image.resize((siz,int(h / the_key))).convert("RGBA")
+    elif h > w:
+      the_key = h / siz
+      image = image.resize((int(w / the_key),siz)).convert("RGBA")
+    else:
+      image = image.resize(newsize).convert("RGBA")
+    images1 = []
+    for i in range(60):
+        try:
+            im = image.copy()
+            im = im.quantize(colors=i + 1, method=2)
+            images1.append(im)
+        except:
+            break
+    images2 = list(reversed(images1))
+    images = images1 + images2
+    buffer = BytesIO()
+    images[0].save(buffer,
+                format='gif',
+                save_all=True,
+                append_images=images[1:],
+                duration=1,
+                loop=0)
+    buffer.seek(0)
+    return buffer
