@@ -15,7 +15,7 @@ class PILManip:
         try:
             io = BytesIO(image)
             io.seek(0)
-            return Image.open(io)
+            return Image.open(io, formats=("PNG", "JPEG", "GIF"))
         except UnidentifiedImageError:
             raise BadImage("Unable to use Image")
 
@@ -26,7 +26,7 @@ class PILManip:
         try:
             io = BytesIO(image)
             io.seek(0)
-            return Image.open(io)
+            return Image.open(io, formats=("PNG", "JPEG"))
         except UnidentifiedImageError:
             raise BadImage("Unable to use Image")
 
