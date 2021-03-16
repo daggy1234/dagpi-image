@@ -1,13 +1,13 @@
 import random
 from io import BytesIO
-
+import math
 import numpy as np
 from PIL import Image
 from PIL import Image as PILImage
 from PIL import (ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps,
-                 ImageSequence, ImageChops)
+                 ImageSequence)
 
-import neon as _neon
+import app.image.neon as _neon
 from app.exceptions.errors import ParameterError
 from app.image.PILManip import PILManip, double_image, pil, static_pil
 from app.image.decorators import executor
@@ -44,7 +44,15 @@ __all__ = (
     "fedora",
     "stringify",
     "mosiac",
-    "neon"
+    "neon",
+    "quantize",
+    "gen_dissolve",
+    "petpetgen",
+    "spin_manip",
+    "ice",
+    "molten",
+    "earth",
+    "comic_manip"
 )
 
 
@@ -176,6 +184,72 @@ def gay(image):
     ci = image.convert("RGBA")
     ci.paste(filled, mask=filled)
     return ci
+
+
+@executor
+@pil
+def molten(img):
+    img = img.convert("RGB")
+    width, height = img.size
+    pix = img.load()
+    for w in range(width):
+        for h in range(height):
+            r, g, b = pix[w, h]
+            pix[w, h] = min(255, int(abs(r * 128 / (g + b + 1)))), \
+                min(255, int(abs(g * 128 / (b + r + 1)))), \
+                min(255, int(abs(b * 128 / (r + g + 1))))
+
+    return img
+
+
+@executor
+@pil
+def ice(img):
+    img = img.convert("RGB")
+    width, height = img.size
+    pix = img.load()
+    for w in range(width):
+        for h in range(height):
+            r, g, b = pix[w, h]
+            pix[w, h] = min(255, int(abs(r - g - b) * 3 / 2)), \
+                min(255, int(abs(g - b - r) * 3 / 2)), \
+                min(255, int(abs(b - r - g) * 3 / 2))
+
+    return img
+
+
+@executor
+@pil
+def earth(img):
+    img = img.convert("RGB")
+    width, height = img.size
+    pix = img.load()
+    for w in range(width):
+        for h in range(height):
+            r, g, b = pix[w, h]
+            pix[w, h] = int(math.sin(math.atan2(g, b)) * 255), \
+                int(math.sin(math.atan2(b, r)) * 255), \
+                int(math.sin(math.atan2(r, g)) * 255)
+
+    return img
+
+
+@executor
+@pil
+def comic_manip(img):
+    img = img.convert("RGB")
+    width, height = img.size
+    pix = img.load()
+    for w in range(width):
+        for h in range(height):
+            r, g, b = pix[w, h]
+            pix[w, h] = tuple(map(lambda i: min(255, i),
+                                  [
+                abs(g - b + g + r) * r // 256,
+                abs(b - g + b + r) * r // 256,
+                abs(b - g + b + r) * r // 256]))
+
+    return img.convert('L')
 
 
 @executor
@@ -459,10 +533,8 @@ def stringify(im):
             for offset in range(3):
                 draw.line(
                     (
-                        (row_index * 100, column_index *
-                         100 + height1 + offset * 3),
-                        (row_index * 100 + 100, column_index *
-                         100 + height2 + offset * 3)
+                        (row_index * 100, column_index * 100 + height1 + offset * 3),
+                        (row_index * 100 + 100, column_index * 100 + height2 + offset * 3)
                     ),
                     fill="white", width=12, joint="curve")
     return canvas
@@ -470,24 +542,39 @@ def stringify(im):
 
 @executor
 @pil
-def mosiac(img, pixels: int = None):
-    """
-    Heavily Inspired by the code used by
-    https://github.com/TrustyJAID/Trusty-cogs/blob/a236336034c981d8ea25155ef0c8f3f9d3fc4132/notsobot/notsobot.py#L1238-L1262
-    """
-    print(img.size)
-    img = img.convert("RGBA").resize(
-        (int(img.size[0] / pixels), int(img.size[1] / pixels)), 5).resize(
-        (int(img.size[0] * pixels), int(img.size[1] * pixels)), 5)
-    bg = (0, 0, 0)
+def mosiac(img, block_size: int = None):
+    if block_size < 1 or block_size > 32:
+        raise ParameterError("Blocksize must be between 1 and 32")
+
+    if img.mode != "RGBA":
+        img = img.convert("RGBA")
+
     width, height = img.size
-    load = img.load()
-    for i in range(0, width, pixels):
-        for j in range(0, height, pixels):
-            for r in range(pixels):
-                load[i + r, j] = bg
-                load[i, j + r] = bg
-    return img
+    pix = img.load()
+
+    dst_img = Image.new("RGBA", (width, height))
+    dst_pix = dst_img.load()
+
+    for w in range(0, width, block_size):
+        for h in range(0, height, block_size):
+            r_sum, g_sum, b_sum = 0, 0, 0
+            size = block_size ** 2
+
+            for i in range(w, min(w + block_size, width)):
+                for j in range(h, min(h + block_size, height)):
+                    r_sum += pix[i, j][0]
+                    g_sum += pix[i, j][1]
+                    b_sum += pix[i, j][2]
+
+            r_ave = int(r_sum / size)
+            g_ave = int(g_sum / size)
+            b_ave = int(b_sum / size)
+
+            for i in range(w, min(w + block_size, width)):
+                for j in range(h, min(h + block_size, height)):
+                    dst_pix[i, j] = r_ave, g_ave, b_ave, pix[w, h][3]
+
+    return dst_img.convert("P", colors=256)
 
 
 @executor
@@ -602,9 +689,46 @@ def communism(byt: bytes) -> BytesIO:
     obj.seek(0)
     return obj
 
+
+@executor
+def petpetgen(byt: bytes) -> BytesIO:
+    im = Image.open("app/image/assets/petpet.gif")
+    bim = PILManip.static_pil_image(byt)
+    br = bim.convert("RGBA").resize((200, 200), 4)
+    frames = list()
+    i = 0
+    for fr in ImageSequence.Iterator(im):
+        y = 300 if i % 2 == 1 else 250
+        ima = Image.new("RGBA", (500, 500), (0, 0, 0, 255))
+        r = fr.resize((500, 500), 4).convert("RGBA")
+        ima.paste(br, (200, y))
+        ima.paste(r, mask=r)
+        frames.append(ima)
+        i += 1
+        io = BytesIO()
+    frames[0].save(io,
+                   format='gif',
+                   save_all=True,
+                   append_images=frames[1:],
+                   loop=0)
+
+    io.seek(0)
+    return io
+
+
+@executor
+def spin_manip(bytes: bytes) -> BytesIO:
+    return [img := PILManip.static_pil_image(bytes), f := [img.rotate(i).resize(img.size, 4) for i in range(0, 360, 5)],
+            f[0].save(io := BytesIO(), format='gif',
+                      save_all=True,
+                      append_images=f[1:],
+                      loop=0), io.seek(0), io][4]
+
 # Following Code by discord user z03h#6375
 # and is also AGPLv3 Licensed
 # https://github.com/z03h
+
+
 @executor
 def neon(byt: bytes, colors, *, multi=False, **kwargs) -> BytesIO:
     img = PILManip.pil_image(byt)
@@ -612,37 +736,76 @@ def neon(byt: bytes, colors, *, multi=False, **kwargs) -> BytesIO:
     return neon_func(img, colors, **kwargs)
 
 # Made by isirk#0001
-## > https://github.com/isirk
+#  https://github.com/isirk
+
+
 @executor
 def quantize(byt: bytes) -> BytesIO:
     image = PILManip.static_pil_image(byt)
     siz = 300
-    newsize = (siz,siz)
+    newsize = (siz, siz)
     w, h = image.size
     if w > h:
-      the_key = w / siz
-      image = image.resize((siz,int(h / the_key))).convert("RGBA")
+        the_key = w / siz
+        image = image.resize((siz, int(h / the_key))).convert("RGBA")
     elif h > w:
-      the_key = h / siz
-      image = image.resize((int(w / the_key),siz)).convert("RGBA")
+        the_key = h / siz
+        image = image.resize((int(w / the_key), siz)).convert("RGBA")
     else:
-      image = image.resize(newsize).convert("RGBA")
+        image = image.resize(newsize).convert("RGBA")
     images1 = []
     for i in range(60):
         try:
             im = image.copy()
             im = im.quantize(colors=i + 1, method=2)
             images1.append(im)
-        except:
+        except IndexError:
             break
     images2 = list(reversed(images1))
     images = images1 + images2
     buffer = BytesIO()
     images[0].save(buffer,
-                format='gif',
-                save_all=True,
-                append_images=images[1:],
-                duration=1,
-                loop=0)
+                   format='gif',
+                   save_all=True,
+                   append_images=images[1:],
+                   duration=1,
+                   loop=0)
     buffer.seek(0)
     return buffer
+
+
+def transfer_pixels(source_img: Image, dest_img: Image, num_pixels: int, unused):
+    todo = num_pixels
+    while todo > 0 and unused:
+        pixel_loc = unused.pop()
+        source_img.putpixel(pixel_loc, dest_img.getpixel(pixel_loc))
+        todo -= 1
+
+
+@executor
+def gen_dissolve(byt: bytes) -> BytesIO:
+    img = PILManip.pil_image(byt)
+    q = img.quantize(colors=1, method=2)
+    p = q.getpalette()
+    r_tup = (p[0], p[1], p[2])
+    im = Image.new("RGBA", img.size, r_tup)
+    pixels = []
+    for x in range(img.size[0]):
+        for y in range(img.size[1]):
+            pixels.append((x, y))
+    random.shuffle(pixels)
+    images = list()
+    images.append(img.copy())
+    while len(pixels) > 0:
+        transfer_pixels(img, im, 2500, pixels)
+        images.append(img.copy())
+    images = images + images[::-1]
+    io = BytesIO()
+    images[0].save(io,
+                   format='gif',
+                   save_all=True,
+                   append_images=images[1:],
+                   duration=100,
+                   loop=0)
+    io.seek(0)
+    return io

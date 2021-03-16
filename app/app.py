@@ -16,7 +16,7 @@ from app.middleware import add_process_time_header, auth_check
 from app.routes import image_routes
 
 sentry = os.getenv("SENTRY")
-sentry_sdk.init(dsn=sentry,release="dagpi-image@1.7.1")
+sentry_sdk.init(dsn=sentry, release="dagpi-image@1.7.1")
 app = FastAPI(docs_url="/playground", redoc_url="/docs")
 asgi_app = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)

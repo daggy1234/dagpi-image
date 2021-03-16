@@ -112,14 +112,14 @@ def motiv(img, top_text: str, bottom_text: str):
     white_bg.paste(im, (5, 5), im)
     base.paste(white_bg, (100, 100), white_bg)
     wt = WriteText(base)
-    pos = im.height + 100 + im.height / 100
+    pos = im.height + 100 + im.height / 150
     text_h = wt.write_text_box(100, pos, top_text, im.width,
                                "app/image/assets/times-new-roman.ttf",
                                im.height // 5, (255, 255, 255), place="center",
                                justify_last_line=True)
     text_h_t = wt.write_text_box(100, text_h, bottom_text, im.width,
                                  "app/image/assets/times-new-roman.ttf",
-                                 (2 * (im.height // 10)) // 3, (255, 255, 255),
+                                 (3 * (im.height // 10)) // 4, (255, 255, 255),
                                  place="center", justify_last_line=True)
     ret = wt.ret_img()
     return ret.crop((0, 0, new_w, text_h_t + 30))

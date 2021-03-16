@@ -8,6 +8,7 @@ from app.utils.client import Client
 async def post_stat(route: str, token: str, ua: str):
     await Client.post_stat(route, token, ua)
 
+
 async def auth_check(request: Request, call_next):
     if (request.url.path == "/") or (request.url.path == "/metrics/") or \
             (request.url.path == "/docs") or \
@@ -33,9 +34,11 @@ async def auth_check(request: Request, call_next):
                     ua = request.headers.get("user-agent")
                 except KeyError:
                     ua = "No User Agent"
-                t.add_task(post_stat, route=request.url.path,token=token,ua=ua)
+                t.add_task(post_stat, route=request.url.path, token=token, ua=ua)
                 response.background = t
                 return response
-            return JSONResponse({"message": "Ratelimited"}, headers={'X-Ratelimit-Limit': str(tok.ratelimit), 'X-Ratelimit-Remaining': str(tok.left)},status_code=429)
+            return JSONResponse({"message": "Ratelimited"}, headers={'X-Ratelimit-Limit': str(tok.ratelimit),
+                                                                     'X-Ratelimit-Remaining': str(tok.left)},
+                                status_code=429)
 
         return JSONResponse({"message": "Unauthorized"}, status_code=403)

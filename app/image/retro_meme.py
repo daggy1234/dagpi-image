@@ -147,12 +147,12 @@ class Meme:
 
         text_bottom = self.text.split("|")[1:]
         if text_bottom:
-            text_bottom, text_bottom_width, bottom_font = self.prepare_text(
-                text_bottom)
+            text_bottom, text_bottom_width, bottom_font = self.prepare_text(text_bottom)
             bottom_xy = [
-                ((self.image.width - text_bottom_width) / 2),
-                (self.image.height - bottom_font.getsize(text_bottom)[1] *
-                 len(text_bottom.split("\n")) - margin_xy[1]), ]
+                (
+                    (self.image.width - text_bottom_width) / 2),
+                (self.image.height - bottom_font.getsize(text_bottom)[1] * len(text_bottom.split("\n")) - margin_xy[1]),
+            ]
             self.draw_text(bottom_xy, text_bottom, bottom_font)
 
     def make_meme(self):

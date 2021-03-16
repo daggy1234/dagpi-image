@@ -12,6 +12,7 @@ from app.exceptions.errors import BadImage, ParameterError, ManipulationError
 
 __all__ = ('neon', 'a_neon')
 
+
 def gif_a_neon(oim, **kwargs):
     """Specific function for animated source and animated gradient
     kwargs are similar to neon_static
@@ -23,25 +24,22 @@ def gif_a_neon(oim, **kwargs):
     if not (sharp or soft):
         raise ParameterError('sharp and soft both cannot be False')
     overlay = kwargs.get('overlay', False)
-    gradient = kwargs.get('gradient', 0)
-    multi = True
     single = False
     try:
         colors = kwargs['colors']
-        per_color = kwargs.get('per_color') or 6
         colors_per_frame = kwargs.get('colors_per_frame') or 3
         gradient_direction = kwargs.get('gradient_direction', 1)
     except KeyError:
         raise ParameterError('Must set "colors"')
 
-    if not all(isinstance(c, (tuple,list)) for c in colors):
+    if not all(isinstance(c, (tuple, list)) for c in colors):
         raise ParameterError('colors must be a tuple/list of RGB tuples')
 
     horizontal = gradient_direction % 2
     # create the gradient
     paste = create_gradient(oim, colors, single, gradient_direction, horizontal,
-                                 colors_per_frame)
-    if gradient_direction in (0,1):
+                            colors_per_frame)
+    if gradient_direction in (0, 1):
         # reverse gradient to reverse direction
         paste = paste.rotate(180)
 
@@ -50,21 +48,21 @@ def gif_a_neon(oim, **kwargs):
     num_frames = oim.n_frames
 
     # calculate pixel to move per frame
-    if gradient_direction==5:
+    if gradient_direction == 5:
         step = 360
-        paste = paste.resize((oim.width*2, oim.height*2))
+        paste = paste.resize((oim.width * 2, oim.height * 2))
     elif horizontal:
         # set step based on width if horizontal gradient
         # or height for vertical gradient
-        step = int((paste.width if horizontal else paste.height)/2)
+        step = int((paste.width if horizontal else paste.height) / 2)
     # divmod to get as equal steps as possible while
     # summing to original size
     step, rem = divmod(step, num_frames)
-    iter_steps = iter(([step+1]*rem) + ([step]*(num_frames-rem)))
+    iter_steps = iter(([step + 1] * rem) + ([step] * (num_frames - rem)))
 
-    if gradient_direction in (1,2):
-        #reverse the position for reversed gradient
-        position = -paste.width+oim.width if horizontal else -paste.height+oim.height
+    if gradient_direction in (1, 2):
+        # reverse the position for reversed gradient
+        position = -paste.width + oim.width if horizontal else -paste.height + oim.height
     frames = []
     durations = []
     for im in ImageSequence.Iterator(oim):
@@ -76,7 +74,7 @@ def gif_a_neon(oim, **kwargs):
         outline = create_sharp_outline(im, single, **kwargs)
 
         # create mask when pasting end result colors
-        with im, outline, Image.new('RGBA', im.size, (0,0,0,0)) as mask:
+        with im, outline, Image.new('RGBA', im.size, (0, 0, 0, 0)) as mask:
             if soft:
                 # create soft outline
                 soft = create_soft_outline(outline, single, **kwargs)
@@ -91,16 +89,17 @@ def gif_a_neon(oim, **kwargs):
             if overlay:
                 temp = im.copy()
             else:
-                temp = Image.new('RGBA', im.size, (0,0,0,255))
+                temp = Image.new('RGBA', im.size, (0, 0, 0, 255))
 
             with process_gradient(paste, mask, position, gradient_direction) as temp_paste:
                 temp.paste(temp_paste, mask=mask)
         frames.append(temp)
 
         # reverse the step for reverse gradients
-        position -= -next(iter_steps) if gradient_direction in (1,2) else next(iter_steps)
+        position -= -next(iter_steps) if gradient_direction in (1, 2) else next(iter_steps)
 
     return frames, durations
+
 
 def default_neon_kwargs(kwargs):
     defaults = {'sharp': True,
@@ -117,6 +116,7 @@ def default_neon_kwargs(kwargs):
             kwargs[kwarg] = defaults[kwarg]
 
     return kwargs
+
 
 def neon_static(oim, **kwargs):
     """neon colors for single images
@@ -185,16 +185,14 @@ def neon_static(oim, **kwargs):
         raise ParameterError('sharp and soft both cannot be False')
     overlay = kwargs.get('overlay', False)
     gradient = kwargs.get('gradient', 0)
-    multi = kwargs.get('multi', False)
     try:
         colors = kwargs['colors']
     except KeyError:
         raise ParameterError('Must set "colors"')
     else:
         per_color = kwargs.get('per_color') or 6
-        if all(isinstance(c, (tuple,list)) for c in colors):
+        if all(isinstance(c, (tuple, list)) for c in colors):
             # tuple of rgb tuples
-            frames = []
             if len(colors) == 1:
                 # passed single color, switch to single neon
                 gradient = 0
@@ -203,7 +201,7 @@ def neon_static(oim, **kwargs):
                 colors = tuple(colors[0])
             else:
                 # multiple colors
-                if gradient in (0,1,2):
+                if gradient in (0, 1, 2):
                     # 0 no gradient, animated
                     # 1 static gradient
                     # 2 animated gradient, animated
@@ -227,7 +225,7 @@ def neon_static(oim, **kwargs):
     outline = create_sharp_outline(im, single, **kwargs)
 
     # create mask when pasting end result colors
-    with Image.new('RGBA', im.size, (0,0,0,0)) as mask:
+    with Image.new('RGBA', im.size, (0, 0, 0, 0)) as mask:
         if soft:
             # create soft outline
             with create_soft_outline(outline, single, **kwargs) as soft:
@@ -241,7 +239,7 @@ def neon_static(oim, **kwargs):
 
         # set effect kwargs
         options = {'overlay': overlay,
-                  'per_color': per_color}
+                   'per_color': per_color}
         # set to neon static
         effect = neon_static_breathing
         if gradient:
@@ -251,6 +249,7 @@ def neon_static(oim, **kwargs):
             # switch to gradient function
             effect = neon_static_gradient
         return effect(im, mask, colors, single, **options)
+
 
 def preprocess_neon(im, *, single, **kwargs):
     sharpen = kwargs.get('sharpen', None)
@@ -264,9 +263,9 @@ def preprocess_neon(im, *, single, **kwargs):
     maxsize = kwargs.get('maxsize', 512 if single else 256)
     size = max(im.size)
     if size > maxsize:
-        #resize image while trying to keep ratio
+        # resize image while trying to keep ratio
         ratio = size / maxsize
-        im = im.resize((int(im.width/ratio), int(im.height/ratio)))
+        im = im.resize((int(im.width / ratio), int(im.height / ratio)))
 
     # Apply sharpening, attemp to enahnce edges before contour
     if sharpen is not None:
@@ -289,6 +288,7 @@ def preprocess_neon(im, *, single, **kwargs):
 
     return im
 
+
 def create_sharp_outline(im, single, **kwargs):
     multi = kwargs.get('multi')
     # get edges, convert to L mode
@@ -303,16 +303,17 @@ def create_sharp_outline(im, single, **kwargs):
     height -= 1
     draw = ImageDraw.Draw(countour_outline)
     # draw black lines along edges
-    draw.line((0,0, 0,height), 0, 1)
-    draw.line((0,0, width,0), 0, 1)
-    draw.line((width,height, 0,height), 0, 1)
-    draw.line((width,height, width,0), 0, 1)
+    draw.line((0, 0, 0, height), 0, 1)
+    draw.line((0, 0, width, 0), 0, 1)
+    draw.line((width, height, 0, height), 0, 1)
+    draw.line((width, height, width, 0), 0, 1)
 
     # birghten to enhance sharp outline
     enhancer = ImageEnhance.Brightness(countour_outline)
     countour_outline = enhancer.enhance(kwargs.get('sharp_brightness') or (3.0 if single and not multi else 2.0))
 
     return countour_outline
+
 
 def create_soft_outline(outline, single, **kwargs):
     multi = kwargs.get('multi')
@@ -323,13 +324,14 @@ def create_soft_outline(outline, single, **kwargs):
     soft = enhancer.enhance(kwargs.get('soft_brightness') or (1.9 if single and not multi else 1.5))
     return soft
 
+
 def neon_static_breathing(im, mask, colors, single, *, overlay, per_color):
     """handles single color or breathing effect"""
     if single:
         # single color
         with Image.new('RGB', im.size, colors) as paste:
             # use original if overlay or new image
-            temp = im if overlay else Image.new('RGBA', im.size, (0,0,0,255))
+            temp = im if overlay else Image.new('RGBA', im.size, (0, 0, 0, 255))
             temp.paste(paste, mask=mask)
         return temp
 
@@ -349,16 +351,18 @@ def neon_static_breathing(im, mask, colors, single, *, overlay, per_color):
         for color in color_range(current, next_color, per_color):
             with Image.new('RGB', im.size, color) as paste:
                 # copy original if overlay else new image
-                temp = im.copy() if overlay else Image.new('RGBA', im.size, (0,0,0,255))
+                temp = im.copy() if overlay else Image.new('RGBA', im.size, (0, 0, 0, 255))
                 temp.paste(paste, mask=mask)
             frames.append(temp)
     return frames
 
+
 def color_range(start, end, steps):
     """generator to yield colors between 2 colors and x steps"""
-    delta = tuple((cur - nc)/steps for cur, nc in zip(start, end))
+    delta = tuple((cur - nc) / steps for cur, nc in zip(start, end))
     for i in range(steps):
-        yield tuple(cur - int(d*i) for cur, d in zip(start, delta))
+        yield tuple(cur - int(d * i) for cur, d in zip(start, delta))
+
 
 def neon_static_gradient(im, mask, colors, single, gradient_direction,
                          *, overlay, per_color, colors_per_frame):
@@ -366,14 +370,14 @@ def neon_static_gradient(im, mask, colors, single, gradient_direction,
     horizontal = gradient_direction % 2
     # create gradient to paste
     paste = create_gradient(im, colors, single, gradient_direction, horizontal,
-                                 colors_per_frame)
+                            colors_per_frame)
 
     if single:
         # static image
         if paste.size != mask.size:
             # resize incase of rounding error
             paste = paste.resize(mask.size)
-        temp = im if overlay else Image.new('RGBA', im.size, (0,0,0,255))
+        temp = im if overlay else Image.new('RGBA', im.size, (0, 0, 0, 255))
         with paste, mask:
             temp.paste(paste, mask=mask)
         return temp
@@ -381,26 +385,26 @@ def neon_static_gradient(im, mask, colors, single, gradient_direction,
     # animated gradient
     frames = []
     position = 0
-    if gradient_direction==5:
+    if gradient_direction == 5:
         # radial gradient
-        step = int(360*per_color)
+        step = int(360 * per_color)
         min_pos = -360
         # make sure paste fits the mask when rotated
-        paste = paste.resize((mask.width*2,mask.height*2))
+        paste = paste.resize((mask.width * 2, mask.height * 2))
     else:
         # get the step based on width if horizontal gradient
         # or height if vertical gradient
         attr = 'width' if horizontal else 'height'
         # horizontal
         step = int(getattr(im, attr) * per_color)
-        min_pos = -int(getattr(paste, attr)/2)
+        min_pos = -int(getattr(paste, attr) / 2)
 
     step, rem = divmod(step, 100)
-    steps = iter([step+1]*rem)
+    steps = iter([step + 1] * rem)
 
     while position > min_pos:
         # copy if overlay else new image
-        temp = im.copy() if overlay else Image.new('RGBA', im.size, (0,0,0,255))
+        temp = im.copy() if overlay else Image.new('RGBA', im.size, (0, 0, 0, 255))
         temp_paste = process_gradient(paste, mask, position, gradient_direction)
         with temp_paste, mask:
             temp.paste(temp_paste, mask=mask)
@@ -413,14 +417,15 @@ def neon_static_gradient(im, mask, colors, single, gradient_direction,
             position -= step
     return frames
 
+
 def create_gradient(im, colors, single, gradient_direction, horizontal, colors_per_frame):
     arrays = []
     # add first color to rotate back
-    iter_colors = iter(colors + type(colors)((colors[0],))) if not single or gradient_direction==5 else iter(colors)
+    iter_colors = iter(colors + type(colors)((colors[0],))) if not single or gradient_direction == 5 else iter(colors)
     next_color = next(iter_colors)
     # single gradient fits in original image
     # moving gradient is extended part original image
-    ratio = len(colors)-1 if single or gradient_direction==5 else colors_per_frame-1
+    ratio = len(colors) - 1 if single or gradient_direction == 5 else colors_per_frame - 1
     while True:
         # create gradients with 2 colors
         try:
@@ -431,15 +436,15 @@ def create_gradient(im, colors, single, gradient_direction, horizontal, colors_p
         with wImage() as wim:
             # use ImageMagick pseudo scripts to create gradients
             wim.clear()
-            pseudo =  f'gradient:rgb{tuple(current)}-rgb{tuple(next_color)}'
+            pseudo = f'gradient:rgb{tuple(current)}-rgb{tuple(next_color)}'
             if horizontal:
                 # horizontal gradient
                 wim.options['gradient:direction'] = 'east'
-                wim.pseudo(int(im.width/ratio), im.height, pseudo)
+                wim.pseudo(int(im.width / ratio), im.height, pseudo)
             else:
                 # vertical gradient
                 wim.options['gradient:direction'] = 'north'
-                wim.pseudo(im.width, int(im.height/ratio), pseudo)
+                wim.pseudo(im.width, int(im.height / ratio), pseudo)
             # image to array, add array to a list
             arrays.append(np.array(wim))
     if not horizontal:
@@ -460,24 +465,25 @@ def create_gradient(im, colors, single, gradient_direction, horizontal, colors_p
         # combine into horizontal/vertical gradient
         paste = Image.fromarray(stack(arrays if single else [*arrays, *arrays]))
 
-    if (single and gradient_direction in (1,2)) or gradient_direction==5:
+    if (single and gradient_direction in (1, 2)) or gradient_direction == 5:
         # reverse the gradient for correct direction
         paste = paste.rotate(180)
     return paste
+
 
 def process_gradient(paste, mask, position, gradient_direction):
     """Helper method to crop the gradient to correct sizes"""
     horizontal = gradient_direction % 2
     if gradient_direction == 5:
-        coords = ( int(paste.width/4),int(paste.height/4),
-                  int(paste.width/4)+mask.width,int(paste.height/4)+mask.height)
+        coords = (int(paste.width / 4), int(paste.height / 4),
+                  int(paste.width / 4) + mask.width, int(paste.height / 4) + mask.height)
         temp_paste = paste.rotate(-position).crop(coords)
     elif horizontal:
         # horizontal
-        temp_paste = paste.crop((-position,0, -position+mask.width,mask.height))
+        temp_paste = paste.crop((-position, 0, -position + mask.width, mask.height))
     else:
         # vertical
-        temp_paste = paste.crop((0,-position, mask.width,-position+mask.height))
+        temp_paste = paste.crop((0, -position, mask.width, -position + mask.height))
     return temp_paste
 
 
@@ -538,30 +544,27 @@ def neon(oim, colors, **kwargs):
     gradient = kwargs.pop('gradient', 0)
     overlay = kwargs.pop('overlay', False)
 
-    animated = gradient!=1 and len(colors)!=1
-    directions = {'l':3, 'left':3,
-                  'd':2, 'down':2,
-                  'r':1, 'right':1,
-                  'u':0, 'up':0,
-                  'radial':5}
-    gradient_direction = directions.get(kwargs.pop('direction','').lower(), 3)
-
-    maxsize = 256 if animated else 512
+    directions = {'l': 3, 'left': 3,
+                  'd': 2, 'down': 2,
+                  'r': 1, 'right': 1,
+                  'u': 0, 'up': 0,
+                  'radial': 5}
+    gradient_direction = directions.get(kwargs.pop('direction', '').lower(), 3)
 
     per_color = kwargs.pop('per_color', None)
     saturation = kwargs.pop('saturation', None)
-    image =  neon_static(oim, colors=colors,
-                                     per_color=per_color or (10 if gradient else 8),
-                                     saturation=saturation or 0.7,
-                                     overlay=overlay,
-                                     gradient=gradient,
-                                     gradient_direction=gradient_direction,
-                                     **kwargs
-                                    )
+    image = neon_static(oim, colors=colors,
+                        per_color=per_color or (10 if gradient else 8),
+                        saturation=saturation or 0.7,
+                        overlay=overlay,
+                        gradient=gradient,
+                        gradient_direction=gradient_direction,
+                        **kwargs
+                        )
     final = io.BytesIO()
     if isinstance(image, list):
         ext = 'gif'
-        if gradient==2 and gradient_direction in (1,2):
+        if gradient == 2 and gradient_direction in (1, 2):
             # reverse images to simulate moving the opposite direction
             image.reverse()
         image[0].save(final, format=ext, save_all=True, dispose=2, append_images=image[1:], loop=0)
@@ -580,14 +583,14 @@ def a_neon(oim, colors, **kwargs):
     gradient = kwargs.pop('gradient', 0)
     overlay = kwargs.pop('overlay', False)
 
-    directions = {'l':3, 'left':3,
-                  'd':2, 'down':2,
-                  'r':1, 'right':1,
-                  'u':0, 'up':0,
-                  'radial':5}
-    gradient_direction = directions.get(kwargs.pop('direction','').lower(), 3)
+    directions = {'l': 3, 'left': 3,
+                  'd': 2, 'down': 2,
+                  'r': 1, 'right': 1,
+                  'u': 0, 'up': 0,
+                  'radial': 5}
+    gradient_direction = directions.get(kwargs.pop('direction', '').lower(), 3)
 
-    #start neon process after getting image bytes
+    # start neon process after getting image bytes
     image = []
     durations = []
 
@@ -602,14 +605,14 @@ def a_neon(oim, colors, **kwargs):
     if not gradient and len(colors) > 1:
         # create the colors for breathing
 
-        #check # of colors to frames
+        # check # of colors to frames
         if len(colors) >= total_frames:
             raise ParameterError('Too many colors')
 
         # divmod to evenly distribute frames per colors
         # and match original frame count
         per, remainder = divmod(total_frames, len(colors))
-        _frames_per_color = ([per+1] * remainder) + ([per] * (len(colors) - remainder))
+        _frames_per_color = ([per + 1] * remainder) + ([per] * (len(colors) - remainder))
         iter_colors = []
         ic = iter(colors + type(colors)((colors[0],)))
         next_color = next(ic)
@@ -638,26 +641,26 @@ def a_neon(oim, colors, **kwargs):
 
             durations.append(im.info.get('duration', 10))
             frame = neon_static(im, colors=color,
-                                     per_color=per_color or (10 if gradient else 8),
-                                     saturation=saturation or 0.7,
-                                     overlay=overlay,
-                                     gradient=gradient,
-                                     gradient_direction=gradient_direction,
-                                     max_size=256,
-                                     multi=True,
-                                     **kwargs
-                                    )
-            image.append(frame)
-    else:
-        # animated gradient with animated source
-        image, durations = gif_a_neon(oim, colors=colors,
+                                per_color=per_color or (10 if gradient else 8),
                                 saturation=saturation or 0.7,
                                 overlay=overlay,
                                 gradient=gradient,
                                 gradient_direction=gradient_direction,
-                                colors_per_frame=colors_per_frame or 2,
                                 max_size=256,
-                                **kwargs)
+                                multi=True,
+                                **kwargs
+                                )
+            image.append(frame)
+    else:
+        # animated gradient with animated source
+        image, durations = gif_a_neon(oim, colors=colors,
+                                      saturation=saturation or 0.7,
+                                      overlay=overlay,
+                                      gradient=gradient,
+                                      gradient_direction=gradient_direction,
+                                      colors_per_frame=colors_per_frame or 2,
+                                      max_size=256,
+                                      **kwargs)
     final = io.BytesIO()
     if isinstance(image, list):
         ext = 'gif'

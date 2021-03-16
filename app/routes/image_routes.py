@@ -31,7 +31,7 @@ async def retro_meme(url: str, top_text: str, bottom_text: str):
 async def motiv_meme(url: str, top_text: str, bottom_text: str):
     byt = await Client.image_bytes(url)
     img = await motiv(byt, top_text, bottom_text)
-    return Response(img.read(), media_type=f"image/png")
+    return Response(img.read(), media_type="image/png")
 
 
 @router.get("/modernmeme/", responses=normal_response)
@@ -177,6 +177,34 @@ async def gay_image(url: str):
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
+@router.get("/burn/", responses=normal_response)
+async def burn(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await molten(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/freeze/", responses=normal_response)
+async def freeze(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await ice(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/ground/", responses=normal_response)
+async def ground(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await earth(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/comic/", responses=normal_response)
+async def comic(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await comic_manip(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
 @router.get("/pride/", responses=normal_response)
 async def pride_image(url: str, flag: str):
     byt = await Client.image_bytes(url)
@@ -310,6 +338,34 @@ async def america_image(url: str):
     return Response(img.read(), media_type="image/gif")
 
 
+@router.get("/sketch/", responses=gif_response_only)
+async def sketch_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await quantize(byt)
+    return Response(img.read(), media_type="image/gif")
+
+
+@router.get("/spin/", responses=gif_response_only)
+async def spin_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await spin_manip(byt)
+    return Response(img.read(), media_type="image/gif")
+
+
+@router.get("/petpet/", responses=gif_response_only)
+async def pet_pet_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await petpetgen(byt)
+    return Response(img.read(), media_type="image/gif")
+
+
+@router.get("/dissolve/", responses=gif_response_only)
+async def dissolve(url: str):
+    byt = await Client.image_bytes(url)
+    img = await gen_dissolve(byt)
+    return Response(img.read(), media_type="image/gif")
+
+
 @router.get("/communism/", responses=gif_response_only)
 async def commie_image(url: str):
     byt = await Client.image_bytes(url)
@@ -328,7 +384,7 @@ async def get_thought_image(url: str, text: str):
 async def get_captcha_image(url: str, text: str):
     byt = await Client.image_bytes(url)
     img = await captcha(byt, text)
-    return Response(img.read(), media_type=f"image/png")
+    return Response(img.read(), media_type="image/png")
 
 
 @router.get("/tweet/", responses=static_response_only)
@@ -360,22 +416,27 @@ async def discord_quote(url: str, username: str, text: str, dark: bool = True):
 
 
 @router.get("/yt/", responses=static_response_only)
-async def discord_quote(url: str, username: str, text: str, dark: bool = True):
+async def youtube_comment(url: str, username: str, text: str, dark: bool = True):
     byt = await Client.image_bytes(url)
     img = await yt_comment(byt, username, text, dark)
     return Response(img.read(), media_type="image/png")
 
+
 @router.get("/neon/", responses=normal_response)
-async def neon_image(url: str, sharp: bool = True, soft: bool = True, overlay: bool = False, multi:bool = False,
-                     gradient: int = 0, per_color: int = None, colors_per_frame: int = None, direction: str = 'left',
-                     colors = None):
+async def neon_image(url: str, sharp: bool = True, soft: bool = True,
+                     overlay: bool = False, multi: bool = False,
+                     gradient: int = 0, per_color: int = None,
+                     colors_per_frame: int = None, direction: str = 'left',
+                     colors=None):
     if colors is None:
-        colors =  [(244, 40, 43),
+        colors = [(244, 40, 43),
                   (241, 196, 15),
                   (56, 244, 120),
                   (52, 152, 249),
                   (180, 49, 182)]
     animated = multi or len(colors) > 1
     byt = await Client.image_bytes(url)
-    img = await neon(byt, colors, multi, sharp, soft, overlay, direction, gradient, per_color, colors_per_frame)
+    img = await neon(byt, colors, multi=multi, sharp=sharp, soft=soft,
+                     overlay=overlay, direction=direction, gradient=gradient,
+                     per_color=per_color, colors_per_frame=colors_per_frame)
     return Response(img.read(), media_type=f"image/{'gif' if animated else 'png'}")
