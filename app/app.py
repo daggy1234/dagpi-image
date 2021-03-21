@@ -49,7 +49,7 @@ async def param_error(_request: Request, exc: ParameterError):
 async def manipulation_error(_request: Request, exc: ManipulationError):
     return JSONResponse(
         status_code=422,
-        content={"message": str(exc)},
+        content={"message": f"Unable to manipulate image: {str(exc)}"},
     )
 
 
@@ -148,7 +148,7 @@ def custom_openapi():
             "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
                    "dagpib.png"}}
     for endpoint in openapi_schema["paths"].keys():
-        if not (endpoint == "/" or endpoint == "/image/openapi.json"):
+        if endpoint not in ["/", "/image/openapi.json"]:
             openapi_schema["paths"][endpoint]["get"]["parameters"].append(
                 {"required": True,
                  "schema": {"title": "Authorization", "type": "string"},
