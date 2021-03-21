@@ -4,6 +4,7 @@ from app.image.numpy_manip import *
 from app.image.pil_manipulation import *
 from app.image.retro_meme import *
 from app.image.text_images import *
+from app.image.polaroid_manip import glitch
 from app.image.wand_manipulation import *
 from app.routes.responses import (gif_response_only, normal_response,
                                   static_response_only)
@@ -203,6 +204,13 @@ async def comic(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await comic_manip(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/glitch/", responses=static_response_only)
+async def glitch_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await glitch(byt)
+    return Response(img.read(), media_type="image/png")
 
 
 @router.get("/pride/", responses=normal_response)

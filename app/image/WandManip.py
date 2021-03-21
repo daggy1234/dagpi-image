@@ -34,7 +34,7 @@ def wand(function):
                     frame = function(frame, *args, **kwargs)
                     dst_image.sequence.append(frame)
                 byt = dst_image.make_blob()
-        elif img.format == "PNG" or img.format == "GIF":
+        elif img.format in ["PNG", "JPEG"]:
             dst_image = function(img, *args, **kwargs)
             byt = dst_image.make_blob()
         else:

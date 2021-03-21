@@ -46,10 +46,10 @@ async def param_error(_request: Request, exc: ParameterError):
 
 
 @app.exception_handler(ManipulationError)
-async def manipulation_error(_request: Request, _exc: ManipulationError):
+async def manipulation_error(_request: Request, exc: ManipulationError):
     return JSONResponse(
         status_code=422,
-        content={"message": "Unable to process the image due to an Error"},
+        content={"message": str(exc)},
     )
 
 

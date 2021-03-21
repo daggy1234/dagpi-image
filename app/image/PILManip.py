@@ -59,7 +59,7 @@ def pil(function):
                 res_frame = function(frame, *args, **kwargs)
                 frames.append(res_frame)
             return PILManip.pil_gif_save(frames), "gif"
-        elif img.format == "PNG" or img.format == "JPEG":
+        elif img.format in ["PNG", "JPEG"]:
             img = function(img, *args, **kwargs)
             return PILManip.pil_image_save(img), "png"
         else:

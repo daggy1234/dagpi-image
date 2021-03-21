@@ -123,8 +123,11 @@ def magik(image, scale: int = None):
                          height=int(image.height * 0.5),
                          delta_x=int(0.5 * scale) if scale else 1,
                          rigidity=0)
-    image.liquid_rescale(width=int(image.width * 1.5),
-                         height=int(image.height * 1.5),
-                         delta_x=scale if scale else 2,
-                         rigidity=0)
+    image.liquid_rescale(
+        width=int(image.width * 1.5),
+        height=int(image.height * 1.5),
+        delta_x=scale or 2,
+        rigidity=0,
+    )
+
     return image

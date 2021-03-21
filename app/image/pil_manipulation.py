@@ -78,38 +78,37 @@ def thought_image(image, file: str):
     if len(file) > 200:
         raise ParameterError(
             f"Your text is too long {len(file)} is greater than 200")
+    if len(file) > 151:
+        fo = file[:50] + "\n" + file[50:]
+        ft = fo[:100] + "\n" + fo[100:]
+        ff = ft[:150] + "\n" + ft[150:]
+        size = 10
+    elif len(file) > 101:
+        fo = file[:50] + "\n" + file[50:]
+        ff = fo[:100] + "\n" + fo[100:]
+        size = 12
+    elif 51 < len(file) < 100:
+        ff = file[:50] + "\n" + file[50:]
+        size = 14
+    elif 20 < len(file) <= 50:
+        ff = file
+        size = 18
     else:
-        if len(file) > 151:
-            fo = file[:50] + "\n" + file[50:]
-            ft = fo[:100] + "\n" + fo[100:]
-            ff = ft[:150] + "\n" + ft[150:]
-            size = 10
-        elif len(file) > 101:
-            fo = file[:50] + "\n" + file[50:]
-            ff = fo[:100] + "\n" + fo[100:]
-            size = 12
-        elif 51 < len(file) < 100:
-            ff = file[:50] + "\n" + file[50:]
-            size = 14
-        elif 20 < len(file) <= 50:
-            ff = file
-            size = 18
-        else:
-            ff = file
-            size = 25
-        pfp = image.resize((200, 225), 5)
-        width = 800
-        height = 600
-        fim = im.resize((width, height), 4)
-        area = (125, 50)
-        fim.paste(pfp, area)
-        base = fim.convert("RGBA")
-        txt = Image.new("RGBA", base.size, (255, 255, 255, 0))
-        fnt = ImageFont.truetype("app/image/assets/Helvetica-Bold-Font.ttf",
-                                 size)
-        d = ImageDraw.Draw(txt)
-        d.text((400, 150), f"{ff}", font=fnt, fill=(0, 0, 0, 255))
-        return Image.alpha_composite(base, txt)
+        ff = file
+        size = 25
+    pfp = image.resize((200, 225), 5)
+    width = 800
+    height = 600
+    fim = im.resize((width, height), 4)
+    area = (125, 50)
+    fim.paste(pfp, area)
+    base = fim.convert("RGBA")
+    txt = Image.new("RGBA", base.size, (255, 255, 255, 0))
+    fnt = ImageFont.truetype("app/image/assets/Helvetica-Bold-Font.ttf",
+                             size)
+    d = ImageDraw.Draw(txt)
+    d.text((400, 150), f"{ff}", font=fnt, fill=(0, 0, 0, 255))
+    return Image.alpha_composite(base, txt)
 
 
 @executor
@@ -169,7 +168,7 @@ def htiler(image):
 def jail(image):
     w, h = image.size
     fil = Image.open("app/image/assets/jail.png")
-    filled = fil.resize((w, h), 5)
+    filled = fil.resize((w, h), 5).convert("RGBA")
     ci = image.convert("RGBA")
     ci.paste(filled, mask=filled)
     return ci
@@ -180,7 +179,7 @@ def jail(image):
 def gay(image):
     w, h = image.size
     fil = Image.open("app/image/assets/gayfilter.png")
-    filled = fil.resize((w, h), 5)
+    filled = fil.resize((w, h), 5).convert("RGBA")
     ci = image.convert("RGBA")
     ci.paste(filled, mask=filled)
     return ci
@@ -293,7 +292,7 @@ def triggered(byt: bytes):
     im = im.resize((500, 500), 1)
     overlay = Image.open("app/image/assets/triggered.png")
     ml = []
-    for i in range(0, 30):
+    for _si in range(30):
         blank = Image.new("RGBA", (400, 400))
         x = -1 * (random.randint(50, 100))
         y = -1 * (random.randint(50, 100))
@@ -392,9 +391,7 @@ def ascii_image(image):
     new_img = Image.new("RGBA", (new_img_width, new_img_height), bgcolor)
     draw = ImageDraw.Draw(new_img)
     y = 0
-    line_idx = 0
-    for line in lines:
-        line_idx += 1
+    for line_idx, line in enumerate(lines):
         draw.text((0, y), line, (0, 255, 65), font=font)
         y += letter_height
     return new_img
@@ -658,7 +655,7 @@ def america(byt: bytes) -> BytesIO:
     image = img.convert("RGBA").resize((480, 480), 5)
     flag = Image.open("app/image/assets/america.gif")
     image.putalpha(96)
-    frame_list = list()
+    frame_list = []
     for frame in ImageSequence.Iterator(flag):
         frame = frame.resize((480, 480), 5).convert("RGBA")
         frame.paste(image, (0, 0), image)
@@ -677,7 +674,7 @@ def communism(byt: bytes) -> BytesIO:
     image = img.convert("RGBA").resize((480, 480), 5)
     flag = Image.open("app/image/assets/communism.gif")
     image.putalpha(96)
-    frame_list = list()
+    frame_list = []
     for frame in ImageSequence.Iterator(flag):
         frame = frame.resize((480, 480), 5).convert("RGBA")
         frame.paste(image, (0, 0), image)
@@ -695,16 +692,14 @@ def petpetgen(byt: bytes) -> BytesIO:
     im = Image.open("app/image/assets/petpet.gif")
     bim = PILManip.static_pil_image(byt)
     br = bim.convert("RGBA").resize((200, 200), 4)
-    frames = list()
-    i = 0
-    for fr in ImageSequence.Iterator(im):
+    frames = []
+    for i, fr in enumerate(ImageSequence.Iterator(im)):
         y = 300 if i % 2 == 1 else 250
         ima = Image.new("RGBA", (500, 500), (0, 0, 0, 255))
         r = fr.resize((500, 500), 4).convert("RGBA")
         ima.paste(br, (200, y))
         ima.paste(r, mask=r)
         frames.append(ima)
-        i += 1
         io = BytesIO()
     frames[0].save(io,
                    format='gif',
@@ -794,12 +789,11 @@ def gen_dissolve(byt: bytes) -> BytesIO:
         for y in range(img.size[1]):
             pixels.append((x, y))
     random.shuffle(pixels)
-    images = list()
-    images.append(img.copy())
-    while len(pixels) > 0:
+    images = [img.copy()]
+    while pixels:
         transfer_pixels(img, im, 2500, pixels)
         images.append(img.copy())
-    images = images + images[::-1]
+    images += images[::-1]
     io = BytesIO()
     images[0].save(io,
                    format='gif',

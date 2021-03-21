@@ -86,11 +86,7 @@ def gif_a_neon(oim, **kwargs):
                 mask.paste(outline, mask=outline)
 
             # start pasting gradient
-            if overlay:
-                temp = im.copy()
-            else:
-                temp = Image.new('RGBA', im.size, (0, 0, 0, 255))
-
+            temp = im.copy() if overlay else Image.new('RGBA', im.size, (0, 0, 0, 255))
             with process_gradient(paste, mask, position, gradient_direction) as temp_paste:
                 temp.paste(temp_paste, mask=mask)
         frames.append(temp)
@@ -477,14 +473,13 @@ def process_gradient(paste, mask, position, gradient_direction):
     if gradient_direction == 5:
         coords = (int(paste.width / 4), int(paste.height / 4),
                   int(paste.width / 4) + mask.width, int(paste.height / 4) + mask.height)
-        temp_paste = paste.rotate(-position).crop(coords)
+        return paste.rotate(-position).crop(coords)
     elif horizontal:
         # horizontal
-        temp_paste = paste.crop((-position, 0, -position + mask.width, mask.height))
+        return paste.crop((-position, 0, -position + mask.width, mask.height))
     else:
         # vertical
-        temp_paste = paste.crop((0, -position, mask.width, -position + mask.height))
-    return temp_paste
+        return paste.crop((0, -position, mask.width, -position + mask.height))
 
 
 def neon(oim, colors, **kwargs):
@@ -662,10 +657,9 @@ def a_neon(oim, colors, **kwargs):
                                       max_size=256,
                                       **kwargs)
     final = io.BytesIO()
-    if isinstance(image, list):
-        ext = 'gif'
-        image[0].save(final, format=ext, save_all=True, dispose=2, append_images=image[1:], duration=durations, loop=0)
-    else:
+    if not isinstance(image, list):
         raise ManipulationError(f'Got {type(image)} instead of list of PIL.Image')
+    ext = 'gif'
+    image[0].save(final, format=ext, save_all=True, dispose=2, append_images=image[1:], duration=durations, loop=0)
     final.seek(0)
     return final
