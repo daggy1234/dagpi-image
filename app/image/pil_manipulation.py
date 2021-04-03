@@ -687,26 +687,63 @@ def communism(byt: bytes) -> BytesIO:
     return obj
 
 
-@executor
-def petpetgen(byt: bytes) -> BytesIO:
-    im = Image.open("app/image/assets/petpet.gif")
-    bim = PILManip.static_pil_image(byt)
-    br = bim.convert("RGBA").resize((200, 200), 4)
-    frames = []
-    for i, fr in enumerate(ImageSequence.Iterator(im)):
-        y = 300 if i % 2 == 1 else 250
-        ima = Image.new("RGBA", (500, 500), (0, 0, 0, 255))
-        r = fr.resize((500, 500), 4).convert("RGBA")
-        ima.paste(br, (200, y))
-        ima.paste(r, mask=r)
-        frames.append(ima)
-        io = BytesIO()
-    frames[0].save(io,
-                   format='gif',
-                   save_all=True,
-                   append_images=frames[1:],
-                   loop=0)
+# @executor
+# def petpetgen(byt: bytes) -> BytesIO:
+#     im = Image.open("app/image/assets/petpet.gif")
+#     bim = PILManip.static_pil_image(byt)
+#     br = bim.convert("RGBA").resize((200, 200), 4)
+#     frames = []
+#     for i, fr in enumerate(ImageSequence.Iterator(im)):
+#         y = 300 if i % 2 == 1 else 250
+#         ima = Image.new("RGBA", (500, 500), (0, 0, 0, 255))
+#         r = fr.resize((500, 500), 4).convert("RGBA")
+#         ima.paste(br, (200, y))
+#         ima.paste(r, mask=r)
+#         frames.append(ima)
+#         io = BytesIO()
+#     frames[0].save(io,
+#                    format='gif',
+#                    save_all=True,
+#                    append_images=frames[1:],
+#                    loop=0)
 
+#     io.seek(0)
+#     return io
+
+@executor
+def petpetgen(byt: bytes, squish=0) -> None:
+
+    img = PILManip.static_pil_image(byt)
+    frame_spec = [
+        (27, 31, 86, 90),
+        (22, 36, 91, 90),
+        (18, 41, 95, 90),
+        (22, 41, 91, 91),
+        (27, 28, 86, 91)
+    ]
+    squish_factor = [
+        (0, 0, 0, 0),
+        (-7, 22, 8, 0),
+        (-8, 30, 9, 6),
+        (-3, 21, 5, 9),
+        (0, 0, 0, 0)
+    ]
+
+    gif_frames = []
+    squish_translation_factor = [0, 20, 34, 21, 0]
+    for i in range(5):
+        spec = list(frame_spec[i])
+        for j, s in enumerate(spec):
+            spec[j] = int(s + squish_factor[i][j] * squish)
+        hand = Image.open(f'app/image/assets/PetPetFrames/frame{i}.png').convert("RGBA")
+        img = img.resize((int((spec[2] - spec[0]) * 1.2), int((spec[3] - spec[1]) * 1.2)), 5)
+        gif_frame = Image.new('RGBA', (112, 112), (0, 0, 0, 255))
+        gif_frame.paste(img, (spec[0], spec[1]), mask=img)
+        gif_frame.paste(hand, (0, int(squish * squish_translation_factor[i])), hand)
+        gif_frames.append(gif_frame)
+    io = BytesIO()
+    gif_frames[0].save(io, save_all=True, format="gif",
+                       append_images=gif_frames[1:], optimize=False, duration=16, loop=0)
     io.seek(0)
     return io
 
