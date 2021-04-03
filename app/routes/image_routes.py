@@ -150,6 +150,13 @@ async def wanted_image(url: str):
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
+@router.get("/shatter/", responses=normal_response)
+async def shatter_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await shatter(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
 @router.get("/bad/", responses=normal_response)
 async def bad_image(url: str):
     byt = await Client.image_bytes(url)
@@ -182,6 +189,13 @@ async def gay_image(url: str):
 async def burn(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await molten(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/earth/", responses=normal_response)
+async def earth_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await earth(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
