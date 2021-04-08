@@ -279,7 +279,7 @@ def shatter(image):
 @pil
 def wasted(image):
     w, h = image.size
-    fil = Image.open("app/image/assets/wasted.png")
+    fil = Image.open("app/image/assets/wasted.png").convert("RGBA")
     fil_r = fil.resize((w, h), 5)
     conv_im = image.convert("RGBA")
     conv_im.paste(fil_r, mask=fil_r)
@@ -713,7 +713,7 @@ def communism(byt: bytes) -> BytesIO:
 @executor
 def petpetgen(byt: bytes, squish=0) -> None:
 
-    img = PILManip.static_pil_image(byt)
+    img = PILManip.static_pil_image(byt).convert("RGBA")
     frame_spec = [
         (27, 31, 86, 90),
         (22, 36, 91, 90),
