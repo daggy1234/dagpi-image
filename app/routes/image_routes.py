@@ -346,11 +346,11 @@ async def night_image(url: str):
     return Response(img.read(), media_type=f"image/{img_format}")
 
 
-@router.get("/solar/", responses=normal_response)
-async def solar_image(url: str):
-    byt = await Client.image_bytes(url)
-    img, img_format = await solar(byt)
-    return Response(img.read(), media_type=f"image/{img_format}")
+# @router.get("/solar/", responses=normal_response)
+# async def solar_image(url: str):
+#     byt = await Client.image_bytes(url)
+#     img, img_format = await solar(byt)
+#     return Response(img.read(), media_type=f"image/{img_format}")
 
 
 @router.get("/america/", responses=gif_response_only)
