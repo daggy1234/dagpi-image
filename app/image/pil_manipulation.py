@@ -334,9 +334,9 @@ def why_are_you_gay(gay_image, av_image):
 @executor
 @double_image
 def slap(im, im2):
-    base = Image.open("app/image/assets/slap.png")
-    im = im.resize((90, 90), 1)
-    im2 = im2.resize((110, 110), 1)
+    base = Image.open("app/image/assets/slap.png").convert("RGBA")
+    im = im.resize((90, 90), 1).convert("RGBA")
+    im2 = im2.resize((110, 110), 1).convert("RGBA")
     base.paste(im, (50, 170))
     base.paste(im2, (270, 110))
     return base
