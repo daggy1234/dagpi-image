@@ -71,6 +71,14 @@ async def get_why_are_you_gay(url: str, url2: str):
     byt_b = await Client.image_bytes(url2)
     img = await why_are_you_gay(byt, byt_b)
     return Response(img.read(), media_type="image/png")
+  
+
+@router.get("/slap/", responses=static_response_only)
+async def slap_image(url: str, url2: str):
+    byt = await Client.image_bytes(url)
+    byt_b = await Client.image_bytes(url2)
+    img = await slap(byt, byt_b)
+    return Response(img.read(), media_type="image/png")
 
 
 @router.get("/invert/", responses=normal_response)
