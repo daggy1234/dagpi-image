@@ -52,7 +52,7 @@ __all__ = (
     "ice",
     "molten",
     "earth",
-    "comic_manip"
+    "comic_manip",
     "slap"
 )
 
