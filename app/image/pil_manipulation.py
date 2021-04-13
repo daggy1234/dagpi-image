@@ -52,7 +52,8 @@ __all__ = (
     "ice",
     "molten",
     "earth",
-    "comic_manip"
+    "comic_manip",
+    "slap"
 )
 
 
@@ -328,6 +329,17 @@ def why_are_you_gay(gay_image, av_image):
     im.paste(op, (550, 100))
     im.paste(mp, (100, 125))
     return im
+  
+
+@executor
+@double_image
+def slap(im, im2):
+    base = Image.open("app/image/assets/slap.png").convert("RGBA")
+    im = im.resize((90, 90), 1).convert("RGBA")
+    im2 = im2.resize((110, 110), 1).convert("RGBA")
+    base.paste(im, (50, 170))
+    base.paste(im2, (270, 110))
+    return base
 
 
 @executor
