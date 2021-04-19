@@ -881,7 +881,7 @@ def shake(byt: bytes) -> BytesIO:
 @executor
 def flash(byt: bytes) -> BytesIO:
     img = PILManip.pil_image(byt)
-    frames = list()
+    frames = []
 
     img = img.convert("RGBA").resize((512, 512))
     enhancer = ImageEnhance.Brightness(img)
@@ -903,7 +903,6 @@ def flash(byt: bytes) -> BytesIO:
 @executor
 def bonk(byt: bytes) -> BytesIO:
     im = PILManip.pil_image(byt)
-    frames = []
     with Image.open("app/image/assets/hammer_raised.png") as up:
         with Image.open("app/image/assets/hammer_down.png") as down:
 
@@ -911,8 +910,7 @@ def bonk(byt: bytes) -> BytesIO:
 
             im = im.resize((90, 90))
             up.paste(im, (85, 85))
-            frames.append(up.resize((800, 800)))
-
+            frames = [up.resize((800, 800))]
             im = im.resize((90, 50))
             down.paste(im, (85, 125))
             frames.append(down.resize((800, 800)))
