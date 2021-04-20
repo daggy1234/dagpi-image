@@ -868,11 +868,11 @@ def shake(byt: bytes) -> BytesIO:
         img.paste(img, (random.randint(170, 250), random.randint(170, 250)))
         frames.append(img)
     buffer = BytesIO()
-    images[0].save(buffer,
+    frames[0].save(buffer,
           format='gif', 
           save_all= True,
           optimize= True,
-          append_images= images[1:], 
+          append_images= frames[1:], 
           duration= 15,
           loop= 10
     )
@@ -881,7 +881,7 @@ def shake(byt: bytes) -> BytesIO:
 @executor
 def flash(byt: bytes) -> BytesIO:
     img = PILManip.pil_image(byt)
-    frames = list()
+    frames = []
 
     img = img.convert("RGBA").resize((512, 512))
     enhancer = ImageEnhance.Brightness(img)
@@ -890,11 +890,11 @@ def flash(byt: bytes) -> BytesIO:
         frames.append(out)
 
     buffer = BytesIO()
-    images[0].save(buffer,
+    frames[0].save(buffer,
           format='gif', 
           save_all= True,
           optimize= True,
-          append_images= images[1:], 
+          append_images= frames[1:], 
           duration= 50,
           loop= 10
     )
@@ -918,11 +918,11 @@ def bonk(byt: bytes) -> BytesIO:
             frames.append(down.resize((800, 800)))
 
     buffer = BytesIO()
-    images[0].save(buffer,
+    frames[0].save(buffer,
           format='gif', 
           save_all= True,
           optimize= True,
-          append_images= images[1:], 
+          append_images= frames[1:], 
           duration= 150,
           loop= 10
     )
@@ -939,11 +939,11 @@ def bomb(byt: bytes) -> BytesIO:
             frames.append(frame.resize((512, 512)))
 
     buffer = BytesIO()
-    images[0].save(buffer,
+    frames[0].save(buffer,
           format='gif', 
           save_all= True,
           optimize= True,
-          append_images= images[1:], 
+          append_images= frames[1:], 
           duration= 10,
           loop= 10
     )
