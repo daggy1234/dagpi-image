@@ -53,7 +53,11 @@ __all__ = (
     "molten",
     "earth",
     "comic_manip",
-    "slap"
+    "slap", 
+    "bomb", 
+    "bonk", 
+    "shake", 
+    "flash",
 )
 
 
@@ -852,3 +856,95 @@ def gen_dissolve(byt: bytes) -> BytesIO:
                    loop=0)
     io.seek(0)
     return io
+  
+@executor
+def shake(byt: bytes) -> BytesIO:
+    img = PILManip.pil_image(byt)
+    frames = []
+    img = img.convert("RGBA")
+    img = img.resize((650, 650))
+    for _ in range(30):
+        img = Image.new('RGBA', (1024, 1024), 0)
+        img.paste(img, (random.randint(170, 250), random.randint(170, 250)))
+        frames.append(img)
+    buffer = BytesIO()
+    frames[0].save(buffer,
+          format='gif', 
+          save_all= True,
+          optimize= True,
+          append_images= frames[1:], 
+          duration= 15,
+          loop= 10
+    )
+    return buffer
+
+@executor
+def flash(byt: bytes) -> BytesIO:
+    img = PILManip.pil_image(byt)
+    frames = []
+
+    img = img.convert("RGBA").resize((512, 512))
+    enhancer = ImageEnhance.Brightness(img)
+    for i in range(1, 10):
+        out = enhancer.enhance(i)
+        frames.append(out)
+
+    buffer = BytesIO()
+    frames[0].save(buffer,
+          format='gif', 
+          save_all= True,
+          optimize= True,
+          append_images= frames[1:], 
+          duration= 50,
+          loop= 10
+    )
+    return buffer
+
+@executor
+def bonk(byt: bytes) -> BytesIO:
+    im = PILManip.pil_image(byt)
+    frames = []
+    with Image.open("app/image/assets/hammer_raised.png") as up:
+        with Image.open("app/image/assets/hammer_down.png") as down:
+
+            im = im.convert("RGBA")
+
+            im = im.resize((90, 90))
+            up.paste(im, (85, 85))
+            frames.append(up.resize((800, 800)))
+
+            im = im.resize((90, 50))
+            down.paste(im, (85, 125))
+            frames.append(down.resize((800, 800)))
+
+    buffer = BytesIO()
+    frames[0].save(buffer,
+          format='gif', 
+          save_all= True,
+          optimize= True,
+          append_images= frames[1:], 
+          duration= 150,
+          loop= 10
+    )
+    return buffer
+
+@executor
+def bomb(byt: bytes) -> BytesIO:
+    im = PILManip.pil_image(byt)
+    im = im.resize((512, 512))
+    frames = [im for _ in range(50)]
+    with Image.open("app/image/assets/bomb.gif") as bomb:
+
+        for frame in ImageSequence.Iterator(bomb):
+            frames.append(frame.resize((512, 512)))
+
+    buffer = BytesIO()
+    frames[0].save(buffer,
+          format='gif', 
+          save_all= True,
+          optimize= True,
+          append_images= frames[1:], 
+          duration= 10,
+          loop= 10
+    )
+    return buffer
