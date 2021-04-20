@@ -390,9 +390,9 @@ async def pet_pet_image(url: str):
 
 
 @router.get("/dissolve/", responses=gif_response_only)
-async def dissolve(url: str):
+async def dissolve(url: str, transparent: bool = False):
     byt = await Client.image_bytes(url)
-    img = await gen_dissolve(byt)
+    img = await gen_dissolve(byt, transparent)
     return Response(img.read(), media_type="image/gif")
 
 
@@ -477,11 +477,11 @@ async def bomb_gif(url: str):
     img = await bomb(byt)
     return Response(img.read(), media_type="image/gif")
                     
-@router.get("/flash/", responses=gif_response_only)
-async def flash_gif(url: str):
-    byt = await Client.image_bytes(url)
-    img = await flash(byt)
-    return Response(img.read(), media_type="image/gif")
+# @router.get("/flash/", responses=gif_response_only)
+# async def flash_gif(url: str):
+#     byt = await Client.image_bytes(url)
+#     img = await flash(byt)
+#     return Response(img.read(), media_type="image/gif")
                     
 @router.get("/shake/", responses=gif_response_only)
 async def shake_gif(url: str):
