@@ -495,7 +495,7 @@ async def bonk_gif(url: str):
     img = await bonk(byt)
     return Response(img.read(), media_type="image/gif")
                     
-@router.get("/cube", responses=normal_response)
+@router.get("/cube/", responses=normal_response)
 async def cube_image(url: str):
     byt = await Client.image_bytes(url)
     img, img_format = await cube(byt)
