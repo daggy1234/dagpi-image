@@ -18,7 +18,7 @@ _session = None
 async def get_session():
     global _session
     if _session is None:
-        _session = httpx.AsyncClient(headers=headers)
+        _session = httpx.AsyncClient()
     return _session
 
 
@@ -38,7 +38,7 @@ class Client:
     async def auth(token: str):
         session = await get_session()
         print(f"{base_url}/auth/{token}")
-        r = await session.get(f"{base_url}/auth/{token}")
+        r = await session.get(f"{base_url}/auth/{token}", headers=headers)
         return AuthModel(r.json())
 
     @staticmethod
@@ -51,7 +51,7 @@ class Client:
             "user_agent": ua
 
         }
-        r = await session.post(f"{base_url}/statpost", json=js)
+        r = await session.post(f"{base_url}/statpost", json=js, headers=headers)
         print(r.status_code)
 
     @staticmethod

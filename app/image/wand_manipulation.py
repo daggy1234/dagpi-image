@@ -11,9 +11,10 @@ __all__ = (
     "polaroid",
     "poster",
     "sepia",
-    "solar",
+    #    "solar",
     "rainbow",
-    "magik",)
+    "magik",
+)
 
 
 @executor
@@ -49,11 +50,11 @@ def charcoal(image):
     return image
 
 
-@executor
-@wand
-def solar(image):
-    image.solarize(threshold=0.5 * image.quantum_range)
-    return image
+# @executor
+# @wand
+# def solar(image):
+#     image.solarize(threshold=0.5 * image.quantum_range)
+#     return image
 
 
 @executor

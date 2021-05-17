@@ -53,9 +53,9 @@ __all__ = (
     "molten",
     "earth",
     "comic_manip",
-    "slap", 
-    "bomb", 
-    "bonk", 
+    "slap",
+    "bomb",
+    "bonk",
     "shake"
 )
 
@@ -70,8 +70,10 @@ def test(image: PILImage):
 
 @executor
 @pil
-def pixelate(image):
-    img_small = image.resize((32, 32), resample=Image.BILINEAR)
+def pixelate(image, size: int):
+    if size not in [8, 16, 32, 64, 128, 256]:
+        raise ParameterError("Size must be one of [8, 16, 32, 64, 128, 256]")
+    img_small = image.resize((size, size), resample=Image.BILINEAR)
     return img_small.resize(image.size, Image.NEAREST)
 
 
@@ -143,8 +145,15 @@ def deepfry(image):
 @executor
 @pil
 def invert(image):
-    frame = image.convert("RGB")
-    return ImageOps.invert(frame)
+    image = image.convert('RGBA')
+    r, g, b, a = image.split()
+    rgb_image = Image.merge('RGB', (r, g, b))
+
+    inverted_image = ImageOps.invert(rgb_image)
+
+    r2, g2, b2 = inverted_image.split()
+
+    return Image.merge('RGBA', (r2, g2, b2, a))
 
 
 @executor
@@ -332,7 +341,7 @@ def why_are_you_gay(gay_image, av_image):
     im.paste(op, (550, 100))
     im.paste(mp, (100, 125))
     return im
-  
+
 
 @executor
 @double_image
@@ -667,7 +676,7 @@ def memegen(tv, text: str):
 @executor
 def america(byt: bytes) -> BytesIO:
     img = PILManip.static_pil_image(byt)
-    image = img.convert("RGBA").resize((480, 480), 5)
+    image = img.resize((480, 480), 5).convert("RGBA")
     flag = Image.open("app/image/assets/america.gif")
     image.putalpha(96)
     frame_list = []
@@ -835,7 +844,7 @@ def gen_dissolve(byt: bytes, transparent: bool) -> BytesIO:
     pix_to_div = ((img.height * img.width) // 25)
 
     if transparent:
-        im = Image.new("RGBA", img.size, (255,255,255,0))
+        im = Image.new("RGBA", img.size, (255, 255, 255, 0))
     else:
         q = img.quantize(colors=1, method=2)
         p = q.getpalette()
@@ -848,7 +857,7 @@ def gen_dissolve(byt: bytes, transparent: bool) -> BytesIO:
     random.shuffle(pixels)
     images = [img.copy()]
     while pixels:
-        transfer_pixels(img, im,pix_to_div, pixels)
+        transfer_pixels(img, im, pix_to_div, pixels)
         images.append(img.copy())
     images += images[::-1]
     io = BytesIO()
@@ -861,7 +870,8 @@ def gen_dissolve(byt: bytes, transparent: bool) -> BytesIO:
                    loop=0)
     io.seek(0)
     return io
-  
+
+
 @executor
 def shake(byt: bytes) -> BytesIO:
     img = PILManip.pil_image(byt)
@@ -869,19 +879,19 @@ def shake(byt: bytes) -> BytesIO:
     img = img.convert("RGBA")
     img = img.resize((650, 650))
     for _ in range(30):
-        base = Image.new('RGBA', (1024, 1024), (255,0,0,0))
+        base = Image.new('RGBA', (1024, 1024), (255, 0, 0, 0))
         base.paste(img, (random.randint(170, 250), random.randint(170, 250)), mask=img)
         frames.append(base)
     buffer = BytesIO()
     frames[0].save(buffer,
-          format='gif', 
-          save_all= True,
-          optimize= True,
-          append_images= frames[1:], 
-          transparency=0,
-          duration= 15,
-          loop=0
-    )
+                   format='gif',
+                   save_all=True,
+                   optimize=True,
+                   append_images=frames[1:],
+                   transparency=0,
+                   duration=15,
+                   loop=0
+                   )
     buffer.seek(0)
     return buffer
 
@@ -898,23 +908,24 @@ def shake(byt: bytes) -> BytesIO:
 
 #     buffer = BytesIO()
 #     frames[0].save(buffer,
-#           format='gif', 
+#           format='gif',
 #           save_all= True,
 #           optimize= True,
-#           append_images= frames[1:], 
+#           append_images= frames[1:],
 #           duration= 50,
 #           loop=0
 #     )
 #     buffer.seek(0)
 #     return buffer
 
+
 @executor
 def bonk(byt: bytes) -> BytesIO:
     im = PILManip.pil_image(byt).convert("RGBA")
     frames = []
-    up =  Image.open("app/image/assets/hammer_raised.png").convert("RGBA")
+    up = Image.open("app/image/assets/hammer_raised.png").convert("RGBA")
     print(up.size)
-    down =  Image.open("app/image/assets/hammer_down.png").convert("RGBA")
+    down = Image.open("app/image/assets/hammer_down.png").convert("RGBA")
     im = im.resize((150, 150))
     up.paste(im, (100, 100), mask=im)
     frames.append(up)
@@ -923,14 +934,15 @@ def bonk(byt: bytes) -> BytesIO:
     frames.append(down)
     buffer = BytesIO()
     frames[0].save(buffer,
-          format='gif', 
-          save_all= True,
-          append_images= frames[1:], 
-          duration= 150,
-          loop=0
-    )
+                   format='gif',
+                   save_all=True,
+                   append_images=frames[1:],
+                   duration=150,
+                   loop=0
+                   )
     buffer.seek(0)
     return buffer
+
 
 @executor
 def bomb(byt: bytes) -> BytesIO:
@@ -944,12 +956,12 @@ def bomb(byt: bytes) -> BytesIO:
 
     buffer = BytesIO()
     frames[0].save(buffer,
-          format='gif', 
-          save_all= True,
-          optimize= True,
-          append_images= frames[1:], 
-          duration= 10,
-          loop=0
-    )
+                   format='gif',
+                   save_all=True,
+                   optimize=True,
+                   append_images=frames[1:],
+                   duration=10,
+                   loop=0
+                   )
     buffer.seek(0)
     return buffer
