@@ -1,3 +1,5 @@
+from wand.image import Image
+
 from app.image.WandManip import wand
 from app.image.decorators import executor
 
@@ -14,6 +16,7 @@ __all__ = (
     #    "solar",
     "rainbow",
     "magik",
+    "bomb",
 )
 
 
@@ -131,4 +134,17 @@ def magik(image, scale: int = None):
         rigidity=0,
     )
 
+    return image
+
+
+@executor
+@wand
+def bomb(image):
+    with Image(filename="app/image/assets/bomb.gif") as bomb:
+        if len(image.sequence) == 1:
+            seq = image.sequence
+            for _ in range(3):
+                image.sequence += seq
+        bomb.resize(*image.size)
+        image.sequence += bomb.sequence
     return image
