@@ -71,7 +71,7 @@ async def get_why_are_you_gay(url: str, url2: str):
     byt_b = await Client.image_bytes(url2)
     img = await why_are_you_gay(byt, byt_b)
     return Response(img.read(), media_type="image/png")
-  
+
 
 @router.get("/slap/", responses=static_response_only)
 async def slap_image(url: str, url2: str):
@@ -264,9 +264,9 @@ async def delete_image(url: str):
 
 
 @router.get("/pixel/", responses=normal_response)
-async def pixel_route(url: str):
+async def pixel_route(url: str, scale: int = 32):
     byt = await Client.image_bytes(url)
-    img, image_format = await pixelate(byt)
+    img, image_format = await pixelate(byt, scale)
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
@@ -470,25 +470,28 @@ async def neon_image(url: str, sharp: bool = True, soft: bool = True,
                      overlay=overlay, direction=direction, gradient=gradient,
                      per_color=per_color, colors_per_frame=colors_per_frame)
     return Response(img.read(), media_type=f"image/{'gif' if animated else 'png'}")
-                    
+
+
 @router.get("/bomb/", responses=gif_response_only)
 async def bomb_gif(url: str):
     byt = await Client.image_bytes(url)
     img = await bomb(byt)
     return Response(img.read(), media_type="image/gif")
-                    
+
 # @router.get("/flash/", responses=gif_response_only)
 # async def flash_gif(url: str):
 #     byt = await Client.image_bytes(url)
 #     img = await flash(byt)
 #     return Response(img.read(), media_type="image/gif")
-                    
+
+
 @router.get("/shake/", responses=gif_response_only)
 async def shake_gif(url: str):
     byt = await Client.image_bytes(url)
     img = await shake(byt)
     return Response(img.read(), media_type="image/gif")
-                    
+
+
 @router.get("/bonk/", responses=gif_response_only)
 async def bonk_gif(url: str):
     byt = await Client.image_bytes(url)

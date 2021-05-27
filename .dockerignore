@@ -2,3 +2,4 @@ venv/
 alpine-Dockerfile
 requirements.txt
 Dockerfile
+.imgbotconfig
