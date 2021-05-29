@@ -24,6 +24,20 @@ class WandManip:
         return io
 
 
+def wand_static(function):
+    @functools.wraps(function)
+    def wrapper(image, *args, **kwargs):
+        img = WandManip.wand_open(image)
+        if img.format in ["PNG", "JPEG"]:
+            dst_image = function(img, *args, **kwargs)
+            byt = dst_image.make_blob()
+        else:
+            raise BadImage("Inavlid Format")
+        return WandManip.wand_save(byt), img.format
+
+    return wrapper
+
+
 def wand(function):
     @functools.wraps(function)
     def wrapper(image, *args, **kwargs):

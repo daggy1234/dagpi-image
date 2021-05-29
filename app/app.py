@@ -14,9 +14,10 @@ from app.exceptions.errors import (BadImage, BadUrl, FileLarge,
                                    Unauthorised)
 from app.middleware import add_process_time_header, auth_check
 from app.routes import image_routes
+from sentry_sdk import capture_exception
 
 sentry = os.getenv("SENTRY")
-sentry_sdk.init(dsn=sentry, release="dagpi-image@1.2.0")
+sentry_sdk.init(dsn=sentry, release="dagpi-image@1.3.0", traces_sample_rate=0.5)
 app = FastAPI(docs_url="/playground", redoc_url="/docs")
 asgi_app = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
@@ -98,6 +99,7 @@ async def rate_error(_request: Request, _exc: RateLimit):
 @app.exception_handler(500)
 async def internal_server_error(req, exc):
     e_str = str(exc)
+    capture_exception(exc)
     return JSONResponse(
         status_code=500,
         content={"message": "Internal Server Error", "error": e_str}
@@ -123,14 +125,21 @@ def custom_openapi():
         description="The Number 1 Image generation api",
         routes=app.routes
     )
-    openapi_schema["securityDefinitions"] = {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "in": "header",
-            "name": "Authorization"
+    openapi_schema["components"] = {
+        "securitySchemes": {
+            "Token": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "Authorization",
+                "description": "eeuhfu"
+            }
         }
     }
-    openapi_schema["security"] = [{"ApiKeyAuth": []}]
+    openapi_schema["externalDocs"] = {
+        "url": "https://dagpi.docs.apiary.io",
+        "description": "Main Documentation"
+    }
+
     openapi_schema["info"] = {
         "title": "Dagpi",
         "description": " A fast and powerful image manipulation api",
@@ -145,14 +154,15 @@ def custom_openapi():
             "url": "https://www.gnu.org/licenses/agpl-3.0.en.html"
         },
         "x-logo": {
-            "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/"
-                   "dagpib.png"}}
+            "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/dagpib.png"
+        }
+    }
     for endpoint in openapi_schema["paths"].keys():
         if endpoint not in ["/", "/image/openapi.json"]:
-            openapi_schema["paths"][endpoint]["get"]["parameters"].append(
-                {"required": True,
-                 "schema": {"title": "Authorization", "type": "string"},
-                 "name": "Authorization", "in": "header"})
+            openapi_schema["paths"][endpoint]["get"]["security"] = [
+                {
+                    "Token": ["Required"]
+                }]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 

@@ -9,8 +9,8 @@ from async_timeout import timeout
 
 from ..exceptions.errors import BadUrl, NoImageFound, ServerTimeout
 
-headers = {'Authorization': os.getenv("TOKEN", "What")}
-base_url = os.getenv("BASE_URL", "https://dagbot.daggy.tech")
+headers = {'Authorization': os.getenv("TOKEN", "No Token :(")}
+base_url = os.getenv("BASE_URL", "https://dagpi.xyz")
 print(headers, base_url)
 _session = None
 
