@@ -74,12 +74,10 @@ def gif_a_neon(oim, **kwargs):
         outline = create_sharp_outline(im, single, **kwargs)
 
         # create mask when pasting end result colors
-        with im, outline, Image.new('RGBA', im.size, (0, 0, 0, 0)) as mask:
+        with im, outline, Image.new('L', im.size, 0) as mask:
             if soft:
                 # create soft outline
-                soft = create_soft_outline(outline, single, **kwargs)
-                # paste soft outline
-                mask.paste(soft, mask=soft)
+                mask = create_soft_outline(outline, single, **kwargs)
 
             if sharp:
                 # paste sharp outline
@@ -221,12 +219,10 @@ def neon_static(oim, **kwargs):
     outline = create_sharp_outline(im, single, **kwargs)
 
     # create mask when pasting end result colors
-    with Image.new('RGBA', im.size, (0, 0, 0, 0)) as mask:
+    with Image.new('L', im.size, (0)) as mask:
         if soft:
             # create soft outline
-            with create_soft_outline(outline, single, **kwargs) as soft:
-                # paste soft outline
-                mask.paste(soft, mask=soft)
+            mask = create_soft_outline(outline, single, **kwargs) as soft:
 
         if sharp:
             # paste sharp outline
@@ -314,10 +310,10 @@ def create_sharp_outline(im, single, **kwargs):
 def create_soft_outline(outline, single, **kwargs):
     multi = kwargs.get('multi')
     # blur to create soft effect
-    soft = outline.filter(ImageFilter.GaussianBlur(kwargs.get('soft_softness') or 7))
+    soft = outline.filter(ImageFilter.GaussianBlur(kwargs.get('soft_softness') or 9))
     enhancer = ImageEnhance.Brightness(soft)
     # enhance to brighten soft outline colors
-    soft = enhancer.enhance(kwargs.get('soft_brightness') or (1.9 if single and not multi else 1.5))
+    soft = enhancer.enhance(kwargs.get('soft_brightness') or (2.0 if single and not multi else 1.3))
     return soft
 
 
