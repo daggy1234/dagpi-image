@@ -222,7 +222,7 @@ def neon_static(oim, **kwargs):
     with Image.new('L', im.size, (0)) as mask:
         if soft:
             # create soft outline
-            mask = create_soft_outline(outline, single, **kwargs) as soft:
+            mask = create_soft_outline(outline, single, **kwargs)
 
         if sharp:
             # paste sharp outline
