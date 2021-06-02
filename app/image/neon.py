@@ -175,7 +175,7 @@ def neon_static(oim, **kwargs):
     # getting options
     sharp = kwargs.get('sharp', True)
     soft = kwargs.get('soft', True)
-    if not (sharp or soft):
+    if not sharp and not soft:
         raise ParameterError('sharp and soft both cannot be False')
     overlay = kwargs.get('overlay', False)
     gradient = kwargs.get('gradient', 0)
@@ -195,16 +195,15 @@ def neon_static(oim, **kwargs):
                 colors = tuple(colors[0])
             else:
                 # multiple colors
-                if gradient in (0, 1, 2):
-                    # 0 no gradient, animated
-                    # 1 static gradient
-                    # 2 animated gradient, animated
-                    single = gradient == 1
-                    colors_per_frame = kwargs.get('colors_per_frame') or 3
-                    gradient_direction = kwargs.get('gradient_direction', 1)
-                else:
+                if gradient not in (0, 1, 2):
                     raise ParameterError('gradient must be 0, 1, or 2')
 
+                # 0 no gradient, animated
+                # 1 static gradient
+                # 2 animated gradient, animated
+                single = gradient == 1
+                colors_per_frame = kwargs.get('colors_per_frame') or 3
+                gradient_direction = kwargs.get('gradient_direction', 1)
         elif all(isinstance(c, int) for c in colors) and len(colors) == 3:
             # colors is tuple of (r,g,b) instead of nested tuple ((r,g,b),)
             gradient = 0
