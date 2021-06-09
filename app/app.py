@@ -13,7 +13,7 @@ from app.exceptions.errors import (BadImage, BadUrl, FileLarge,
                                    ParameterError, RateLimit, ServerTimeout,
                                    Unauthorised)
 from app.middleware import add_process_time_header, auth_check
-from app.routes import image_routes
+from app.routes import image_routes, special_routes
 from sentry_sdk import capture_exception
 
 sentry = os.getenv("SENTRY")
@@ -23,6 +23,7 @@ asgi_app = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
 app.include_router(image_routes.router)
+app.include_router(special_routes.router)
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_check)
 app.add_route("/metrics/", metrics)
 
