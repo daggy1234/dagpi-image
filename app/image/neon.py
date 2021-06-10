@@ -310,10 +310,10 @@ def create_sharp_outline(im, single, **kwargs):
 def create_soft_outline(outline, single, **kwargs):
     multi = kwargs.get('multi')
     # blur to create soft effect
-    soft = outline.filter(ImageFilter.GaussianBlur(kwargs.get('soft_softness') or 9))
+    soft = outline.filter(ImageFilter.GaussianBlur(kwargs.get('soft_softness') or 4))
     enhancer = ImageEnhance.Brightness(soft)
     # enhance to brighten soft outline colors
-    soft = enhancer.enhance(kwargs.get('soft_brightness') or (2.0 if single and not multi else 1.3))
+    soft = enhancer.enhance(kwargs.get('soft_brightness') or (2.0 if single and not multi else 1.6))
     return soft
 
 
@@ -348,13 +348,41 @@ def neon_static_breathing(im, mask, colors, single, *, overlay, per_color):
             frames.append(temp)
     return frames
 
+# code from Mark Ransom
+# https://stackoverflow.com/a/49321304
+def to_sRGB(x):
+    ''' Returns a sRGB value in the range [0,255]
+        for linear input in [0,1]
+    '''
+    return int(255.9999 * (12.92*x if x <= 0.0031308 else (1.055 * (x ** (1/2.4))) - 0.055))
 
-def color_range(start, end, steps):
-    """generator to yield colors between 2 colors and x steps"""
-    delta = tuple((cur - nc) / steps for cur, nc in zip(start, end))
-    for i in range(steps):
-        yield tuple(cur - int(d * i) for cur, d in zip(start, delta))
+def from_sRGB(x):
+    ''' Returns a linear value in the range [0,1]
+        for sRGB input in [0,255].
+    '''
+    x /= 255.0
+    if x <= 0.04045:
+        y = x / 12.92
+    else:
+        y = ((x + 0.055) / 1.055) ** 2.4
+    return y
 
+def lerp(color1, color2, frac):
+    return color1 * (1 - frac) + color2 * frac
+
+def color_range( color1, color2, steps):
+    gamma = .43
+    color1_lin = [from_sRGB(c) for c in color1]
+    bright1 = sum(color1_lin)**gamma
+    color2_lin = [from_sRGB(c) for c in color2]
+    bright2 = sum(color2_lin)**gamma
+    for step in range(steps):
+        intensity = lerp(bright1, bright2, step/steps) ** (1/gamma)
+        color = tuple(lerp(cl1, cl2, step/steps) for cl1, cl2 in zip(color1_lin, color2_lin))
+        if sum(color) != 0:
+            color = [c * intensity / sum(color) for c in color]
+        color = tuple(to_sRGB(c) for c in color)
+        yield color
 
 def neon_static_gradient(im, mask, colors, single, gradient_direction,
                          *, overlay, per_color, colors_per_frame):
