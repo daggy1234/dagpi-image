@@ -166,7 +166,8 @@ def neon_static(oim, **kwargs):
 
         Passed to preprocessing.
     sharpen: :class:`int`
-        0 for sharpen, 1 for enhance edges, 2 for enhance edges more.
+        -1 for smooth, -2 for smooth more, -3 or lower for gauss blur of radius -(x+2)
+        0 for detail, 1 for sharpen, 2 for enhance edges, 3 for enhance edges more.
         Default is ``None`` for no sharpening.
 
         Passed to preprocessing
@@ -259,11 +260,22 @@ def preprocess_neon(im, *, single, **kwargs):
         ratio = size / maxsize
         im = im.resize((int(im.width / ratio), int(im.height / ratio)))
 
-    # Apply sharpening, attemp to enahnce edges before contour
+    # Apply sharpening or smoothing to edges before getting edges
     if sharpen is not None:
-        filters = (ImageFilter.SHARPEN,
-                   ImageFilter.EDGE_ENHANCE,
-                   ImageFilter.EDGE_ENHANCE_MORE)
+        if sharpen >= 0:
+            filters = (ImageFilter.DETAIL,
+                       ImageFilter.SHARPEN,
+                       ImageFilter.EDGE_ENHANCE,
+                       ImageFilter.EDGE_ENHANCE_MORE,
+                       )
+        else:
+            sharpen = -sharpen
+            filters = (ImageFilter.DETAIL,
+                       ImageFilter.SMOOTH,
+                       ImageFilter.SMOOTH_MORE,
+                       ImageFilter.GaussianBlur(sharpen-2),
+                       )
+            sharpen = min(3, sharpen)  # allow for blur but overflow just blurs more
         try:
             im = im.filter(filters[sharpen])
         except IndexError:
@@ -554,7 +566,8 @@ def neon(oim, colors, **kwargs):
 
         Passed to preprocessing.
     sharpen: :class:`int`
-        0 for sharpen, 1 for enhance edges, 2 for enhance edges more.
+        -1 for smooth, -2 for smooth more, -3 or lower for gauss blur of radius -(x+2)
+        0 for detail, 1 for sharpen, 2 for enhance edges, 3 for enhance edges more.
         Default is ``None`` for no sharpening.
 
         Passed to preprocessing
