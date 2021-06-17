@@ -13,6 +13,20 @@ from app.utils.client import Client
 router = APIRouter()
 
 
+@router.get("/mirror/", responses=normal_response)
+async def mirror_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await mirror(byt)
+    return Response(img.read(), media_type=f"image/{image_format}") 
+
+
+@router.get("/flip/", responses=normal_response)
+async def flip_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await flip(byt)
+    return Response(img.read(), media_type=f"image/{image_format}") 
+
+
 @router.get("/colors/", responses=static_response_only)
 async def color_image(url: str):
     byt = await Client.image_bytes(url)

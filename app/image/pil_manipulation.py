@@ -56,8 +56,23 @@ __all__ = (
     "slap",
     "bomb",
     "bonk",
-    "shake"
+    "shake",
+    "flip",
+    "mirror"
 )
+
+
+@executor
+@pil
+def flip(image):
+    im = image.convert("RGB")
+    return ImageOps.flip(im)
+
+@executor
+@pil
+def mirror(image):
+    im = image.convert("RGB")
+    return ImageOps.mirror(im)
 
 
 @executor
