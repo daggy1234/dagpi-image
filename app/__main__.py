@@ -2,8 +2,8 @@ import os
 
 import uvicorn
 
-host = os.getenv("HOST", "127.0.0.1")
-port = os.getenv("PORT", 5000)
+host: str = os.getenv("HOST", "127.0.0.1")
+port: int = int(os.getenv("PORT", 5000))
 
 if __name__ == "__main__":
     print("Ready to run app")

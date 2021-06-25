@@ -1,6 +1,14 @@
-import functools
+from __future__ import annotations
+from typing import List, Tuple, TYPE_CHECKING, Callable
+
+if TYPE_CHECKING:
+    from typing_extensions import ParamSpec, Concatenate
+    P = ParamSpec('P')
+else:
+    from typing import TypeVar
+    P = TypeVar('P')
+
 from io import BytesIO
-from typing import List
 
 from PIL import Image, ImageSequence, UnidentifiedImageError
 
@@ -9,8 +17,8 @@ from app.exceptions.errors import BadImage, FileLarge
 
 class PILManip:
     @staticmethod
-    def pil_image(image: bytes) -> Image:
-        if image.__sizeof__() > 10 * (2 ** 20):
+    def pil_image(image: bytes) -> Image.Image:
+        if image.__sizeof__() > 10 * (2**20):
             raise FileLarge("Exceeds 10MB")
         try:
             io = BytesIO(image)
@@ -20,8 +28,8 @@ class PILManip:
             raise BadImage("Unable to use Image")
 
     @staticmethod
-    def static_pil_image(image: bytes) -> Image:
-        if image.__sizeof__() > 15 * (2 ** 20):
+    def static_pil_image(image: bytes) -> Image.Image:
+        if image.__sizeof__() > 15 * (2**20):
             raise FileLarge("File Exceeds 15 Mb")
         try:
             io = BytesIO(image)
@@ -31,14 +39,14 @@ class PILManip:
             raise BadImage("Unable to use Image")
 
     @staticmethod
-    def pil_image_save(img: Image) -> BytesIO:
+    def pil_image_save(img: Image.Image) -> BytesIO:
         image_bytes = BytesIO()
         img.save(image_bytes, format="png")
         image_bytes.seek(0)
         return image_bytes
 
     @staticmethod
-    def pil_gif_save(frames: List) -> BytesIO:
+    def pil_gif_save(frames: List[Image.Image]) -> BytesIO:
         image_bytes = BytesIO()
         frames[0].save(image_bytes,
                        format="gif",
@@ -49,9 +57,10 @@ class PILManip:
         return image_bytes
 
 
-def pil(function):
-    @functools.wraps(function)
-    def wrapper(image, *args, **kwargs) -> BytesIO:
+def pil(
+    function: Callable[Concatenate[Image.Image, P], Image.Image]
+) -> Callable[Concatenate[bytes, P], Tuple[BytesIO, str]]:
+    def wrapper(image: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
         img = PILManip.pil_image(image)
         if img.format == "GIF":
             frames = []
@@ -68,20 +77,23 @@ def pil(function):
     return wrapper
 
 
-def double_image(function):
-    @functools.wraps(function)
-    def wrapper(image_a, image_b, *args, **kwargs) -> BytesIO:
-        image_a = PILManip.static_pil_image(image_a)
-        image_b = PILManip.static_pil_image(image_b)
-        img = function(image_a, image_b, *args, **kwargs)
+def double_image(
+    function: Callable[Concatenate[Image.Image, Image.Image, P], Image.Image]
+) -> Callable[Concatenate[bytes, bytes, P], BytesIO]:
+    def wrapper(image_a: bytes, image_b: bytes, *args: P.args,
+                **kwargs: P.kwargs) -> BytesIO:
+        p_image_a = PILManip.static_pil_image(image_a)
+        p_image_b = PILManip.static_pil_image(image_b)
+        img = function(p_image_a, p_image_b, *args, **kwargs)
         return PILManip.pil_image_save(img)
 
     return wrapper
 
 
-def static_pil(function):
-    @functools.wraps(function)
-    def wrapper(image, *args, **kwargs) -> BytesIO:
+def static_pil(
+    function: Callable[Concatenate[Image.Image, P], Image.Image]
+) -> Callable[Concatenate[bytes, P], BytesIO]:
+    def wrapper(image: bytes, *args: P.args, **kwargs: P.kwargs) -> BytesIO:
         img = PILManip.static_pil_image(image)
         img = function(img, *args, **kwargs)
         return PILManip.pil_image_save(img)

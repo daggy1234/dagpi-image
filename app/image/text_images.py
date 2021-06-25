@@ -2,24 +2,17 @@ import random
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-
 from app.exceptions.errors import ParameterError
 from app.image.PILManip import static_pil
 from app.image.decorators import executor
 from app.image.writetext import WriteText
 
-__all__ = (
-    "tweet_gen",
-    "quote",
-    "motiv",
-    "captcha",
-    "yt_comment"
-)
+__all__ = ("tweet_gen", "quote", "motiv", "captcha", "yt_comment")
 
 
 @executor
 @static_pil
-def captcha(img, text: str):
+def captcha(img: Image.Image, text: str) -> Image.Image:
     if len(text) > 30:
         raise ParameterError("text should be less than 30 characters")
     im = img.convert("RGBA").resize((765, 780))
@@ -38,7 +31,7 @@ def captcha(img, text: str):
 
 @executor
 @static_pil
-def tweet_gen(image, username: str, text: str):
+def tweet_gen(image: Image.Image, username: str, text: str) -> Image.Image:
     if len(text) > 180:
         raise ParameterError("Text supplied is too long")
     today = datetime.today()
@@ -103,7 +96,7 @@ def tweet_gen(image, username: str, text: str):
 
 @executor
 @static_pil
-def motiv(img, top_text: str, bottom_text: str):
+def motiv(img: Image.Image, top_text: str, bottom_text: str) -> Image.Image:
     im = img.convert("RGBA")
     new_h, new_w = im.height + im.height * 100, im.width + 200
     white_bg = Image.new("RGBA", (im.width + 10, im.height + 10),
@@ -113,21 +106,30 @@ def motiv(img, top_text: str, bottom_text: str):
     base.paste(white_bg, (100, 100), white_bg)
     wt = WriteText(base)
     pos = im.height + 100 + im.height / 150
-    text_h = wt.write_text_box(100, pos, top_text, im.width,
+    text_h = wt.write_text_box(100,
+                               pos,
+                               top_text,
+                               im.width,
                                "app/image/assets/times-new-roman.ttf",
-                               im.height // 5, (255, 255, 255), place="center",
+                               im.height // 5, (255, 255, 255),
+                               place="center",
                                justify_last_line=True)
-    text_h_t = wt.write_text_box(100, text_h, bottom_text, im.width,
+    text_h_t = wt.write_text_box(100,
+                                 text_h,
+                                 bottom_text,
+                                 im.width,
                                  "app/image/assets/times-new-roman.ttf",
                                  (3 * (im.height // 10)) // 4, (255, 255, 255),
-                                 place="center", justify_last_line=True)
+                                 place="center",
+                                 justify_last_line=True)
     ret = wt.ret_img()
     return ret.crop((0, 0, new_w, text_h_t + 30))
 
 
 @executor
 @static_pil
-def yt_comment(image, username: str, text: str, dark: bool):
+def yt_comment(image: Image.Image, username: str, text: str,
+               dark: bool) -> Image.Image:
     bg = (24, 24, 24) if dark else (249, 249, 249)
     im = Image.new("RGBA", (800, 800), bg)
     com_com = "yt-dark.png" if dark else "yt-light.png"
@@ -158,7 +160,8 @@ def yt_comment(image, username: str, text: str, dark: bool):
 
 @executor
 @static_pil
-def quote(image, username: str, text: str, dark: bool):
+def quote(image: Image.Image, username: str, text: str,
+          dark: bool) -> Image.Image:
     today = datetime.today()
     bg = (54, 57, 63) if dark else (256, 256, 256)
     y = Image.new("RGBA", (2400, 800), bg)
