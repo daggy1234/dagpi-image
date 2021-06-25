@@ -26,11 +26,27 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "14"
+      
+      - name: Install pyright
+        run: npm install -g pyright
+
+      - name: Load cache
+        uses: actions/cache@v2
+        id: cached-dependecies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ matrix.python-version }}
+
+      - name: Validate pyproject.toml
+        run: poetry check
+
+      - name: Install dependencies
+        if: steps.cached-dependecies.outputs.cache-hit != 'true'
+        run: poetry install
+
       - name: Flake8
         run: |
-          poetry install
           poetry run flake8 app --count --show-source --statistics
+      
       - name: Run type checking
-        run: |
-          npm install -g pyright
-          pyright --lib --verifytypes app --ignoreexternal
+        run: pyright --lib --verifytypes app --ignoreexternal

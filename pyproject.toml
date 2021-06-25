@@ -32,6 +32,9 @@ flake8 = "^3.9.2"
 [tool.yapf]
 based_on_style = "pep8"
 
+[tool.poetry.scripts]
+dev = 'app'
+
 
 
 [build-system]

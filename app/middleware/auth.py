@@ -12,11 +12,10 @@ async def post_stat(route: str, token: str, ua: str) -> None:
 async def auth_check(
         request: Request,
         call_next: Callable[[Request], Awaitable[Response]]) -> Response:
-    if (request.url.path == "/") or (request.url.path == "/metrics/") or \
-            (request.url.path == "/docs") or \
-            (request.url.path == "/openapi.json") or \
-            (request.url.path == "/image/openapi.json") or \
-            (request.url.path == "/playground"):
+    if request.url.path in [
+            "/", "/metrics/", "/docs", "/openapi.json", "/image/openapi.json",
+            "/playground"
+    ]:
         response = await call_next(request)
         return response
     else:
