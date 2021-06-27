@@ -200,16 +200,15 @@ def neon_static(oim, **kwargs):
                 colors = tuple(colors[0])
             else:
                 # multiple colors
-                if gradient in (0, 1, 2):
-                    # 0 no gradient, animated
-                    # 1 static gradient
-                    # 2 animated gradient, animated
-                    single = gradient == 1
-                    colors_per_frame = kwargs.get('colors_per_frame') or 3
-                    gradient_direction = kwargs.get('gradient_direction', 1)
-                else:
+                if gradient not in (0, 1, 2):
                     raise ParameterError('gradient must be 0, 1, or 2')
 
+                # 0 no gradient, animated
+                # 1 static gradient
+                # 2 animated gradient, animated
+                single = gradient == 1
+                colors_per_frame = kwargs.get('colors_per_frame') or 3
+                gradient_direction = kwargs.get('gradient_direction', 1)
         elif all(isinstance(c, int) for c in colors) and len(colors) == 3:
             # colors is tuple of (r,g,b) instead of nested tuple ((r,g,b),)
             gradient = 0
@@ -389,11 +388,7 @@ def from_sRGB(x):
         for sRGB input in [0,255].
     '''
     x /= 255.0
-    if x <= 0.04045:
-        y = x / 12.92
-    else:
-        y = ((x + 0.055) / 1.055)**2.4
-    return y
+    return x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055)**2.4
 
 
 def lerp(color1, color2, frac):
