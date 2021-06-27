@@ -4,9 +4,8 @@ from PIL import Image
 from app.image.PILManip import PILManip
 from app.image.decorators import executor
 
-__all__ = (
-    "special",
-)
+__all__ = ("special", )
+
 
 @executor
 def special(byt: bytes) -> BytesIO:
@@ -22,9 +21,13 @@ def special(byt: bytes) -> BytesIO:
         copies.paste(im, (0, 0), mask=im)
         frame_list.append(copies)
     obj = BytesIO()
-    frame_list[0].save(obj, format='gif', save_all=True,
+    frame_list[0].save(obj,
+                       format='gif',
+                       save_all=True,
                        duration=500,
-                       append_images=frame_list[1:], loop=0, disposal=2,
+                       append_images=frame_list[1:],
+                       loop=0,
+                       disposal=2,
                        optimize=True)
     obj.seek(0)
     return obj

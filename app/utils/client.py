@@ -9,13 +9,13 @@ from async_timeout import timeout
 
 from ..exceptions.errors import BadUrl, NoImageFound, ServerTimeout
 
-headers = {'Authorization': os.getenv("TOKEN", "No Token :(")}
-base_url = os.getenv("BASE_URL", "https://dagpi.xyz")
+headers: Dict[str, str] = {'Authorization': os.getenv("TOKEN", "No Token :(")}
+base_url: str = os.getenv("BASE_URL", "https://dagpi.xyz")
 print(headers, base_url)
 _session = None
 
 
-async def get_session():
+async def get_session() -> httpx.AsyncClient:
     global _session
     if _session is None:
         _session = httpx.AsyncClient()
@@ -23,39 +23,30 @@ async def get_session():
 
 
 class AuthModel:
-
-    def __init__(self, obj: Dict):
-        self.auth = obj.get("auth")
-        self.ratelimited = obj.get("ratelimited")
-        self.premium = obj.get("premium")
-        self.ratelimit = int(obj.get("ratelimit"))
-        self.left = int(obj.get("left"))
+    def __init__(self, obj: Dict[str, str]):
+        self.auth = obj["auth"]
+        self.ratelimited = obj["ratelimited"]
+        self.premium = obj["premium"]
+        self.ratelimit = int(obj["ratelimit"])
+        self.left = int(obj["left"])
 
 
 class Client:
-
     @staticmethod
-    async def auth(token: str):
+    async def auth(token: str) -> AuthModel:
         session = await get_session()
         print(f"{base_url}/auth/{token}")
         r = await session.get(f"{base_url}/auth/{token}", headers=headers)
         return AuthModel(r.json())
 
     @staticmethod
-    async def post_stat(route: str, token: str, ua: str):
+    async def post_stat(route: str, token: str, ua: str) -> None:
         session = await get_session()
-        js = {
-            "api": "image",
-            "route": route,
-            "token": token,
-            "user_agent": ua
-
-        }
-        r = await session.post(f"{base_url}/statpost", json=js, headers=headers)
-        print(r.status_code)
+        js = {"api": "image", "route": route, "token": token, "user_agent": ua}
+        await session.post(f"{base_url}/statpost", json=js, headers=headers)
 
     @staticmethod
-    async def image_bytes(url: str):
+    async def image_bytes(url: str) -> bytes:
         url = urllib.parse.unquote(url)
         regex = re.compile(
             r'^(?:http|ftp)s?://'  # http:// or https://
@@ -64,7 +55,8 @@ class Client:
             r'localhost|'
             r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             r'(?::\d+)?'
-            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+            r'(?:/?|[/?]\S+)$',
+            re.IGNORECASE)
         r = (re.match(regex, url) is not None)
         if not r:
             raise BadUrl('Your url is malformed')
@@ -74,8 +66,7 @@ class Client:
                 try:
                     r = await session.get(url)
                     if r.status_code == 200:
-                        byt: bytes = r.read()
-                        return byt
+                        return r.read()
                     else:
                         raise NoImageFound("Non 200 Status Code")
                 except httpx.RequestError:

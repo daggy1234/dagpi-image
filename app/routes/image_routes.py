@@ -10,7 +10,21 @@ from app.routes.responses import (gif_response_only, normal_response,
                                   static_response_only)
 from app.utils.client import Client
 
-router = APIRouter()
+router: APIRouter = APIRouter()
+
+
+@router.get("/mirror/", responses=normal_response)
+async def mirror_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await mirror(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
+@router.get("/flip/", responses=normal_response)
+async def flip_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await flip(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
 
 
 @router.get("/colors/", responses=static_response_only)
@@ -446,30 +460,43 @@ async def discord_quote(url: str, username: str, text: str, dark: bool = True):
 
 
 @router.get("/yt/", responses=static_response_only)
-async def youtube_comment(url: str, username: str, text: str, dark: bool = True):
+async def youtube_comment(url: str,
+                          username: str,
+                          text: str,
+                          dark: bool = True):
     byt = await Client.image_bytes(url)
     img = await yt_comment(byt, username, text, dark)
     return Response(img.read(), media_type="image/png")
 
 
 @router.get("/neon/", responses=normal_response)
-async def neon_image(url: str, sharp: bool = True, soft: bool = True,
-                     overlay: bool = False, multi: bool = False,
-                     gradient: int = 0, per_color: int = None,
-                     colors_per_frame: int = None, direction: str = 'left',
+async def neon_image(url: str,
+                     sharp: bool = True,
+                     soft: bool = True,
+                     overlay: bool = False,
+                     multi: bool = False,
+                     gradient: int = 0,
+                     per_color: int = None,
+                     colors_per_frame: int = None,
+                     direction: str = 'left',
                      colors=None):
     if colors is None:
-        colors = [(244, 40, 43),
-                  (241, 196, 15),
-                  (56, 244, 120),
-                  (52, 152, 249),
-                  (180, 49, 182)]
+        colors = [(244, 40, 43), (241, 196, 15), (56, 244, 120),
+                  (52, 152, 249), (180, 49, 182)]
     animated = multi or len(colors) > 1
     byt = await Client.image_bytes(url)
-    img = await neon(byt, colors, multi=multi, sharp=sharp, soft=soft,
-                     overlay=overlay, direction=direction, gradient=gradient,
-                     per_color=per_color, colors_per_frame=colors_per_frame)
-    return Response(img.read(), media_type=f"image/{'gif' if animated else 'png'}")
+    img = await neon(byt,
+                     colors,
+                     multi=multi,
+                     sharp=sharp,
+                     soft=soft,
+                     overlay=overlay,
+                     direction=direction,
+                     gradient=gradient,
+                     per_color=per_color,
+                     colors_per_frame=colors_per_frame)
+    return Response(img.read(),
+                    media_type=f"image/{'gif' if animated else 'png'}")
 
 
 @router.get("/bomb/", responses=gif_response_only)
@@ -477,6 +504,7 @@ async def bomb_gif(url: str):
     byt = await Client.image_bytes(url)
     img = await bomb(byt)
     return Response(img.read(), media_type="image/gif")
+
 
 # @router.get("/flash/", responses=gif_response_only)
 # async def flash_gif(url: str):
@@ -497,7 +525,8 @@ async def bonk_gif(url: str):
     byt = await Client.image_bytes(url)
     img = await bonk(byt)
     return Response(img.read(), media_type="image/gif")
-                    
+
+
 @router.get("/cube/", responses=normal_response)
 async def cube_image(url: str):
     byt = await Client.image_bytes(url)

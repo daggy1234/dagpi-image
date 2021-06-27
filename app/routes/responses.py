@@ -1,12 +1,12 @@
 from pydantic import BaseModel
+from typing import Union, Any, Dict
 
 
 class Message(BaseModel):
     message: str
 
 
-responses = {
-
+responses: Dict[Union[str, int], Dict[str, Any]] = {
     "404": {
         "message": Message,
         "content": {
@@ -19,11 +19,13 @@ responses = {
         "message": Message,
         "content": {
             "application/json": {
-                "example": {"message": "No image found at your destination"},
+                "example": {
+                    "message": "No image found at your destination"
+                },
                 "example2": {
-                    "message": "File found was not of Appropriate image type"}
+                    "message": "File found was not of Appropriate image type"
+                }
             }
-
         }
     },
     "422": {
@@ -31,7 +33,8 @@ responses = {
         "content": {
             "application/json": {
                 "example": {
-                    "message": "Unable to process the image due to an Error"}
+                    "message": "Unable to process the image due to an Error"
+                }
             }
         }
     },
@@ -40,7 +43,8 @@ responses = {
         "content": {
             "application/json": {
                 "example": {
-                    "message": "Image supplied was too large to be processed"}
+                    "message": "Image supplied was too large to be processed"
+                }
             }
         }
     },
@@ -48,7 +52,9 @@ responses = {
         "message": Message,
         "content": {
             "application/json": {
-                "example": {"message": "Ratelimited"}
+                "example": {
+                    "message": "Ratelimited"
+                }
             }
         }
     },
@@ -56,7 +62,9 @@ responses = {
         "message": Message,
         "content": {
             "application/json": {
-                "example": {"message": "Unauthorised"}
+                "example": {
+                    "message": "Unauthorised"
+                }
             }
         }
     },
@@ -64,13 +72,15 @@ responses = {
         "message": Message,
         "content": {
             "application/json": {
-                "example": {"message": "Unauthorised"}
+                "example": {
+                    "message": "Unauthorised"
+                }
             }
         }
     }
 }
 
-gif_response_only = {
+gif_response_only: Dict[Union[str, int], Dict[str, Any]] = {
     **responses,
     "200": {
         "message": Message,
@@ -80,7 +90,7 @@ gif_response_only = {
     },
 }
 
-static_response_only = {
+static_response_only: Dict[Union[str, int], Dict[str, Any]] = {
     **responses,
     "200": {
         "message": Message,
@@ -90,7 +100,7 @@ static_response_only = {
     },
 }
 
-normal_response = {
+normal_response: Dict[Union[str, int], Dict[str, Any]] = {
     **responses,
     "200": {
         "message": Message,

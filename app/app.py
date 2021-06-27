@@ -1,9 +1,10 @@
 import os
-
+from typing import Optional
 import sentry_sdk
 from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette_prometheus import PrometheusMiddleware, metrics
@@ -16,16 +17,33 @@ from app.middleware import add_process_time_header, auth_check
 from app.routes import image_routes, special_routes
 from sentry_sdk import capture_exception
 
-sentry = os.getenv("SENTRY")
-sentry_sdk.init(dsn=sentry, release="dagpi-image@1.3.0", traces_sample_rate=0.5)
-app = FastAPI(docs_url="/playground", redoc_url="/docs")
-asgi_app = SentryAsgiMiddleware(app)
+sentry: Optional[str] = os.getenv("SENTRY")
+sentry_sdk.init(dsn=sentry,
+                release="dagpi-image@1.3.0",
+                traces_sample_rate=0.5)
+app: FastAPI = FastAPI(docs_url=None, redoc_url=None)
+asgi_app: SentryAsgiMiddleware = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
 app.include_router(image_routes.router)
 app.include_router(special_routes.router)
 app.add_middleware(BaseHTTPMiddleware, dispatch=auth_check)
 app.add_route("/metrics/", metrics)
+
+
+@app.get("/playground", include_in_schema=False)
+def overridden_swagger():
+    return get_swagger_ui_html(
+        openapi_url="/openapi.json",
+        title="Dagpi Playground",
+        swagger_favicon_url="https://cdn.dagpi.xyz/dagpib.png")
+
+
+@app.get("/docs", include_in_schema=False)
+def overridden_redoc():
+    return get_redoc_html(openapi_url="/openapi.json",
+                          title="Dagpi Image Docs",
+                          redoc_favicon_url="https://cdn.dagpi.xyz/dagpib.png")
 
 
 @app.exception_handler(NoImageFound)
@@ -43,8 +61,7 @@ async def bad_url(_request: Request, _exc: BadUrl):
 
 @app.exception_handler(ParameterError)
 async def param_error(_request: Request, exc: ParameterError):
-    return JSONResponse(status_code=400,
-                        content={"message": f"{str(exc)}"})
+    return JSONResponse(status_code=400, content={"message": f"{str(exc)}"})
 
 
 @app.exception_handler(ManipulationError)
@@ -101,18 +118,19 @@ async def rate_error(_request: Request, _exc: RateLimit):
 async def internal_server_error(req, exc):
     e_str = str(exc)
     capture_exception(exc)
-    return JSONResponse(
-        status_code=500,
-        content={"message": "Internal Server Error", "error": e_str}
-    )
+    return JSONResponse(status_code=500,
+                        content={
+                            "message": "Internal Server Error",
+                            "error": e_str
+                        })
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/image/openapi.json")
+@app.get("/image/openapi.json", include_in_schema=False)
 async def openapi():
     return RedirectResponse("/openapi.json")
 
@@ -124,15 +142,22 @@ def custom_openapi():
         title="Dagpi",
         version="1.0",
         description="The Number 1 Image generation api",
-        routes=app.routes
-    )
+        routes=app.routes)
     openapi_schema["components"] = {
         "securitySchemes": {
             "Token": {
-                "type": "apiKey",
-                "in": "header",
-                "name": "Authorization",
-                "description": "eeuhfu"
+                "type":
+                "apiKey",
+                "in":
+                "header",
+                "name":
+                "Authorization",
+                "description":
+                "Dagpi tokens are extremely important and crucial in the way dagpi functions."
+                +
+                "You can get a token from visiting the website at https://dagpi.xyz. "
+                +
+                "For a detailed explanation and a step-by-step guide visit https://dagpi.docs.apiary.io"
             }
         }
     }
@@ -144,6 +169,9 @@ def custom_openapi():
     openapi_schema["info"] = {
         "title": "Dagpi",
         "description": " A fast and powerful image manipulation api",
+        "servers": [{
+            "url": "https://api.dagpi.xyz/image"
+        }],
         "version": "1.0.0",
         "contact": {
             "name": "Daggy1234",
@@ -155,15 +183,14 @@ def custom_openapi():
             "url": "https://www.gnu.org/licenses/agpl-3.0.en.html"
         },
         "x-logo": {
-            "url": "https://asyncdagpi.readthedocs.io/en/latest/_static/dagpib.png"
+            "url": "https://cdn.dagpi.xyz/dagpib.png"
         }
     }
     for endpoint in openapi_schema["paths"].keys():
         if endpoint not in ["/", "/image/openapi.json"]:
-            openapi_schema["paths"][endpoint]["get"]["security"] = [
-                {
-                    "Token": ["Required"]
-                }]
+            openapi_schema["paths"][endpoint]["get"]["security"] = [{
+                "Token": ["Required"]
+            }]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 

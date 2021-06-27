@@ -1,68 +1,46 @@
+from __future__ import annotations
 import random
 from io import BytesIO
 import math
 import numpy as np
 from PIL import Image
-from PIL import Image as PILImage
+from PIL.Image import Image as PILImage
 from PIL import (ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps,
                  ImageSequence)
 
 import app.image.neon as _neon
-from app.exceptions.errors import ParameterError
+from app.exceptions.errors import ManipulationError, ParameterError
 from app.image.PILManip import PILManip, double_image, pil, static_pil
 from app.image.decorators import executor
 from app.image.writetext import WriteText
 
-__all__ = (
-    "angel",
-    "ascii_image",
-    "bad_img",
-    "blur",
-    "deepfry",
-    "five_guys_one_girl",
-    "gay",
-    "htiler",
-    "invert",
-    "jail",
-    "obama",
-    "pixelate",
-    "satan",
-    "sithlord",
-    "thought_image",
-    "top5colors",
-    "trash",
-    "triggered",
-    "wanted",
-    "wasted",
-    "why_are_you_gay",
-    "memegen",
-    "america",
-    "communism",
-    "pride",
-    "delete",
-    "shatter",
-    "fedora",
-    "stringify",
-    "mosiac",
-    "neon",
-    "quantize",
-    "gen_dissolve",
-    "petpetgen",
-    "spin_manip",
-    "ice",
-    "molten",
-    "earth",
-    "comic_manip",
-    "slap",
-    "bomb",
-    "bonk",
-    "shake"
-)
+__all__ = ("angel", "ascii_image", "bad_img", "blur", "deepfry",
+           "five_guys_one_girl", "gay", "htiler", "invert", "jail", "obama",
+           "pixelate", "satan", "sithlord", "thought_image", "top5colors",
+           "trash", "triggered", "wanted", "wasted", "why_are_you_gay",
+           "memegen", "america", "communism", "pride", "delete", "shatter",
+           "fedora", "stringify", "mosiac", "neon", "quantize", "gen_dissolve",
+           "petpetgen", "spin_manip", "ice", "molten", "earth", "comic_manip",
+           "slap", "bomb", "bonk", "shake", "flip", "mirror")
 
 
 @executor
 @pil
-def test(image: PILImage):
+def flip(image: PILImage) -> PILImage:
+    im = image.convert("RGB")
+    return ImageOps.flip(im)
+
+
+@executor
+@pil
+def mirror(image: PILImage) -> PILImage:
+    im = image.convert("RGB")
+    return ImageOps.mirror(im)
+
+
+@executor
+@pil
+def test(image: PILImage) -> PILImage:
     rim = image.rotate(90)
     print("Rotate")
     return rim
@@ -70,7 +48,7 @@ def test(image: PILImage):
 
 @executor
 @pil
-def pixelate(image, size: int):
+def pixelate(image: PILImage, size: int) -> PILImage:
     if size not in [8, 16, 32, 64, 128, 256]:
         raise ParameterError("Size must be one of [8, 16, 32, 64, 128, 256]")
     img_small = image.resize((size, size), resample=Image.BILINEAR)
@@ -79,7 +57,7 @@ def pixelate(image, size: int):
 
 @executor
 @pil
-def thought_image(image, file: str):
+def thought_image(image: PILImage, file: str) -> PILImage:
     im = Image.open("app/image/assets/speech.jpg")
     if len(file) > 200:
         raise ParameterError(
@@ -110,8 +88,7 @@ def thought_image(image, file: str):
     fim.paste(pfp, area)
     base = fim.convert("RGBA")
     txt = Image.new("RGBA", base.size, (255, 255, 255, 0))
-    fnt = ImageFont.truetype("app/image/assets/Helvetica-Bold-Font.ttf",
-                             size)
+    fnt = ImageFont.truetype("app/image/assets/Helvetica-Bold-Font.ttf", size)
     d = ImageDraw.Draw(txt)
     d.text((400, 150), f"{ff}", font=fnt, fill=(0, 0, 0, 255))
     return Image.alpha_composite(base, txt)
@@ -119,15 +96,15 @@ def thought_image(image, file: str):
 
 @executor
 @pil
-def deepfry(image):
+def deepfry(image: PILImage) -> PILImage:
     colours = ((254, 0, 2), (255, 255, 15))
     img = image.convert("RGB")
     width, height = img.width, img.height
-    img = img.resize((int(width ** 0.75), int(height ** 0.75)),
+    img = img.resize((int(width**0.75), int(height**0.75)),
                      resample=Image.LANCZOS)
-    img = img.resize((int(width ** 0.88), int(height ** 0.88)),
+    img = img.resize((int(width**0.88), int(height**0.88)),
                      resample=Image.BILINEAR)
-    img = img.resize((int(width ** 0.9), int(height ** 0.9)),
+    img = img.resize((int(width**0.9), int(height**0.9)),
                      resample=Image.BICUBIC)
     img = img.resize((width, height), resample=Image.BICUBIC)
     img = ImageOps.posterize(img, 4)
@@ -144,7 +121,7 @@ def deepfry(image):
 
 @executor
 @pil
-def invert(image):
+def invert(image: PILImage) -> PILImage:
     image = image.convert('RGBA')
     r, g, b, a = image.split()
     rgb_image = Image.merge('RGB', (r, g, b))
@@ -158,14 +135,14 @@ def invert(image):
 
 @executor
 @pil
-def blur(image):
+def blur(image: PILImage) -> PILImage:
     frame = image.convert("RGBA")
     return frame.filter(ImageFilter.BLUR)
 
 
 @executor
 @pil
-def htiler(image):
+def htiler(image: PILImage) -> PILImage:
     im = Image.open("app/image/assets/hitler.jpg")
     pfp = image.resize((260, 300), 5)
     width = 800
@@ -178,7 +155,7 @@ def htiler(image):
 
 @executor
 @pil
-def jail(image):
+def jail(image: PILImage) -> PILImage:
     w, h = image.size
     fil = Image.open("app/image/assets/jail.png")
     filled = fil.resize((w, h), 5).convert("RGBA")
@@ -189,7 +166,7 @@ def jail(image):
 
 @executor
 @pil
-def gay(image):
+def gay(image: PILImage) -> PILImage:
     w, h = image.size
     fil = Image.open("app/image/assets/gayfilter.png")
     filled = fil.resize((w, h), 5).convert("RGBA")
@@ -200,7 +177,7 @@ def gay(image):
 
 @executor
 @pil
-def molten(img):
+def molten(img: PILImage) -> PILImage:
     img = img.convert("RGB")
     width, height = img.size
     pix = img.load()
@@ -216,7 +193,7 @@ def molten(img):
 
 @executor
 @pil
-def ice(img):
+def ice(img: PILImage) -> PILImage:
     img = img.convert("RGB")
     width, height = img.size
     pix = img.load()
@@ -232,7 +209,7 @@ def ice(img):
 
 @executor
 @pil
-def earth(img):
+def earth(img: PILImage) -> PILImage:
     img = img.convert("RGB")
     width, height = img.size
     pix = img.load()
@@ -248,25 +225,26 @@ def earth(img):
 
 @executor
 @pil
-def comic_manip(img):
+def comic_manip(img: PILImage) -> PILImage:
     img = img.convert("RGB")
     width, height = img.size
     pix = img.load()
     for w in range(width):
         for h in range(height):
             r, g, b = pix[w, h]
-            pix[w, h] = tuple(map(lambda i: min(255, i),
-                                  [
-                abs(g - b + g + r) * r // 256,
-                abs(b - g + b + r) * r // 256,
-                abs(b - g + b + r) * r // 256]))
+            pix[w, h] = tuple(
+                map(lambda i: min(255, i), [
+                    abs(g - b + g + r) * r // 256,
+                    abs(b - g + b + r) * r // 256,
+                    abs(b - g + b + r) * r // 256
+                ]))
 
     return img.convert('L')
 
 
 @executor
 @pil
-def pride(image, flag: str):
+def pride(image: PILImage, flag: str) -> PILImage:
     try:
         im = Image.open(f"app/image/assets/pride/{flag}.png").convert(
             "RGBA").resize((300, 300))
@@ -280,9 +258,9 @@ def pride(image, flag: str):
 
 @executor
 @pil
-def shatter(image):
-    im = Image.open("app/image/assets/glass.png").convert(
-        "RGBA").resize((300, 300))
+def shatter(image: PILImage) -> PILImage:
+    im = Image.open("app/image/assets/glass.png").convert("RGBA").resize(
+        (300, 300))
     ima = image.resize((300, 300)).convert("RGBA")
     ima.paste(im, (0, 0), mask=im)
     return ima
@@ -290,7 +268,7 @@ def shatter(image):
 
 @executor
 @pil
-def wasted(image):
+def wasted(image: PILImage) -> PILImage:
     w, h = image.size
     fil = Image.open("app/image/assets/wasted.png").convert("RGBA")
     fil_r = fil.resize((w, h), 5)
@@ -300,7 +278,7 @@ def wasted(image):
 
 
 @executor
-def triggered(byt: bytes):
+def triggered(byt: bytes) -> BytesIO:
     im = PILManip.pil_image(byt)
     im = im.resize((500, 500), 1)
     overlay = Image.open("app/image/assets/triggered.png")
@@ -319,7 +297,7 @@ def triggered(byt: bytes):
 
 @executor
 @double_image
-def five_guys_one_girl(im, im2):
+def five_guys_one_girl(im: PILImage, im2: PILImage) -> PILImage:
     back = Image.open("app/image/assets/5g1g.png")
     im = im.resize((150, 150), 1)
     back.paste(im, (80, 100))
@@ -334,7 +312,7 @@ def five_guys_one_girl(im, im2):
 
 @executor
 @double_image
-def why_are_you_gay(gay_image, av_image):
+def why_are_you_gay(gay_image: PILImage, av_image: PILImage) -> PILImage:
     im = Image.open("app/image/assets/whyareyougay.png")
     mp = av_image.resize((150, 150), 0)
     op = gay_image.resize((150, 150), 0)
@@ -345,7 +323,7 @@ def why_are_you_gay(gay_image, av_image):
 
 @executor
 @double_image
-def slap(im, im2):
+def slap(im: PILImage, im2: PILImage) -> PILImage:
     base = Image.open("app/image/assets/slap.png").convert("RGBA")
     im = im.resize((90, 90), 1).convert("RGBA")
     im2 = im2.resize((110, 110), 1).convert("RGBA")
@@ -356,7 +334,7 @@ def slap(im, im2):
 
 @executor
 @static_pil
-def top5colors(image):
+def top5colors(image: PILImage) -> PILImage:
     def rgb_to_hex(rgb):
         return ("#%02x%02x%02x" % rgb).upper()
 
@@ -366,6 +344,10 @@ def top5colors(image):
     im = image.resize((int(w * (256 / h)), 256), 1)
     q = im.quantize(colors=5, method=2)
     pal = q.getpalette()
+
+    if not pal:
+        raise ManipulationError("No Pallete generated :(")
+
     back = Image.new("RGBA", (int(w * (256 / h)) + 200, 256),
                      color=(0, 0, 0, 0))
     d = ImageDraw.Draw(back)
@@ -386,14 +368,12 @@ def top5colors(image):
 # noinspection PyArgumentList
 @executor
 @static_pil
-def ascii_image(image):
+def ascii_image(image: PILImage) -> PILImage:
     sc = 0.1
     gcf = 2
     bgcolor = (13, 2, 8)
-    re_list = list(
-        r" .'`^\,:;Il!i><~+_-?][}{1)(|\/tfjrxn"
-        r"uvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
-    )
+    re_list = list(r" .'`^\,:;Il!i><~+_-?][}{1)(|\/tfjrxn"
+                   r"uvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$")
     chars = np.asarray(re_list)
     font = ImageFont.load_default()
     letter_width = font.getsize("x")[0]
@@ -407,7 +387,7 @@ def ascii_image(image):
     img = img.resize(s)
     img = np.sum(np.asarray(img), axis=2)
     img -= img.min()
-    img = (1.0 - img / img.max()) ** gcf * (chars.size - 1)
+    img = (1.0 - img / img.max())**gcf * (chars.size - 1)
     lines = ("\n".join(
         ("".join(r) for r in chars[img.astype(int)]))).split("\n")
     new_img_width = letter_width * width_by_letter
@@ -423,7 +403,7 @@ def ascii_image(image):
 
 @executor
 @pil
-def satan(image):
+def satan(image: PILImage) -> PILImage:
     im = Image.open("app/image/assets/satan.jpg")
     base = image.resize((400, 225), 5)
     width = 800
@@ -436,7 +416,7 @@ def satan(image):
 
 @executor
 @pil
-def delete(img):
+def delete(img: PILImage) -> PILImage:
     im = Image.open("app/image/assets/delete.BMP").convert("RGBA")
     ima = img.resize((195, 195)).convert("RGBA")
     im.paste(ima, (120, 135), ima)
@@ -445,7 +425,7 @@ def delete(img):
 
 @executor
 @pil
-def wanted(image):
+def wanted(image: PILImage) -> PILImage:
     im = Image.open("app/image/assets/wanted.png")
     tp = image.resize((800, 800), 0)
     im.paste(tp, (200, 450))
@@ -454,7 +434,7 @@ def wanted(image):
 
 @executor
 @pil
-def obama(image):
+def obama(image: PILImage) -> PILImage:
     obama_pic = Image.open("app/image/assets/obama.png")
     y = image.resize((300, 300), 1)
     obama_pic.paste(y, (250, 100))
@@ -464,7 +444,7 @@ def obama(image):
 
 @executor
 @pil
-def sithlord(image):
+def sithlord(image: PILImage) -> PILImage:
     im = Image.open("app/image/assets/sithlord.jpg")
     to_pa = image.resize((250, 275), 5)
     size = (225, 225)
@@ -478,7 +458,7 @@ def sithlord(image):
 
 @executor
 @pil
-def trash(image):
+def trash(image: PILImage) -> PILImage:
     im = Image.open("app/image/assets/trash.jpg")
     wthf = image.resize((200, 150), 5)
     width = 800
@@ -491,7 +471,7 @@ def trash(image):
 
 @executor
 @pil
-def bad_img(image) -> Image:
+def bad_img(image) -> PILImage:
     back = Image.open("app/image/assets/bad.png")
     t = image.resize((200, 200), 5)
     back.paste(t, (20, 150))
@@ -500,7 +480,7 @@ def bad_img(image) -> Image:
 
 @executor
 @pil
-def fedora(image):
+def fedora(image: PILImage) -> PILImage:
     img = Image.open('app/image/assets/fedora.bmp').convert('RGBA')
     av = image.resize((275, 275)).convert('RGBA')
     final = Image.new('RGBA', img.size)
@@ -511,7 +491,7 @@ def fedora(image):
 
 @executor
 @pil
-def angel(image):
+def angel(image: PILImage) -> PILImage:
     im = Image.open("app/image/assets/angel.jpg")
     base = image.resize((300, 175), 5)
     width = 800
@@ -524,7 +504,7 @@ def angel(image):
 
 @executor
 @static_pil
-def stringify(im):
+def stringify(im: PILImage) -> PILImage:
     im = im.convert("L")
     im.thumbnail((50, 50))
     brightest = int(
@@ -543,27 +523,29 @@ def stringify(im):
             height2 = 2 * ((int((color2 / 255) * 100) * 100) / brightest)
 
             draw.polygon(
-                (
-                    (row_index * 100, column_index * 100 + 100),
-                    (row_index * 100, column_index * 100 + height1),
-                    (row_index * 100 + 100, column_index * 100 + height2),
-                    (row_index * 100 + 100, column_index * 100 + 100)
-                ),
+                ((row_index * 100, column_index * 100 + 100),
+                 (row_index * 100, column_index * 100 + height1),
+                 (row_index * 100 + 100, column_index * 100 + height2),
+                 (row_index * 100 + 100, column_index * 100 + 100)),
                 fill="black")
 
             for offset in range(3):
-                draw.line(
-                    (
-                        (row_index * 100, column_index * 100 + height1 + offset * 3),
-                        (row_index * 100 + 100, column_index * 100 + height2 + offset * 3)
-                    ),
-                    fill="white", width=12, joint="curve")
+                draw.line(((row_index * 100,
+                            column_index * 100 + height1 + offset * 3),
+                           (row_index * 100 + 100,
+                            column_index * 100 + height2 + offset * 3)),
+                          fill="white",
+                          width=12,
+                          joint="curve")
     return canvas
 
 
 @executor
 @pil
-def mosiac(img, block_size: int = None):
+def mosiac(img: PILImage, block_size: int = None) -> PILImage:
+
+    if not block_size:
+        raise ParameterError("Blocksize must be int between 1 and 32")
     if block_size < 1 or block_size > 32:
         raise ParameterError("Blocksize must be between 1 and 32")
 
@@ -579,7 +561,7 @@ def mosiac(img, block_size: int = None):
     for w in range(0, width, block_size):
         for h in range(0, height, block_size):
             r_sum, g_sum, b_sum = 0, 0, 0
-            size = block_size ** 2
+            size = block_size**2
 
             for i in range(w, min(w + block_size, width)):
                 for j in range(h, min(h + block_size, height)):
@@ -600,7 +582,7 @@ def mosiac(img, block_size: int = None):
 
 @executor
 @pil
-def memegen(tv, text: str):
+def memegen(tv: PILImage, text: str) -> PILImage:
     wid = tv.size[0]
     hei = tv.size[0]
     if 0 < wid < 200:
@@ -658,11 +640,13 @@ def memegen(tv, text: str):
         raise ParameterError("text is too long")
     y = Image.new("RGBA", (tv.size[0], 800), (256, 256, 256))
     wra = WriteText(y)
-    f = wra.write_text_box(
-        x_pos, -10, text, tv.size[0] - 40,
-        "app/image/assets/whitney-medium.ttf",
-        size, color=(0, 0, 0)
-    )
+    f = wra.write_text_box(x_pos,
+                           -10,
+                           text,
+                           tv.size[0] - 40,
+                           "app/image/assets/whitney-medium.ttf",
+                           size,
+                           color=(0, 0, 0))
     t = f
     im = wra.ret_img()
     # im = Image.open(bt)
@@ -685,8 +669,12 @@ def america(byt: bytes) -> BytesIO:
         frame.paste(image, (0, 0), image)
         frame_list.append(frame)
     obj = BytesIO()
-    frame_list[0].save(obj, format='gif', save_all=True,
-                       append_images=frame_list[1:], loop=0, disposal=2,
+    frame_list[0].save(obj,
+                       format='gif',
+                       save_all=True,
+                       append_images=frame_list[1:],
+                       loop=0,
+                       disposal=2,
                        optimize=True)
     obj.seek(0)
     return obj
@@ -704,8 +692,12 @@ def communism(byt: bytes) -> BytesIO:
         frame.paste(image, (0, 0), image)
         frame_list.append(frame)
     obj = BytesIO()
-    frame_list[0].save(obj, format='gif', save_all=True,
-                       append_images=frame_list, loop=0, disposal=2,
+    frame_list[0].save(obj,
+                       format='gif',
+                       save_all=True,
+                       append_images=frame_list,
+                       loop=0,
+                       disposal=2,
                        optimize=True)
     obj.seek(0)
     return obj
@@ -734,24 +726,15 @@ def communism(byt: bytes) -> BytesIO:
 #     io.seek(0)
 #     return io
 
+
 @executor
-def petpetgen(byt: bytes, squish=0) -> None:
+def petpetgen(byt: bytes, squish=0) -> BytesIO:
 
     img = PILManip.static_pil_image(byt).convert("RGBA")
-    frame_spec = [
-        (27, 31, 86, 90),
-        (22, 36, 91, 90),
-        (18, 41, 95, 90),
-        (22, 41, 91, 91),
-        (27, 28, 86, 91)
-    ]
-    squish_factor = [
-        (0, 0, 0, 0),
-        (-7, 22, 8, 0),
-        (-8, 30, 9, 6),
-        (-3, 21, 5, 9),
-        (0, 0, 0, 0)
-    ]
+    frame_spec = [(27, 31, 86, 90), (22, 36, 91, 90), (18, 41, 95, 90),
+                  (22, 41, 91, 91), (27, 28, 86, 91)]
+    squish_factor = [(0, 0, 0, 0), (-7, 22, 8, 0), (-8, 30, 9, 6),
+                     (-3, 21, 5, 9), (0, 0, 0, 0)]
 
     gif_frames = []
     squish_translation_factor = [0, 20, 34, 21, 0]
@@ -759,26 +742,40 @@ def petpetgen(byt: bytes, squish=0) -> None:
         spec = list(frame_spec[i])
         for j, s in enumerate(spec):
             spec[j] = int(s + squish_factor[i][j] * squish)
-        hand = Image.open(f'app/image/assets/PetPetFrames/frame{i}.png').convert("RGBA")
-        img = img.resize((int((spec[2] - spec[0]) * 1.2), int((spec[3] - spec[1]) * 1.2)), 5)
+        hand = Image.open(
+            f'app/image/assets/PetPetFrames/frame{i}.png').convert("RGBA")
+        img = img.resize((int(
+            (spec[2] - spec[0]) * 1.2), int((spec[3] - spec[1]) * 1.2)), 5)
         gif_frame = Image.new('RGBA', (112, 112), (0, 0, 0, 255))
         gif_frame.paste(img, (spec[0], spec[1]), mask=img)
-        gif_frame.paste(hand, (0, int(squish * squish_translation_factor[i])), hand)
+        gif_frame.paste(hand, (0, int(squish * squish_translation_factor[i])),
+                        hand)
         gif_frames.append(gif_frame)
     io = BytesIO()
-    gif_frames[0].save(io, save_all=True, format="gif",
-                       append_images=gif_frames[1:], optimize=False, duration=16, loop=0)
+    gif_frames[0].save(io,
+                       save_all=True,
+                       format="gif",
+                       append_images=gif_frames[1:],
+                       optimize=False,
+                       duration=16,
+                       loop=0)
     io.seek(0)
     return io
 
 
 @executor
 def spin_manip(bytes: bytes) -> BytesIO:
-    return [img := PILManip.static_pil_image(bytes), f := [img.rotate(i).resize(img.size, 4) for i in range(0, 360, 5)],
-            f[0].save(io := BytesIO(), format='gif',
-                      save_all=True,
-                      append_images=f[1:],
-                      loop=0), io.seek(0), io][4]
+    return [
+        img := PILManip.static_pil_image(bytes), f :=
+        [img.rotate(i).resize(img.size, 4) for i in range(0, 360, 5)],
+        f[0].save(io := BytesIO(),
+                  format='gif',
+                  save_all=True,
+                  append_images=f[1:],
+                  loop=0),
+        io.seek(0), io
+    ][4]
+
 
 # Following Code by discord user z03h#6375
 # and is also AGPLv3 Licensed
@@ -790,6 +787,7 @@ def neon(byt: bytes, colors, *, multi=False, **kwargs) -> BytesIO:
     img = PILManip.pil_image(byt)
     neon_func = _neon.a_neon if multi else _neon.neon
     return neon_func(img, colors, **kwargs)
+
 
 # Made by isirk#0001
 #  https://github.com/isirk
@@ -830,7 +828,8 @@ def quantize(byt: bytes) -> BytesIO:
     return buffer
 
 
-def transfer_pixels(source_img: Image, dest_img: Image, num_pixels: int, unused):
+def transfer_pixels(source_img: PILImage, dest_img: PILImage, num_pixels: int,
+                    unused):
     todo = num_pixels
     while todo > 0 and unused:
         pixel_loc = unused.pop()
@@ -848,6 +847,8 @@ def gen_dissolve(byt: bytes, transparent: bool) -> BytesIO:
     else:
         q = img.quantize(colors=1, method=2)
         p = q.getpalette()
+        if not p:
+            raise ManipulationError("Unable to get palette")
         r_tup = (p[0], p[1], p[2])
         im = Image.new("RGBA", img.size, r_tup)
     pixels = []
@@ -880,7 +881,8 @@ def shake(byt: bytes) -> BytesIO:
     img = img.resize((650, 650))
     for _ in range(30):
         base = Image.new('RGBA', (1024, 1024), (255, 0, 0, 0))
-        base.paste(img, (random.randint(170, 250), random.randint(170, 250)), mask=img)
+        base.paste(img, (random.randint(170, 250), random.randint(170, 250)),
+                   mask=img)
         frames.append(base)
     buffer = BytesIO()
     frames[0].save(buffer,
@@ -890,10 +892,10 @@ def shake(byt: bytes) -> BytesIO:
                    append_images=frames[1:],
                    transparency=0,
                    duration=15,
-                   loop=0
-                   )
+                   loop=0)
     buffer.seek(0)
     return buffer
+
 
 # @executor
 # def flash(byt: bytes) -> BytesIO:
@@ -938,8 +940,7 @@ def bonk(byt: bytes) -> BytesIO:
                    save_all=True,
                    append_images=frames[1:],
                    duration=150,
-                   loop=0
-                   )
+                   loop=0)
     buffer.seek(0)
     return buffer
 
@@ -961,7 +962,6 @@ def bomb(byt: bytes) -> BytesIO:
                    optimize=True,
                    append_images=frames[1:],
                    duration=10,
-                   loop=0
-                   )
+                   loop=0)
     buffer.seek(0)
     return buffer

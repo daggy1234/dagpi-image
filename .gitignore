@@ -137,3 +137,5 @@ dmypy.json
 #venv
 pythonenv3.8
 pyrightconfig.json
+requirements.txt
+generate.py

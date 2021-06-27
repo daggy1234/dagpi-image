@@ -19,17 +19,16 @@ __all__ = (
 )
 
 
-
 @executor
 @wand
-def sepia(image):
+def sepia(image: Image) -> Image:
     image.sepia_tone(threshold=0.8)
     return image
 
 
 @executor
 @wand
-def rainbow(image):
+def rainbow(image: Image) -> Image:
     frequency = 3
     phase_shift = -90
     amplitude = 0.2
@@ -40,14 +39,14 @@ def rainbow(image):
 
 @executor
 @wand
-def grayscale(image):
+def grayscale(image: Image) -> Image:
     image.transform_colorspace("gray")
     return image
 
 
 @executor
 @wand
-def charcoal(image):
+def charcoal(image: Image) -> Image:
     image.transform_colorspace("gray")
     image.sketch(0.5, 0.0, 98.0)
     return image
@@ -62,21 +61,21 @@ def charcoal(image):
 
 @executor
 @wand
-def paint(image):
+def paint(image: Image) -> Image:
     image.oil_paint(sigma=3)
     return image
 
 
 @executor
 @wand
-def poster(image):
+def poster(image: Image) -> Image:
     image.posterize(2)
     return image
 
 
 @executor
 @wand
-def floor(image):
+def floor(image: Image) -> Image:
     print("floor")
     image.virtual_pixel = "tile"
     image.resize(300, 300)
@@ -88,21 +87,21 @@ def floor(image):
 
 @executor
 @wand
-def swirl(image):
+def swirl(image: Image) -> Image:
     image.swirl(degree=-90)
     return image
 
 
 @executor
 @wand
-def polaroid(image):
+def polaroid(image: Image) -> Image:
     image.polaroid()
     return image
 
 
 @executor
 @wand
-def edge(image):
+def edge(image: Image) -> Image:
     image.alpha_channel = False
     image.transform_colorspace("gray")
     image.edge(2)
@@ -111,14 +110,14 @@ def edge(image):
 
 @executor
 @wand
-def night(image):
+def night(image: Image) -> Image:
     image.blue_shift(factor=1.25)
     return image
 
 
 @executor
 @wand
-def magik(image, scale: int = None):
+def magik(image: Image, scale: int = None) -> Image:
     """
     https://github.com/lolaristocrat/magik/blob/master/magik.py
     Heavily inspired by this
@@ -139,36 +138,35 @@ def magik(image, scale: int = None):
 
 @executor
 @wand
-def cube(image):
-    
+def cube(image: Image) -> Image:
     def p(x):
         return int(x / 3)
-    
+
     image.resize(p(1000), p(860))
     image.format = "png"
     image.alpha_channel = "opaque"
-    
+
     image1 = image
     image2 = image1.clone()
-    
+
     final = Image(width=p(2550), height=p(760) * 3)
     final.format = "png"
-    
+
     image1.shear(background="none", x=(-30))
     image1.rotate(-30)
     final.composite(image1, left=p(250), top=p(-230) + p(118))
     image1.close()
-    
+
     image2.shear(background="rgba(0,0,0,0)", x=30)
     image2.rotate(-30)
     image3 = image2.clone()
     final.composite(image2, left=p(750) - p(72), top=p(630))
     image2.close()
-    
+
     image3.flop()
     final.composite(image3, left=p(-250) + p(68), top=p(630))
     image3.close()
-    
+
     final.crop(left=80, top=40, right=665, bottom=710)
-    
+
     return final
