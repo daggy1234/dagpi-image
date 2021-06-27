@@ -1,3 +1,4 @@
+from __future__ import annotations
 from app.exceptions.errors import BadImage, FileLarge, ManipulationError
 import polaroid
 from typing import TYPE_CHECKING, Callable
