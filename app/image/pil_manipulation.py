@@ -969,15 +969,16 @@ def bomb(byt: bytes) -> BytesIO:
     buffer.seek(0)
     return buffer
   
+  
 @executor
-def type(text: str) -> BytesIO
+def type(text: str) -> BytesIO:
     text = "\n".join(textwrap.wrap(text, width=25))
     font = ImageFont.truetype("app/image/assets/whitney-semibold.ttf", 25)
     x, y = font.getsize_multiline(text)
     frames = []
 
-    for i in range(len(text)+1):
-        img = Image.new("RGBA", (x+10, y+10), 0)
+    for i in range(len(text) + 1):
+        img = Image.new("RGBA", (x + 10, y + 10), 0)
         draw = ImageDraw.Draw(img)
         draw.multiline_text((3, 3), text[:i], fill=(245, 245, 220), font=font)
         frames.append(img)
@@ -993,10 +994,11 @@ def type(text: str) -> BytesIO
     buffer.seek(0)
     return buffer
 
+  
 @executor
 def expand(byt: bytes) -> BytesIO:
     asset = PILManip.pil_image(byt)
-    size  = (math.ceil(500 / img.height * img.width), 500)
+    size = (math.ceil(500 / img.height * img.width), 500)
     asset = asset.convert("RGBA").resize(size)
     frames = []
     center = asset.width // 2
@@ -1024,6 +1026,7 @@ def expand(byt: bytes) -> BytesIO:
     buffer.seek(0)
     return buffer
 
+  
 @executor
 @static_pil
 def lego(img: PILImage) -> PILImage:
@@ -1036,7 +1039,7 @@ def lego(img: PILImage) -> PILImage:
     x = y = 0
     for row in np.asarray(img.convert("RGBA")):
         for px in row:
-            if px[-1] != 0: # ignore transparent pixels
+            if px[-1] != 0:  # ignore transparent pixels
                 overlay = Image.new('RGBA', lego.size, tuple(px))
                 f = Image.blend(overlay, lego, alpha=.3)
                 back.paste(f, (x, y))
