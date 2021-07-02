@@ -1,7 +1,10 @@
 from __future__ import annotations
-import random
-from io import BytesIO
+
 import math
+import random
+import textwrap
+from io import BytesIO
+
 import numpy as np
 from PIL import Image
 from PIL.Image import Image as PILImage
@@ -471,7 +474,7 @@ def trash(image: PILImage) -> PILImage:
 
 @executor
 @pil
-def bad_img(image) -> PILImage:
+def bad_img(image: PILImage) -> PILImage:
     back = Image.open("app/image/assets/bad.png")
     t = image.resize((200, 200), 5)
     back.paste(t, (20, 150))
@@ -965,3 +968,79 @@ def bomb(byt: bytes) -> BytesIO:
                    loop=0)
     buffer.seek(0)
     return buffer
+  
+@executor
+def type(text: str) -> BytesIO
+    text = "\n".join(textwrap.wrap(text, width=25))
+    font = ImageFont.truetype("app/image/assets/whitney-semibold.ttf", 25)
+    x, y = font.getsize_multiline(text)
+    frames = []
+
+    for i in range(len(text)+1):
+        img = Image.new("RGBA", (x+10, y+10), 0)
+        draw = ImageDraw.Draw(img)
+        draw.multiline_text((3, 3), text[:i], fill=(245, 245, 220), font=font)
+        frames.append(img)
+
+    buffer = BytesIO()
+    frames[0].save(buffer,
+                   format='gif',
+                   save_all=True,
+                   optimize=True,
+                   append_images=frames[1:],
+                   duration=120,
+                   loop=0)
+    buffer.seek(0)
+    return buffer
+
+@executor
+def expand(byt: bytes) -> BytesIO:
+    asset = PILManip.pil_image(byt)
+    size  = (math.ceil(500 / img.height * img.width), 500)
+    asset = asset.convert("RGBA").resize(size)
+    frames = []
+    center = asset.width // 2
+
+    for i in range(0, int(center * 1.5), 10):
+        mask = Image.new("L", asset.size, 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse(
+            (center - i, center - i, center + i, center + i), 
+            fill=255
+        )
+
+        out = ImageOps.fit(asset, mask.size)
+        out.putalpha(mask)
+        frames.append(out)
+
+    buffer = BytesIO()
+    frames[0].save(buffer,
+                   format='gif',
+                   save_all=True,
+                   optimize=True,
+                   append_images=frames[1:],
+                   duration=10,
+                   loop=0)
+    buffer.seek(0)
+    return buffer
+
+@executor
+@static_pil
+def lego(img: PILImage) -> PILImage:
+    num = 40
+    lego = Image.open('app/image/assets/lego.png')
+    size = (math.ceil(num / img.height * img.width), num)
+    img = img.resize(size)
+
+    back = Image.new("RGBA", (img.width * lego.width, img.height * lego.height), 0)
+    x = y = 0
+    for row in np.asarray(img.convert("RGBA")):
+        for px in row:
+            if px[-1] != 0: # ignore transparent pixels
+                overlay = Image.new('RGBA', lego.size, tuple(px))
+                f = Image.blend(overlay, lego, alpha=.3)
+                back.paste(f, (x, y))
+            x += lego.width
+        x = 0
+        y += lego.height
+    return back
