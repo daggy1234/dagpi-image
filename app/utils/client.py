@@ -3,13 +3,13 @@ import os
 import re
 import urllib.parse
 from typing import Dict
-
+import time
 import httpx
 from async_timeout import timeout
 
 from ..exceptions.errors import BadUrl, NoImageFound, ServerTimeout
 
-headers: Dict[str, str] = {'Authorization': os.getenv("TOKEN", "No Token :(")}
+headers: Dict[str, str] = {'Authorization': os.getenv("TOKEN", "token")}
 base_url: str = os.getenv("BASE_URL", "https://dagpi.xyz")
 print(headers, base_url)
 _session = None
@@ -29,13 +29,13 @@ class AuthModel:
         self.premium = obj["premium"]
         self.ratelimit = int(obj["ratelimit"])
         self.left = int(obj["left"])
+        self.retry_after = int(int(obj["after"]) - time.time())
 
 
 class Client:
     @staticmethod
     async def auth(token: str) -> AuthModel:
         session = await get_session()
-        print(f"{base_url}/auth/{token}")
         r = await session.get(f"{base_url}/auth/{token}", headers=headers)
         return AuthModel(r.json())
 

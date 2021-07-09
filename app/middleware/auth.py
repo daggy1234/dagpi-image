@@ -30,6 +30,7 @@ async def auth_check(
                 response = await call_next(request)
                 response.headers["X-Ratelimit-Limit"] = str(tok.ratelimit)
                 response.headers['X-Ratelimit-Remaining'] = str(tok.left)
+                response.headers['X-Ratelimit-Retry-After'] = str(tok.retry_after)
                 t = BackgroundTasks()
                 try:
                     ua = request.headers.get("user-agent")
@@ -44,7 +45,8 @@ async def auth_check(
             return JSONResponse({"message": "Ratelimited"},
                                 headers={
                                     'X-Ratelimit-Limit': str(tok.ratelimit),
-                                    'X-Ratelimit-Remaining': str(tok.left)
+                                    'X-Ratelimit-Remaining': str(tok.left),
+                                    'X-Ratelimit-Retry-After': str(tok.retry_after)
                                 },
                                 status_code=429)
 
