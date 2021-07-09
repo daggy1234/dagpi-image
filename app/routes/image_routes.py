@@ -63,6 +63,13 @@ async def trigger_image(url: str):
     return Response(img.read(), media_type="image/gif")
 
 
+@router.get("/expand/", responses=gif_response_only)
+async def expand_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await expand(byt)
+    return Response(img.read(), media_type="image/gif")
+
+
 @router.get("/wasted/", responses=normal_response)
 async def wasted_image(url: str):
     byt = await Client.image_bytes(url)
@@ -142,6 +149,13 @@ async def angel_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await angel(byt)
     return Response(img.read(), media_type=f"image/{image_format}")
+
+@router.get("/lego/", responses=normal_response)
+async def lego_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await lego(byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
 
 
 @router.get("/satan/", responses=normal_response)

@@ -34,8 +34,9 @@ class PILManip:
         try:
             io = BytesIO(image)
             io.seek(0)
-            return Image.open(io, formats=("PNG", "JPEG"))
-        except UnidentifiedImageError:
+            return Image.open(io, formats=("PNG", "JPEG", "GIF"))
+        except UnidentifiedImageError as e:
+            print(e)
             raise BadImage("Unable to use Image")
 
     @staticmethod

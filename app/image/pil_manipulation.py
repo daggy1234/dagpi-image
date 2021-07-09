@@ -24,7 +24,7 @@ __all__ = ("angel", "ascii_image", "bad_img", "blur", "deepfry",
            "memegen", "america", "communism", "pride", "delete", "shatter",
            "fedora", "stringify", "mosiac", "neon", "quantize", "gen_dissolve",
            "petpetgen", "spin_manip", "ice", "molten", "earth", "comic_manip",
-           "slap", "bomb", "bonk", "shake", "flip", "mirror")
+           "slap", "bomb", "bonk", "shake", "flip", "mirror", "lego", "expand")
 
 
 @executor
@@ -997,8 +997,8 @@ def type(text: str) -> BytesIO:
   
 @executor
 def expand(byt: bytes) -> BytesIO:
-    asset = PILManip.pil_image(byt)
-    size = (math.ceil(500 / img.height * img.width), 500)
+    asset = PILManip.static_pil_image(byt)
+    size = (math.ceil(500 / asset.height * asset.width), 500)
     asset = asset.convert("RGBA").resize(size)
     frames = []
     center = asset.width // 2
@@ -1008,7 +1008,7 @@ def expand(byt: bytes) -> BytesIO:
         draw = ImageDraw.Draw(mask)
         draw.ellipse(
             (center - i, center - i, center + i, center + i), 
-            fill=255
+            fill=255 #type: ignore
         )
 
         out = ImageOps.fit(asset, mask.size)
@@ -1028,7 +1028,7 @@ def expand(byt: bytes) -> BytesIO:
 
   
 @executor
-@static_pil
+@pil
 def lego(img: PILImage) -> PILImage:
     num = 40
     lego = Image.open('app/image/assets/lego.png')
