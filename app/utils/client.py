@@ -2,8 +2,7 @@ import asyncio
 import os
 import re
 import urllib.parse
-from typing import Dict, Union
-import time
+from typing import Dict, TypedDict
 import httpx
 from async_timeout import timeout
 
@@ -21,15 +20,23 @@ async def get_session() -> httpx.AsyncClient:
         _session = httpx.AsyncClient()
     return _session
 
+class AuthModelDict(TypedDict):
+    auth: bool
+    ratelimited: bool
+    premium: bool
+    ratelimit: int
+    left: int
+    after: int
+
 
 class AuthModel:
-    def __init__(self, obj: Dict[str, Union[str, bool, int]]):
-        self.auth = bool(obj["auth"])
-        self.ratelimited = bool(obj["ratelimited"])
-        self.premium = bool(obj["premium"])
-        self.ratelimit = int(obj["ratelimit"])
-        self.left = int(obj["left"])
-        self.reset = int(obj["after"])
+    def __init__(self, obj: AuthModelDict):
+        self.auth = obj["auth"]
+        self.ratelimited = obj["ratelimited"]
+        self.premium = obj["premium"]
+        self.ratelimit = obj["ratelimit"]
+        self.left = obj["left"]
+        self.reset = obj["after"]
 
 
 class Client:
@@ -37,7 +44,8 @@ class Client:
     async def auth(token: str) -> AuthModel:
         session = await get_session()
         r = await session.get(f"{base_url}/auth/{token}", headers=headers)
-        return AuthModel(r.json())
+        model: AuthModelDict = r.json()
+        return AuthModel(model)
 
     @staticmethod
     async def post_stat(route: str, token: str, ua: str) -> None:
