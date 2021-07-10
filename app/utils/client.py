@@ -2,7 +2,7 @@ import asyncio
 import os
 import re
 import urllib.parse
-from typing import Dict
+from typing import Dict, Union
 import time
 import httpx
 from async_timeout import timeout
@@ -23,13 +23,13 @@ async def get_session() -> httpx.AsyncClient:
 
 
 class AuthModel:
-    def __init__(self, obj: Dict[str, str]):
-        self.auth = obj["auth"]
-        self.ratelimited = obj["ratelimited"]
-        self.premium = obj["premium"]
+    def __init__(self, obj: Dict[str, Union[str, bool, int]]):
+        self.auth = bool(obj["auth"])
+        self.ratelimited = bool(obj["ratelimited"])
+        self.premium = bool(obj["premium"])
         self.ratelimit = int(obj["ratelimit"])
         self.left = int(obj["left"])
-        self.retry_after = int(int(obj["after"]) - time.time())
+        self.reset = int(obj["after"])
 
 
 class Client:

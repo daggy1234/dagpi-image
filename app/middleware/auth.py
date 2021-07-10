@@ -28,9 +28,9 @@ async def auth_check(
         if tok.auth:
             if not tok.ratelimited:
                 response = await call_next(request)
-                response.headers["X-Ratelimit-Limit"] = str(tok.ratelimit)
-                response.headers['X-Ratelimit-Remaining'] = str(tok.left)
-                response.headers['X-Ratelimit-Retry-After'] = str(tok.retry_after)
+                response.headers["X-RateLimit-Limit"] = str(tok.ratelimit)
+                response.headers['X-RateLimit-Remaining'] = str(tok.left)
+                response.headers['X-RateLimit-Reset'] = str(tok.reset)
                 t = BackgroundTasks()
                 try:
                     ua = request.headers.get("user-agent")
@@ -44,9 +44,9 @@ async def auth_check(
                 return response
             return JSONResponse({"message": "Ratelimited"},
                                 headers={
-                                    'X-Ratelimit-Limit': str(tok.ratelimit),
-                                    'X-Ratelimit-Remaining': str(tok.left),
-                                    'X-Ratelimit-Retry-After': str(tok.retry_after)
+                                    'X-RateLimit-Limit': str(tok.ratelimit),
+                                    'X-RateLimit-Remaining': str(tok.left),
+                                    'X-RateLimit-Reset': str(tok.reset)
                                 },
                                 status_code=429)
 
