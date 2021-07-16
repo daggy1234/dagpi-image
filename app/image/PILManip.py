@@ -1,5 +1,8 @@
 from __future__ import annotations
+import functools
 from typing import List, Tuple, TYPE_CHECKING, Callable
+from app.executor import get_executor
+import asyncio
 
 if TYPE_CHECKING:
     from typing_extensions import ParamSpec, Concatenate
@@ -23,7 +26,7 @@ class PILManip:
         try:
             io = BytesIO(image)
             io.seek(0)
-            return Image.open(io, formats=("PNG", "JPEG", "GIF"))
+            return Image.open(io, formats=["PNG", "JPEG", "GIF"])
         except UnidentifiedImageError:
             raise BadImage("Unable to use Image")
 
@@ -34,7 +37,7 @@ class PILManip:
         try:
             io = BytesIO(image)
             io.seek(0)
-            return Image.open(io, formats=("PNG", "JPEG", "GIF"))
+            return Image.open(io, formats=["PNG", "JPEG", "GIF"])
         except UnidentifiedImageError as e:
             print(e)
             raise BadImage("Unable to use Image")
@@ -58,45 +61,85 @@ class PILManip:
         return image_bytes
 
 
-def pil(
-    function: Callable[Concatenate[Image.Image, P], Image.Image]
-) -> Callable[Concatenate[bytes, P], Tuple[BytesIO, str]]:
-    def wrapper(image: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
-        img = PILManip.pil_image(image)
-        if img.format == "GIF":
-            frames = []
-            for frame in ImageSequence.Iterator(img):
-                res_frame = function(frame, *args, **kwargs)
-                frames.append(res_frame)
-            return PILManip.pil_gif_save(frames), "gif"
-        elif img.format in ["PNG", "JPEG"]:
-            img = function(img, *args, **kwargs)
-            return PILManip.pil_image_save(img), "png"
-        else:
-            raise BadImage("Bad Format")
-
-    return wrapper
+def pil_manip_static(image: bytes, function: Callable[Concatenate[Image.Image,
+                                                                  P],
+                                                      Image.Image], *args,
+                     **kwargs) -> BytesIO:
+    img = PILManip.static_pil_image(image)
+    img = function(img, *args, **kwargs)
+    return PILManip.pil_image_save(img)
 
 
-def double_image(
-    function: Callable[Concatenate[Image.Image, Image.Image, P], Image.Image]
-) -> Callable[Concatenate[bytes, bytes, P], BytesIO]:
-    def wrapper(image_a: bytes, image_b: bytes, *args: P.args,
-                **kwargs: P.kwargs) -> BytesIO:
-        p_image_a = PILManip.static_pil_image(image_a)
-        p_image_b = PILManip.static_pil_image(image_b)
-        img = function(p_image_a, p_image_b, *args, **kwargs)
-        return PILManip.pil_image_save(img)
-
-    return wrapper
-
-
-def static_pil(
-    function: Callable[Concatenate[Image.Image, P], Image.Image]
-) -> Callable[Concatenate[bytes, P], BytesIO]:
-    def wrapper(image: bytes, *args: P.args, **kwargs: P.kwargs) -> BytesIO:
-        img = PILManip.static_pil_image(image)
+def pil_manip(image: bytes, function: Callable[Concatenate[Image.Image, P],
+                                               Image.Image], *args,
+              **kwargs) -> Tuple[BytesIO, str]:
+    img = PILManip.pil_image(image)
+    if img.format == "GIF":
+        frames = []
+        for frame in ImageSequence.Iterator(img):
+            res_frame = function(frame, *args, **kwargs)
+            frames.append(res_frame)
+        return PILManip.pil_gif_save(frames), "gif"
+    elif img.format in ["PNG", "JPEG"]:
         img = function(img, *args, **kwargs)
-        return PILManip.pil_image_save(img)
+        return PILManip.pil_image_save(img), "png"
+    else:
+        raise BadImage("Bad Format")
 
-    return wrapper
+
+async def pil(function: Callable[Concatenate[Image.Image, P], Image.Image],
+              byt: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(pil_manip, byt, function, *args, **kwargs)
+    out = await loop.run_in_executor(get_executor(), fn)
+    return out
+
+
+async def static_pil(function: Callable[Concatenate[Image.Image, P],
+                                        Image.Image], byt: bytes, *args,
+                     **kwargs) -> BytesIO:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(pil_manip_static, byt, function, *args, **kwargs)
+    out = await loop.run_in_executor(get_executor(), fn)
+    return out
+
+
+def double_image_manip(function: Callable[Concatenate[Image.Image, Image.Image,
+                                                      P], Image.Image],
+                       image_a: bytes, image_b: bytes, *args: P.args,
+                       **kwargs: P.kwargs) -> BytesIO:
+    p_image_a = PILManip.static_pil_image(image_a)
+    p_image_b = PILManip.static_pil_image(image_b)
+    img = function(p_image_a, p_image_b, *args, **kwargs)
+    return PILManip.pil_image_save(img)
+
+
+async def pil_multi_image(function: Callable[Concatenate[Image.Image,
+                                                         Image.Image, P],
+                                             Image.Image], image: bytes,
+                          image_2: bytes, *args, **kwargs) -> BytesIO:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(double_image_manip, function, image, image_2, *args,
+                           **kwargs)
+    out = await loop.run_in_executor(get_executor(), fn)
+    return out
+
+
+# def pil(
+#     function: Callable[Concatenate[Image.Image, P], Image.Image]
+# ) -> Callable[Concatenate[bytes, P], Tuple[BytesIO, str]]:
+#     def wrapper(image: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
+#         img = PILManip.pil_image(image)
+#         if img.format == "GIF":
+#             frames = []
+#             for frame in ImageSequence.Iterator(img):
+#                 res_frame = function(frame, *args, **kwargs)
+#                 frames.append(res_frame)
+#             return PILManip.pil_gif_save(frames), "gif"
+#         elif img.format in ["PNG", "JPEG"]:
+#             img = function(img, *args, **kwargs)
+#             return PILManip.pil_image_save(img), "png"
+#         else:
+#             raise BadImage("Bad Format")
+
+#     return wrapper

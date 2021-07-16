@@ -267,20 +267,23 @@ def preprocess_neon(im, *, single, **kwargs):
     # Apply sharpening or smoothing to edges before getting edges
     if sharpen is not None:
         if sharpen >= 0:
-            filters = (ImageFilter.DETAIL,
-                       ImageFilter.SHARPEN,
-                       ImageFilter.EDGE_ENHANCE,
-                       ImageFilter.EDGE_ENHANCE_MORE,
-                       )
+            filters = (
+                ImageFilter.DETAIL,
+                ImageFilter.SHARPEN,
+                ImageFilter.EDGE_ENHANCE,
+                ImageFilter.EDGE_ENHANCE_MORE,
+            )
         else:
             sharpen = -sharpen
-            filters = (ImageFilter.DETAIL,
-                       ImageFilter.SMOOTH,
-                       ImageFilter.SMOOTH_MORE,
-                       ImageFilter.GaussianBlur(sharpen-2),
-                       )
-            sharpen = min(3, sharpen)  # allow for blur but overflow just blurs more
-            
+            filters = (
+                ImageFilter.DETAIL,
+                ImageFilter.SMOOTH,
+                ImageFilter.SMOOTH_MORE,
+                ImageFilter.GaussianBlur(sharpen - 2),
+            )
+            sharpen = min(
+                3, sharpen)  # allow for blur but overflow just blurs more
+
         try:
             im = im.filter(filters[sharpen])
         except IndexError:

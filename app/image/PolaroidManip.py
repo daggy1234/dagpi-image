@@ -31,7 +31,7 @@ class PolaroidManip:
             raise ManipulationError("Error encoding")
 
 
-def polaroid(
+def polaroid_deco(
     function: Callable[Concatenate[polaroid.Image, P], polaroid.Image]
 ) -> Callable[Concatenate[bytes, P], BytesIO]:
     def wrapper(image: bytes, *args, **kwargs) -> BytesIO:

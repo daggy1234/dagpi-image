@@ -20,6 +20,7 @@ async def get_session() -> httpx.AsyncClient:
         _session = httpx.AsyncClient()
     return _session
 
+
 class AuthModelDict(TypedDict):
     auth: bool
     ratelimited: bool

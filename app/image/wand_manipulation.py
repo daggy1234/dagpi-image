@@ -1,5 +1,3 @@
-from app.image.WandManip import wand
-from app.image.decorators import executor
 from wand.image import Image
 
 __all__ = (
@@ -19,15 +17,11 @@ __all__ = (
 )
 
 
-@executor
-@wand
 def sepia(image: Image) -> Image:
     image.sepia_tone(threshold=0.8)
     return image
 
 
-@executor
-@wand
 def rainbow(image: Image) -> Image:
     frequency = 3
     phase_shift = -90
@@ -37,44 +31,34 @@ def rainbow(image: Image) -> Image:
     return image
 
 
-@executor
-@wand
 def grayscale(image: Image) -> Image:
     image.transform_colorspace("gray")
     return image
 
 
-@executor
-@wand
 def charcoal(image: Image) -> Image:
     image.transform_colorspace("gray")
     image.sketch(0.5, 0.0, 98.0)
     return image
 
 
-# @executor
-# @wand
+#
+#
 # def solar(image):
 #     image.solarize(threshold=0.5 * image.quantum_range)
 #     return image
 
 
-@executor
-@wand
 def paint(image: Image) -> Image:
     image.oil_paint(sigma=3)
     return image
 
 
-@executor
-@wand
 def poster(image: Image) -> Image:
     image.posterize(2)
     return image
 
 
-@executor
-@wand
 def floor(image: Image) -> Image:
     print("floor")
     image.virtual_pixel = "tile"
@@ -85,22 +69,16 @@ def floor(image: Image) -> Image:
     return image
 
 
-@executor
-@wand
 def swirl(image: Image) -> Image:
     image.swirl(degree=-90)
     return image
 
 
-@executor
-@wand
 def polaroid(image: Image) -> Image:
     image.polaroid()
     return image
 
 
-@executor
-@wand
 def edge(image: Image) -> Image:
     image.alpha_channel = False
     image.transform_colorspace("gray")
@@ -108,15 +86,11 @@ def edge(image: Image) -> Image:
     return image
 
 
-@executor
-@wand
 def night(image: Image) -> Image:
     image.blue_shift(factor=1.25)
     return image
 
 
-@executor
-@wand
 def magik(image: Image, scale: int = None) -> Image:
     """
     https://github.com/lolaristocrat/magik/blob/master/magik.py
@@ -136,8 +110,6 @@ def magik(image: Image, scale: int = None) -> Image:
     return image
 
 
-@executor
-@wand
 def cube(image: Image) -> Image:
     def p(x):
         return int(x / 3)

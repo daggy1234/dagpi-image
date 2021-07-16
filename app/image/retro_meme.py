@@ -4,9 +4,6 @@ from typing import Any, Dict, List, Tuple
 
 from PIL import Image, ImageDraw, ImageFont
 
-from app.image.PILManip import pil
-from app.image.decorators import executor
-
 __all__ = ("retromeme_gen", )
 
 
@@ -184,8 +181,6 @@ class Meme:
             raise ManipulationError("No Image")
 
 
-@executor
-@pil
 def retromeme_gen(image: Image.Image, text: str) -> Image.Image:
     mem = Meme(text, image.convert("RGBA"))
     return mem.make_meme()
