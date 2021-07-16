@@ -19,13 +19,9 @@ __all__ = (
 )
 
 
-
-
 def sepia(image: Image) -> Image:
     image.sepia_tone(threshold=0.8)
     return image
-
-
 
 
 def rainbow(image: Image) -> Image:
@@ -37,13 +33,9 @@ def rainbow(image: Image) -> Image:
     return image
 
 
-
-
 def grayscale(image: Image) -> Image:
     image.transform_colorspace("gray")
     return image
-
-
 
 
 def charcoal(image: Image) -> Image:
@@ -52,13 +44,11 @@ def charcoal(image: Image) -> Image:
     return image
 
 
-# 
-# 
+#
+#
 # def solar(image):
 #     image.solarize(threshold=0.5 * image.quantum_range)
 #     return image
-
-
 
 
 def paint(image: Image) -> Image:
@@ -66,13 +56,9 @@ def paint(image: Image) -> Image:
     return image
 
 
-
-
 def poster(image: Image) -> Image:
     image.posterize(2)
     return image
-
-
 
 
 def floor(image: Image) -> Image:
@@ -85,20 +71,14 @@ def floor(image: Image) -> Image:
     return image
 
 
-
-
 def swirl(image: Image) -> Image:
     image.swirl(degree=-90)
     return image
 
 
-
-
 def polaroid(image: Image) -> Image:
     image.polaroid()
     return image
-
-
 
 
 def edge(image: Image) -> Image:
@@ -108,13 +88,9 @@ def edge(image: Image) -> Image:
     return image
 
 
-
-
 def night(image: Image) -> Image:
     image.blue_shift(factor=1.25)
     return image
-
-
 
 
 def magik(image: Image, scale: int = None) -> Image:
@@ -134,8 +110,6 @@ def magik(image: Image, scale: int = None) -> Image:
     )
 
     return image
-
-
 
 
 def cube(image: Image) -> Image:

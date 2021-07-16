@@ -126,6 +126,7 @@ async def hog_image(url: str):
     img = await byt_to_byt(hog_process, byt)
     return Response(img.read(), media_type="image/png")
 
+
 @router.get("/triangle/", responses=static_response_only)
 async def triange(url: str):
     byt = await Client.image_bytes(url)
@@ -153,12 +154,12 @@ async def angel_image(url: str):
     img, image_format = await pil(angel, byt)
     return Response(img.read(), media_type=f"image/{image_format}")
 
+
 @router.get("/lego/", responses=normal_response)
 async def lego_image(url: str):
     byt = await Client.image_bytes(url)
     img, image_format = await pil(lego, byt)
     return Response(img.read(), media_type=f"image/{image_format}")
-
 
 
 @router.get("/satan/", responses=normal_response)
@@ -318,7 +319,7 @@ async def mosiac_manip(url: str, pixels: int = 16):
 @router.get("/ascii/", responses=static_response_only)
 async def asc_image(url: str):
     byt = await Client.image_bytes(url)
-    img = await  static_pil(ascii_image, byt)
+    img = await static_pil(ascii_image, byt)
     return Response(img.read(), media_type="image/png")
 
 
@@ -502,16 +503,17 @@ async def neon_image(url: str,
                   (52, 152, 249), (180, 49, 182)]
     animated = multi or len(colors) > 1
     byt = await Client.image_bytes(url)
-    img = await byt_to_byt(neon, byt,
-                     colors=colors,
-                     multi=multi,
-                     sharp=sharp,
-                     soft=soft,
-                     overlay=overlay,
-                     direction=direction,
-                     gradient=gradient,
-                     per_color=per_color,
-                     colors_per_frame=colors_per_frame)
+    img = await byt_to_byt(neon,
+                           byt,
+                           colors=colors,
+                           multi=multi,
+                           sharp=sharp,
+                           soft=soft,
+                           overlay=overlay,
+                           direction=direction,
+                           gradient=gradient,
+                           per_color=per_color,
+                           colors_per_frame=colors_per_frame)
     return Response(img.read(),
                     media_type=f"image/{'gif' if animated else 'png'}")
 

@@ -26,6 +26,7 @@ polaroid = "^0.3.2"
 [tool.poetry.dev-dependencies]
 yapf = "^0.31.0"
 flake8 = "^3.9.2"
+toml = "^0.10.2"
 
 [tool.pyright]
 

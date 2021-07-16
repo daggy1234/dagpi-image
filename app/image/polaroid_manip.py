@@ -2,8 +2,8 @@ from app.image.decorators import executor
 from app.image.PolaroidManip import polaroid as polaroid_deco
 import polaroid
 
-
 __all__ = ("glitch", "comic_manip_static")
+
 
 @executor
 @polaroid_deco

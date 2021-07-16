@@ -40,18 +40,17 @@ class NumpyManip:
         return image_bytes
 
 
-def numpy_manip(
-    image: bytes,
-    function: Callable[Concatenate[np.ndarray, P], np.ndarray],
-    *args,
-    **kwargs
-) -> BytesIO:
+def numpy_manip(image: bytes, function: Callable[Concatenate[np.ndarray, P],
+                                                 np.ndarray], *args,
+                **kwargs) -> BytesIO:
     img = NumpyManip.image_read(image)
     ret_img = function(img, *args, **kwargs)
     return NumpyManip.image_save(ret_img)
 
-async def numpy(function: Callable[Concatenate[np.ndarray, P], np.ndarray], byt: bytes, *args, **kwargs) -> BytesIO:
+
+async def numpy(function: Callable[Concatenate[np.ndarray, P], np.ndarray],
+                byt: bytes, *args, **kwargs) -> BytesIO:
     loop = asyncio.get_event_loop()
-    fn = functools.partial(numpy_manip, byt, function,*args, **kwargs)
+    fn = functools.partial(numpy_manip, byt, function, *args, **kwargs)
     out = await loop.run_in_executor(get_executor(), fn)
     return out

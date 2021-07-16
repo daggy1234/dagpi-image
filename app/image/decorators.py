@@ -29,7 +29,8 @@ def executor(function: Callable[P, R]) -> Callable[P, Awaitable[R]]:
     return decorator
 
 
-async def byt_to_byt(function: Callable[Concatenate[bytes, P], BytesIO], byt: bytes,*args, **kwargs) -> BytesIO:
+async def byt_to_byt(function: Callable[Concatenate[bytes, P], BytesIO],
+                     byt: bytes, *args, **kwargs) -> BytesIO:
     loop = asyncio.get_event_loop()
     fn = functools.partial(function, byt, **kwargs)
     out = await loop.run_in_executor(ProcessPoolExecutor(), fn)

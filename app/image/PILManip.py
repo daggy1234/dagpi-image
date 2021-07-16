@@ -62,25 +62,18 @@ class PILManip:
         return image_bytes
 
 
-
-def pil_manip_static(
-    image: bytes,
-    function: Callable[Concatenate[Image.Image, P], Image.Image],
-    *args,
-    **kwargs
-) -> BytesIO:
+def pil_manip_static(image: bytes, function: Callable[Concatenate[Image.Image,
+                                                                  P],
+                                                      Image.Image], *args,
+                     **kwargs) -> BytesIO:
     img = PILManip.static_pil_image(image)
     img = function(img, *args, **kwargs)
     return PILManip.pil_image_save(img)
 
 
-
-def pil_manip(
-    image: bytes,
-    function: Callable[Concatenate[Image.Image, P], Image.Image],
-    *args,
-    **kwargs
-) -> Tuple[BytesIO, str]:
+def pil_manip(image: bytes, function: Callable[Concatenate[Image.Image, P],
+                                               Image.Image], *args,
+              **kwargs) -> Tuple[BytesIO, str]:
     img = PILManip.pil_image(image)
     if img.format == "GIF":
         frames = []
@@ -94,35 +87,44 @@ def pil_manip(
     else:
         raise BadImage("Bad Format")
 
-async def pil(function: Callable[Concatenate[Image.Image, P], Image.Image], byt: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
-     loop = asyncio.get_event_loop()
-     fn = functools.partial(pil_manip, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(get_executor(), fn)
-     return out
 
-async def static_pil(function: Callable[Concatenate[Image.Image, P], Image.Image], byt: bytes,*args, **kwargs) -> BytesIO:
-     loop = asyncio.get_event_loop()
-     fn = functools.partial(pil_manip_static, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(get_executor(), fn)
-     return out
+async def pil(function: Callable[Concatenate[Image.Image, P], Image.Image],
+              byt: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(pil_manip, byt, function, *args, **kwargs)
+    out = await loop.run_in_executor(get_executor(), fn)
+    return out
 
 
-def double_image_manip(
-    function: Callable[Concatenate[Image.Image, Image.Image, P], Image.Image],
-    image_a: bytes, image_b: bytes, *args: P.args,
-                **kwargs: P.kwargs
-) -> BytesIO:
+async def static_pil(function: Callable[Concatenate[Image.Image, P],
+                                        Image.Image], byt: bytes, *args,
+                     **kwargs) -> BytesIO:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(pil_manip_static, byt, function, *args, **kwargs)
+    out = await loop.run_in_executor(get_executor(), fn)
+    return out
+
+
+def double_image_manip(function: Callable[Concatenate[Image.Image, Image.Image,
+                                                      P], Image.Image],
+                       image_a: bytes, image_b: bytes, *args: P.args,
+                       **kwargs: P.kwargs) -> BytesIO:
     p_image_a = PILManip.static_pil_image(image_a)
     p_image_b = PILManip.static_pil_image(image_b)
     img = function(p_image_a, p_image_b, *args, **kwargs)
     return PILManip.pil_image_save(img)
 
 
-async def pil_multi_image(function: Callable[Concatenate[Image.Image, Image.Image, P], Image.Image], image: bytes, image_2: bytes, *args,**kwargs) -> BytesIO:
+async def pil_multi_image(function: Callable[Concatenate[Image.Image,
+                                                         Image.Image, P],
+                                             Image.Image], image: bytes,
+                          image_2: bytes, *args, **kwargs) -> BytesIO:
     loop = asyncio.get_event_loop()
-    fn = functools.partial(double_image_manip,function, image, image_2, *args, **kwargs)
+    fn = functools.partial(double_image_manip, function, image, image_2, *args,
+                           **kwargs)
     out = await loop.run_in_executor(get_executor(), fn)
     return out
+
 
 # def pil(
 #     function: Callable[Concatenate[Image.Image, P], Image.Image]
@@ -142,6 +144,3 @@ async def pil_multi_image(function: Callable[Concatenate[Image.Image, Image.Imag
 #             raise BadImage("Bad Format")
 
 #     return wrapper
-
-
-

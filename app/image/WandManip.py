@@ -34,12 +34,9 @@ class WandManip:
         return io
 
 
-def wand_static_manip(
-    image: bytes,
-    function: Callable[Concatenate[Image, P], Image],
-    *args: P.args,
-    **kwargs: P.kwargs
-) -> Tuple[BytesIO, str]:
+def wand_static_manip(image: bytes, function: Callable[Concatenate[Image, P],
+                                                       Image], *args: P.args,
+                      **kwargs: P.kwargs) -> Tuple[BytesIO, str]:
     img = WandManip.wand_open(image)
     if img.format in ["PNG", "JPEG"]:
         dst_image: Image = function(img, *args, **kwargs)
@@ -52,19 +49,16 @@ def wand_static_manip(
         raise ManipulationError("No bytes from saving Image")
 
 
+async def wand_static(function: Callable[Concatenate[Image, P], Image],
+                      byt: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(wand_static_manip, byt, function, *args, **kwargs)
+    out = await loop.run_in_executor(get_executor(), fn)
+    return out
 
-async def wand_static(function: Callable[Concatenate[Image, P], Image], byt: bytes,*args, **kwargs) -> Tuple[BytesIO, str]:
-     loop = asyncio.get_event_loop()
-     fn = functools.partial(wand_static_manip, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(get_executor(), fn)
-     return out
 
-def wand_manip(
-    image: bytes,
-    function: Callable[Concatenate[Image, P], Image],
-    *args: P.args,
-    **kwargs: P.kwargs
-) -> Tuple[BytesIO, str]:
+def wand_manip(image: bytes, function: Callable[Concatenate[Image, P], Image],
+               *args: P.args, **kwargs: P.kwargs) -> Tuple[BytesIO, str]:
     img = WandManip.wand_open(image)
     img_format = ""
     if img.format:
@@ -87,8 +81,10 @@ def wand_manip(
     else:
         raise ManipulationError("No bytes returned")
 
-async def wand(function: Callable[Concatenate[Image, P], Image], byt: bytes,*args, **kwargs) -> Tuple[BytesIO, str]:
-     loop = asyncio.get_event_loop()
-     fn = functools.partial(wand_manip, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(get_executor(), fn)
-     return out
+
+async def wand(function: Callable[Concatenate[Image, P], Image], byt: bytes,
+               *args, **kwargs) -> Tuple[BytesIO, str]:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(wand_manip, byt, function, *args, **kwargs)
+    out = await loop.run_in_executor(get_executor(), fn)
+    return out
