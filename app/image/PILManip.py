@@ -1,8 +1,8 @@
 from __future__ import annotations
-from concurrent.futures import ProcessPoolExecutor
 import functools
 from typing import List, Tuple, TYPE_CHECKING, Callable
 import multiprocessing
+from app.executor import get_executor
 import asyncio
 
 if TYPE_CHECKING:
@@ -97,20 +97,15 @@ def pil_manip(
 async def pil(function: Callable[Concatenate[Image.Image, P], Image.Image], byt: bytes, *args, **kwargs) -> Tuple[BytesIO, str]:
      loop = asyncio.get_event_loop()
      fn = functools.partial(pil_manip, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+     out = await loop.run_in_executor(get_executor(), fn)
      return out
 
 async def static_pil(function: Callable[Concatenate[Image.Image, P], Image.Image], byt: bytes,*args, **kwargs) -> BytesIO:
      loop = asyncio.get_event_loop()
      fn = functools.partial(pil_manip_static, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+     out = await loop.run_in_executor(get_executor(), fn)
      return out
 
-async def gif_out_from_byt(function: Callable[Concatenate[bytes, P], BytesIO], byt: bytes,*args, **kwargs) -> BytesIO:
-    loop = asyncio.get_event_loop()
-    fn = functools.partial(function, byt, **kwargs)
-    out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
-    return out
 
 def double_image_manip(
     function: Callable[Concatenate[Image.Image, Image.Image, P], Image.Image],
@@ -126,7 +121,7 @@ def double_image_manip(
 async def pil_multi_image(function: Callable[Concatenate[Image.Image, Image.Image, P], Image.Image], image: bytes, image_2: bytes, *args,**kwargs) -> BytesIO:
     loop = asyncio.get_event_loop()
     fn = functools.partial(double_image_manip,function, image, image_2, *args, **kwargs)
-    out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+    out = await loop.run_in_executor(get_executor(), fn)
     return out
 
 # def pil(

@@ -2,7 +2,7 @@ from __future__ import annotations
 from io import BytesIO
 import functools
 import asyncio
-from concurrent.futures import ProcessPoolExecutor
+from app.executor import get_executor
 from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
@@ -53,5 +53,5 @@ def numpy_manip(
 async def numpy(function: Callable[Concatenate[np.ndarray, P], np.ndarray], byt: bytes, *args, **kwargs) -> BytesIO:
     loop = asyncio.get_event_loop()
     fn = functools.partial(numpy_manip, byt, function,*args, **kwargs)
-    out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+    out = await loop.run_in_executor(get_executor(), fn)
     return out

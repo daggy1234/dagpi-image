@@ -4,7 +4,7 @@ import asyncio
 from wand.exceptions import TypeError
 from wand.image import Image
 import functools
-from concurrent.futures import ProcessPoolExecutor
+from app.executor import get_executor
 from typing import Callable, Tuple, TYPE_CHECKING
 
 from app.exceptions.errors import BadImage, FileLarge, ManipulationError
@@ -56,7 +56,7 @@ def wand_static_manip(
 async def wand_static(function: Callable[Concatenate[Image, P], Image], byt: bytes,*args, **kwargs) -> Tuple[BytesIO, str]:
      loop = asyncio.get_event_loop()
      fn = functools.partial(wand_static_manip, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+     out = await loop.run_in_executor(get_executor(), fn)
      return out
 
 def wand_manip(
@@ -90,5 +90,5 @@ def wand_manip(
 async def wand(function: Callable[Concatenate[Image, P], Image], byt: bytes,*args, **kwargs) -> Tuple[BytesIO, str]:
      loop = asyncio.get_event_loop()
      fn = functools.partial(wand_manip, byt, function,*args, **kwargs)
-     out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+     out = await loop.run_in_executor(get_executor(), fn)
      return out
