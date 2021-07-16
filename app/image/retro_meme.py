@@ -34,8 +34,7 @@ class Meme:
 
     def get_font_measures(self, text: str, font_size: int,
                           ratio) -> Dict[str, Any]:
-        measures = {}
-        measures["font"] = ImageFont.truetype(self.font_path, size=font_size)
+        measures = {"font": ImageFont.truetype(self.font_path, size=font_size)}
         measures["width"] = self.draw.textsize(text, font=measures["font"])[0]
         measures["ratio"] = measures["width"] / float(self.image.width)
         measures["ratio_diff"] = abs(ratio - measures["ratio"])
@@ -98,10 +97,8 @@ class Meme:
             wrapping = 32
         elif text_length > 100:
             wrapping = 10 + text_length // 3
-        elif text_length > 32:
-            wrapping = 5 + text_length // 2
         else:
-            raise ManipulationError("Unable to compute wrapping")
+            wrapping = 5 + text_length // 2
         return int(wrapping)
 
     def prepare_text(self,

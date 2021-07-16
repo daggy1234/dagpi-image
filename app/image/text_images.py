@@ -172,25 +172,22 @@ def quote(image: Image.Image, username: str, text: str,
     fntt = ImageFont.truetype("app/image/assets/whitney-medium.ttf", 30)
     if len(text) > 1000:
         raise ParameterError("text too long")
-    else:
-        user_color = (256, 256, 256) if dark else (6, 6, 7)
-        d.text((260, 70), username, fill=user_color, font=fntd)
-        wi = fntd.getsize(username)
-        # 72767d
-        d.text((300 + wi[0], 92), t_string, fill=(114, 118, 125), font=fntt)
-        wrap = WriteText(y)
-        # dark: #ffffff light:
-        text_color = (256, 256, 256) if dark else (46, 51, 56)
-        f = wrap.write_text_box(
-            260,
-            90,
-            text,
-            2120,
-            "app/image/assets/whitney-medium.ttf",
-            50,
-            color=text_color,
-        )
-        im = wrap.ret_img()
-        # dark: #36393f or lighr; #ffffff
-        ima = im.crop((0, 0, 2400, (f + 90)))
-        return ima
+    user_color = (256, 256, 256) if dark else (6, 6, 7)
+    d.text((260, 70), username, fill=user_color, font=fntd)
+    wi = fntd.getsize(username)
+    # 72767d
+    d.text((300 + wi[0], 92), t_string, fill=(114, 118, 125), font=fntt)
+    wrap = WriteText(y)
+    # dark: #ffffff light:
+    text_color = (256, 256, 256) if dark else (46, 51, 56)
+    f = wrap.write_text_box(
+        260,
+        90,
+        text,
+        2120,
+        "app/image/assets/whitney-medium.ttf",
+        50,
+        color=text_color,
+    )
+    im = wrap.ret_img()
+    return im.crop((0, 0, 2400, (f + 90)))
