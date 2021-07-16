@@ -1,5 +1,3 @@
-from app.image.WandManip import wand
-from app.image.decorators import executor
 from wand.image import Image
 
 __all__ = (

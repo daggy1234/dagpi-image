@@ -9,9 +9,8 @@ from skimage.feature import hog
 from skimage.filters import sobel
 from skimage.color import rgb2gray, gray2rgb
 
-from app.image.NumpyManip import NumpyManip, numpy
+from app.image.NumpyManip import NumpyManip
 from app.image.PILManip import PILManip
-from app.image.decorators import executor
 
 __all__ = ("get_sobel", "hog_process", "rgb_graph", "triangle_manip")
 

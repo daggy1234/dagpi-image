@@ -5,8 +5,8 @@ from app.image.pil_manipulation import *
 from app.image.retro_meme import *
 from app.image.text_images import *
 from app.image.polaroid_manip import glitch
-from app.image.PILManip import pil, pil_manip_static, static_pil, pil_multi_image
-from app.image.WandManip import wand, wand_manip, wand_static
+from app.image.PILManip import pil, static_pil, pil_multi_image
+from app.image.WandManip import wand
 from app.image.NumpyManip import numpy
 from app.image.decorators import byt_to_byt
 from app.image.wand_manipulation import *

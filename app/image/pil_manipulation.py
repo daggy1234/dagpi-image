@@ -928,7 +928,7 @@ def expand(byt: bytes) -> BytesIO:
         draw = ImageDraw.Draw(mask)
         draw.ellipse(
             (center - i, center - i, center + i, center + i),
-            fill=255  #type: ignore
+            fill=255  # type: ignore
         )
 
         out = ImageOps.fit(asset, mask.size)

@@ -4,9 +4,6 @@ from typing import Any, Dict, List, Tuple
 
 from PIL import Image, ImageDraw, ImageFont
 
-from app.image.PILManip import pil
-from app.image.decorators import executor
-
 __all__ = ("retromeme_gen", )
 
 

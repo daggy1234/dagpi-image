@@ -1,7 +1,6 @@
 from __future__ import annotations
 import functools
 from typing import List, Tuple, TYPE_CHECKING, Callable
-import multiprocessing
 from app.executor import get_executor
 import asyncio
 
