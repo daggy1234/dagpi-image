@@ -184,8 +184,6 @@ class Meme:
             raise ManipulationError("No Image")
 
 
-@executor
-@pil
 def retromeme_gen(image: Image.Image, text: str) -> Image.Image:
     mem = Meme(text, image.convert("RGBA"))
     return mem.make_meme()

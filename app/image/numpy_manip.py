@@ -16,7 +16,6 @@ from app.image.decorators import executor
 __all__ = ("get_sobel", "hog_process", "rgb_graph", "triangle_manip")
 
 
-@executor
 def triangle_manip(raw_byt: bytes) -> BytesIO:
     img = NumpyManip.image_read(raw_byt)
     gimg = rgb2gray(img)
@@ -42,8 +41,6 @@ def triangle_manip(raw_byt: bytes) -> BytesIO:
     return byt
 
 
-@executor
-@numpy
 def get_sobel(img) -> np.ndarray:
     # noinspection PyTypeChecker,PyUnresolvedReferences
     @adapt_rgb(each_channel)
@@ -53,7 +50,6 @@ def get_sobel(img) -> np.ndarray:
     return rescale_intensity(1 - _sobel_each(img))
 
 
-@executor
 def hog_process(raw_b: bytes) -> BytesIO:
     img = NumpyManip.image_read(raw_b)
     fd, hog_image = hog(
@@ -70,8 +66,7 @@ def hog_process(raw_b: bytes) -> BytesIO:
     return byt
 
 
-@executor
-def rgb_graph(img: bytes):
+def rgb_graph(img: bytes) -> BytesIO:
     def get_r(r):
         return "#%02x%02x%02x" % (r, 0, 0)
 

@@ -10,8 +10,8 @@ from app.image.writetext import WriteText
 __all__ = ("tweet_gen", "quote", "motiv", "captcha", "yt_comment")
 
 
-@executor
-@static_pil
+
+
 def captcha(img: Image.Image, text: str) -> Image.Image:
     if len(text) > 30:
         raise ParameterError("text should be less than 30 characters")
@@ -29,8 +29,8 @@ def captcha(img: Image.Image, text: str) -> Image.Image:
     return wt.ret_img()
 
 
-@executor
-@static_pil
+
+
 def tweet_gen(image: Image.Image, username: str, text: str) -> Image.Image:
     if len(text) > 180:
         raise ParameterError("Text supplied is too long")
@@ -94,8 +94,8 @@ def tweet_gen(image: Image.Image, username: str, text: str) -> Image.Image:
     return img_wrap.ret_img()
 
 
-@executor
-@static_pil
+
+
 def motiv(img: Image.Image, top_text: str, bottom_text: str) -> Image.Image:
     im = img.convert("RGBA")
     new_h, new_w = im.height + im.height * 100, im.width + 200
@@ -126,8 +126,8 @@ def motiv(img: Image.Image, top_text: str, bottom_text: str) -> Image.Image:
     return ret.crop((0, 0, new_w, text_h_t + 30))
 
 
-@executor
-@static_pil
+
+
 def yt_comment(image: Image.Image, username: str, text: str,
                dark: bool) -> Image.Image:
     bg = (24, 24, 24) if dark else (249, 249, 249)
@@ -158,8 +158,8 @@ def yt_comment(image: Image.Image, username: str, text: str,
     return im.crop([75, 75, 750, t_h + com.size[1]])
 
 
-@executor
-@static_pil
+
+
 def quote(image: Image.Image, username: str, text: str,
           dark: bool) -> Image.Image:
     today = datetime.today()

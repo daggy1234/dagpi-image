@@ -1,5 +1,8 @@
 from __future__ import annotations
 from io import BytesIO
+import functools
+import asyncio
+from concurrent.futures import ProcessPoolExecutor
 from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
@@ -37,12 +40,18 @@ class NumpyManip:
         return image_bytes
 
 
-def numpy(
-    function: Callable[Concatenate[np.ndarray, P], np.ndarray]
-) -> Callable[Concatenate[bytes, P], BytesIO]:
-    def wrapper(image: bytes, *args, **kwargs):
-        img = NumpyManip.image_read(image)
-        ret_img = function(img, *args, **kwargs)
-        return NumpyManip.image_save(ret_img)
+def numpy_manip(
+    image: bytes,
+    function: Callable[Concatenate[np.ndarray, P], np.ndarray],
+    *args,
+    **kwargs
+) -> BytesIO:
+    img = NumpyManip.image_read(image)
+    ret_img = function(img, *args, **kwargs)
+    return NumpyManip.image_save(ret_img)
 
-    return wrapper
+async def numpy(function: Callable[Concatenate[np.ndarray, P], np.ndarray], byt: bytes, *args, **kwargs) -> BytesIO:
+    loop = asyncio.get_event_loop()
+    fn = functools.partial(numpy_manip, byt, function,*args, **kwargs)
+    out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+    return out

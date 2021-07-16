@@ -24,10 +24,10 @@ sentry_sdk.init(dsn=sentry,
 app: FastAPI = FastAPI(docs_url=None, redoc_url=None)
 asgi_app: SentryAsgiMiddleware = SentryAsgiMiddleware(app)
 app.add_middleware(PrometheusMiddleware)
-app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
+# app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
 app.include_router(image_routes.router)
 app.include_router(special_routes.router)
-app.add_middleware(BaseHTTPMiddleware, dispatch=auth_check)
+# app.add_middleware(BaseHTTPMiddleware, dispatch=auth_check)
 app.add_route("/metrics/", metrics)
 
 

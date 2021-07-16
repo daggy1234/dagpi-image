@@ -5,7 +5,6 @@ import polaroid
 
 __all__ = ("glitch", "comic_manip_static")
 
-
 @executor
 @polaroid_deco
 def glitch(img: polaroid.Image) -> polaroid.Image:

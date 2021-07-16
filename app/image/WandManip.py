@@ -1,8 +1,10 @@
 from __future__ import annotations
 from io import BytesIO
-
+import asyncio
 from wand.exceptions import TypeError
 from wand.image import Image
+import functools
+from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, Tuple, TYPE_CHECKING
 
 from app.exceptions.errors import BadImage, FileLarge, ManipulationError
@@ -32,50 +34,61 @@ class WandManip:
         return io
 
 
-def wand_static(
-    function: Callable[Concatenate[Image, P], Image]
-) -> Callable[P, Tuple[BytesIO, str]]:
-    def wrapper(image: bytes, *args: P.args,
-                **kwargs: P.kwargs) -> Tuple[BytesIO, str]:
-        img = WandManip.wand_open(image)
-        if img.format in ["PNG", "JPEG"]:
-            dst_image: Image = function(img, *args, **kwargs)
+def wand_static_manip(
+    image: bytes,
+    function: Callable[Concatenate[Image, P], Image],
+    *args: P.args,
+    **kwargs: P.kwargs
+) -> Tuple[BytesIO, str]:
+    img = WandManip.wand_open(image)
+    if img.format in ["PNG", "JPEG"]:
+        dst_image: Image = function(img, *args, **kwargs)
+        byt = dst_image.make_blob()
+    else:
+        raise BadImage("Invalid Format")
+    if byt:
+        return WandManip.wand_save(byt), str(img.format)
+    else:
+        raise ManipulationError("No bytes from saving Image")
+
+
+
+async def wand_static(function: Callable[Concatenate[Image, P], Image], byt: bytes,*args, **kwargs) -> Tuple[BytesIO, str]:
+     loop = asyncio.get_event_loop()
+     fn = functools.partial(wand_static_manip, byt, function,*args, **kwargs)
+     out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+     return out
+
+def wand_manip(
+    image: bytes,
+    function: Callable[Concatenate[Image, P], Image],
+    *args: P.args,
+    **kwargs: P.kwargs
+) -> Tuple[BytesIO, str]:
+    img = WandManip.wand_open(image)
+    img_format = ""
+    if img.format:
+        img_format = img.format
+    else:
+        raise BadImage("Invalid Format")
+    if img_format == "GIF":
+        with Image() as dst_image:
+            for frame in img.sequence:
+                frame = function(frame, *args, **kwargs)
+                dst_image.sequence.append(frame)
             byt = dst_image.make_blob()
-        else:
-            raise BadImage("Invalid Format")
-        if byt:
-            return WandManip.wand_save(byt), img.format
-        else:
-            raise ManipulationError("No bytes from saving Image")
+    elif img_format in ["PNG", "JPEG"]:
+        dst_image = function(img, *args, **kwargs)
+        byt = dst_image.make_blob()
+    else:
+        raise BadImage("Inavlid Format")
+    if byt:
+        return WandManip.wand_save(byt), str(img_format)
+    else:
+        raise ManipulationError("No bytes returned")
 
-    return wrapper
-
-
-def wand(
-    function: Callable[Concatenate[Image, P], Image]
-) -> Callable[Concatenate[bytes, P], Tuple[BytesIO, str]]:
-    def wrapper(image: bytes, *args: P.args,
-                **kwargs: P.kwargs) -> Tuple[BytesIO, str]:
-        img = WandManip.wand_open(image)
-        img_format = ""
-        if img.format:
-            img_format = img.format
-        else:
-            raise BadImage("Invalid Format")
-        if img_format == "GIF":
-            with Image() as dst_image:
-                for frame in img.sequence:
-                    frame = function(frame, *args, **kwargs)
-                    dst_image.sequence.append(frame)
-                byt = dst_image.make_blob()
-        elif img_format in ["PNG", "JPEG"]:
-            dst_image = function(img, *args, **kwargs)
-            byt = dst_image.make_blob()
-        else:
-            raise BadImage("Inavlid Format")
-        if byt:
-            return WandManip.wand_save(byt), str(img_format)
-        else:
-            raise ManipulationError("No bytes returned")
-
-    return wrapper
+async def wand(function: Callable[Concatenate[Image, P], Image], byt: bytes,*args, **kwargs) -> Tuple[BytesIO, str]:
+     loop = asyncio.get_event_loop()
+     fn = functools.partial(wand_manip, byt, function,*args, **kwargs)
+     out = await loop.run_in_executor(ProcessPoolExecutor(), fn)
+     return out
