@@ -53,4 +53,4 @@ jobs:
           poetry run flake8 app --count --show-source --statistics
       
       - name: Run type checking
-        run: pyright --lib --verifytypes app --ignoreexternal
+        run: pyright --lib --verifytypes website --ignoreexternal
