@@ -1,6 +1,6 @@
 # Dagpi-Image
 
-# Quickly and effortlessly manipulate images
+### Quickly and effortlessly manipulate images
 
 Build Using the following libraries
 
