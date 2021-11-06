@@ -347,7 +347,7 @@ def create_soft_outline(outline, single, **kwargs):
         arr += np.array(frame).astype(np.float64)/i
     amax = np.amax(arr)
     if amax:
-        arr = arr/(np.amax(arr) / 200)
+        arr = arr/(amax / 200)
         arr = arr.astype(np.uint8)
     else:
         arr = np.zeros(arr.shape, dype=np.uint8)
