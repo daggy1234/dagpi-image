@@ -331,15 +331,24 @@ def create_sharp_outline(im, single, **kwargs):
 
 
 def create_soft_outline(outline, single, **kwargs):
-    multi = kwargs.get('multi')
+    # multi = kwargs.get('multi')
     # blur to create soft effect
-    soft = outline.filter(
-        ImageFilter.GaussianBlur(kwargs.get('soft_softness') or 4))
-    enhancer = ImageEnhance.Brightness(soft)
+    brightness = kwargs.get('soft_brightness') or (1.0)
+    radius = kwargs.get('soft_softness') or 13
+
+    steps = max(int(radius//5), 1)
+    step = radius/steps
+
+    # blur to create soft effect
     # enhance to brighten soft outline colors
-    soft = enhancer.enhance(
-        kwargs.get('soft_brightness')
-        or (2.0 if single and not multi else 1.6))
+    frames = (ImageEnhance.Brightness(outline.filter(ImageFilter.GaussianBlur(radius+1-step*i))).enhance(brightness) for i in range(steps))
+    arr = np.zeros((outline.height, outline.width))
+    for i, frame in enumerate(frames, 1):
+        arr += np.array(frame).astype(np.float64)/i
+    arr = arr/(np.amax(arr) / 200)
+    arr = arr.astype(np.uint8)
+    soft = Image.fromarray(arr)
+    # soft = ImageEnhance.Brightness(soft).enhance(brightness)
     return soft
 
 
@@ -653,7 +662,7 @@ def neon(oim, colors, **kwargs):
 
 
 def a_neon(oim, colors, **kwargs):
-    """Handles animated souce to neon images
+    """Handles animated source to neon images
     Refer to :func:`neon` for kwarg info
     """
     gradient = kwargs.pop('gradient', 0)
@@ -730,7 +739,7 @@ def a_neon(oim, colors, **kwargs):
                                 overlay=overlay,
                                 gradient=gradient,
                                 gradient_direction=gradient_direction,
-                                max_size=256,
+                                maxsize=256,
                                 multi=True,
                                 **kwargs)
             image.append(frame)
@@ -743,7 +752,7 @@ def a_neon(oim, colors, **kwargs):
                                       gradient=gradient,
                                       gradient_direction=gradient_direction,
                                       colors_per_frame=colors_per_frame or 2,
-                                      max_size=256,
+                                      maxsize=256,
                                       **kwargs)
     final = io.BytesIO()
     if not isinstance(image, list):
