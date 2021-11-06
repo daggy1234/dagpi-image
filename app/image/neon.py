@@ -345,8 +345,13 @@ def create_soft_outline(outline, single, **kwargs):
     arr = np.zeros((outline.height, outline.width))
     for i, frame in enumerate(frames, 1):
         arr += np.array(frame).astype(np.float64)/i
-    arr = arr/(np.amax(arr) / 200)
-    arr = arr.astype(np.uint8)
+    amax = np.amax(arr)
+    if amax:
+        arr = arr/(np.amax(arr) / 200)
+        arr = arr.astype(np.uint8)
+    else:
+        arr = np.zeros(arr.shape, dype=np.uint8)
+        
     soft = Image.fromarray(arr)
     # soft = ImageEnhance.Brightness(soft).enhance(brightness)
     return soft
