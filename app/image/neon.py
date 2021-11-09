@@ -199,17 +199,15 @@ def neon_static(oim, **kwargs):
                 single = True
                 colors = tuple(colors[0])
             else:
-                # multiple colors
-                if gradient in (0, 1, 2):
-                    # 0 no gradient, animated
-                    # 1 static gradient
-                    # 2 animated gradient, animated
-                    single = gradient == 1
-                    colors_per_frame = kwargs.get('colors_per_frame') or 3
-                    gradient_direction = kwargs.get('gradient_direction', 1)
-                else:
+                if gradient not in (0, 1, 2):
                     raise ParameterError('gradient must be 0, 1, or 2')
 
+                # 0 no gradient, animated
+                # 1 static gradient
+                # 2 animated gradient, animated
+                single = gradient == 1
+                colors_per_frame = kwargs.get('colors_per_frame') or 3
+                gradient_direction = kwargs.get('gradient_direction', 1)
         elif all(isinstance(c, int) for c in colors) and len(colors) == 3:
             # colors is tuple of (r,g,b) instead of nested tuple ((r,g,b),)
             gradient = 0
@@ -331,16 +329,29 @@ def create_sharp_outline(im, single, **kwargs):
 
 
 def create_soft_outline(outline, single, **kwargs):
-    multi = kwargs.get('multi')
+    # multi = kwargs.get('multi')
     # blur to create soft effect
-    soft = outline.filter(
-        ImageFilter.GaussianBlur(kwargs.get('soft_softness') or 4))
-    enhancer = ImageEnhance.Brightness(soft)
+    brightness = kwargs.get('soft_brightness') or (1.0)
+    radius = kwargs.get('soft_softness') or 13
+
+    steps = max(int(radius//5), 1)
+    step = radius/steps
+
+    # blur to create soft effect
     # enhance to brighten soft outline colors
-    soft = enhancer.enhance(
-        kwargs.get('soft_brightness')
-        or (2.0 if single and not multi else 1.6))
-    return soft
+    frames = (ImageEnhance.Brightness(outline.filter(ImageFilter.GaussianBlur(radius+1-step*i))).enhance(brightness) for i in range(steps))
+    arr = np.zeros((outline.height, outline.width))
+    for i, frame in enumerate(frames, 1):
+        arr += np.array(frame).astype(np.float64)/i
+    amax = np.amax(arr)
+    if amax:
+        arr = arr/(amax / 200)
+        arr = arr.astype(np.uint8)
+    else:
+        arr = np.zeros(arr.shape, dype=np.uint8)
+
+    # soft = ImageEnhance.Brightness(soft).enhance(brightness)
+    return Image.fromarray(arr)
 
 
 def neon_static_breathing(im, mask, colors, single, *, overlay, per_color):
@@ -392,11 +403,7 @@ def from_sRGB(x):
         for sRGB input in [0,255].
     '''
     x /= 255.0
-    if x <= 0.04045:
-        y = x / 12.92
-    else:
-        y = ((x + 0.055) / 1.055)**2.4
-    return y
+    return x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055)**2.4
 
 
 def lerp(color1, color2, frac):
@@ -653,7 +660,7 @@ def neon(oim, colors, **kwargs):
 
 
 def a_neon(oim, colors, **kwargs):
-    """Handles animated souce to neon images
+    """Handles animated source to neon images
     Refer to :func:`neon` for kwarg info
     """
     gradient = kwargs.pop('gradient', 0)
@@ -730,7 +737,7 @@ def a_neon(oim, colors, **kwargs):
                                 overlay=overlay,
                                 gradient=gradient,
                                 gradient_direction=gradient_direction,
-                                max_size=256,
+                                maxsize=256,
                                 multi=True,
                                 **kwargs)
             image.append(frame)
@@ -743,7 +750,7 @@ def a_neon(oim, colors, **kwargs):
                                       gradient=gradient,
                                       gradient_direction=gradient_direction,
                                       colors_per_frame=colors_per_frame or 2,
-                                      max_size=256,
+                                      maxsize=256,
                                       **kwargs)
     final = io.BytesIO()
     if not isinstance(image, list):
