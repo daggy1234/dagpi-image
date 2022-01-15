@@ -496,7 +496,7 @@ async def neon_image(url: str,
                      gradient: int = 0,
                      per_color: int = None,
                      colors_per_frame: int = None,
-                     direction: str = 'left',
+                     direction: str = 'right',
                      colors=None):
     if colors is None:
         colors = [(244, 40, 43), (241, 196, 15), (56, 244, 120),

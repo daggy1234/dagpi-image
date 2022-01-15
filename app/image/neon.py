@@ -485,61 +485,51 @@ def neon_static_gradient(im, mask, colors, single, gradient_direction, *,
 
 def create_gradient(im, colors, single, gradient_direction, horizontal,
                     colors_per_frame):
-    arrays = []
-    # add first color to rotate back
-    iter_colors = iter(colors + type(colors)(
-        (colors[0], ))) if not single or gradient_direction == 5 else iter(
-            colors)
-    next_color = next(iter_colors)
-    # single gradient fits in original image
-    # moving gradient is extended part original image
-    ratio = len(
-        colors
-    ) - 1 if single or gradient_direction == 5 else colors_per_frame - 1
-    while True:
-        # create gradients with 2 colors
-        try:
-            current = next_color
-            next_color = next(iter_colors)
-        except StopIteration:
-            break
-        with wImage() as wim:
-            # use ImageMagick pseudo scripts to create gradients
-            wim.clear()
-            pseudo = f'gradient:rgb{tuple(current)}-rgb{tuple(next_color)}'
-            if horizontal:
-                # horizontal gradient
-                wim.options['gradient:direction'] = 'east'
-                wim.pseudo(int(im.width / ratio), im.height, pseudo)
-            else:
-                # vertical gradient
-                wim.options['gradient:direction'] = 'north'
-                wim.pseudo(im.width, int(im.height / ratio), pseudo)
-            # image to array, add array to a list
-            arrays.append(np.array(wim))
-    if not horizontal:
-        # uh idk why, I think it's backwards
-        arrays.reverse()
-    # use numpy to combine arrays
-    # hstack for horizontal // vstack for vertical gradient
-    stack = np.hstack if horizontal else np.vstack
-
-    # get pil image from stacked arrays
     if gradient_direction == 5:
-        # create radial gradient
-        with wImage.from_array(stack(arrays)) as wim:
-            wim.virtual_pixel = 'edge'
-            wim.distort('arc', (360, ))
-            paste = Image.fromarray(np.array(wim))
+        use_colors = [colors[-1], *colors, colors[0]]
+    elif single:
+        use_colors = colors
     else:
-        # combine into horizontal/vertical gradient
-        paste = Image.fromarray(
-            stack(arrays if single else [*arrays, *arrays]))
+        use_colors = [colors[-1], *colors, *colors]
 
-    if (single and gradient_direction in (1, 2)) or gradient_direction == 5:
-        # reverse the gradient for correct direction
-        paste = paste.rotate(180)
-    return paste
+    # calculate final image size
+    if single or gradient_direction == 5:
+        # final should fit into a single image
+        ratio = 1
+    else:
+        # extend the image to be shifted
+        ratio = (len(use_colors) + colors_per_frame)/colors_per_frame
+
+    gradient = Image.new('RGB', (len(use_colors), 1))
+    for i, color in enumerate(use_colors):
+        gradient.putpixel((i,0), color)
+
+    # resize image
+    gradient = gradient.resize((int(im.width*ratio), im.height))
+    if gradient_direction == 5 or not single:
+        left = int(gradient.width/len(use_colors))
+        right = int(gradient.width - left) if gradient_direction == 5 else gradient.width
+        gradient = gradient.crop((left, 0, right, gradient.height))
+    # rotate image
+    rotate_lookup = {
+        0: Image.ROTATE_90,
+        2: Image.ROTATE_270,
+        3: Image.ROTATE_180
+    }
+    rotate = rotate_lookup.get(gradient_direction)
+    if rotate:
+        gradient = gradient.transpose(rotate)
+
+    if gradient_direction == 5:
+        with wImage.from_array(np.array(gradient)) as wim:
+            wim.virtual_pixel = 'edge'
+            wim.distort('arc', (360,))
+            gradient = Image.fromarray(np.array(wim))
+        gradient = gradient.transpose(Image.FLIP_TOP_BOTTOM)
+    elif not single:
+        gradient = gradient.transpose(Image.FLIP_LEFT_RIGHT if horizontal else Image.FLIP_TOP_BOTTOM)
+        
+    return gradient
 
 
 def process_gradient(paste, mask, position, gradient_direction):
