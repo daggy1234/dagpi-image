@@ -11,6 +11,8 @@ from PIL import Image
 from PIL.Image import Image as PILImage
 from PIL import (ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps,
                  ImageSequence)
+from PIL.ImageFilter import BoxBlur
+from glitch_this import ImageGlitcher
 
 import app.image.neon as _neon
 from app.exceptions.errors import ManipulationError, ParameterError
@@ -24,7 +26,7 @@ __all__ = ("angel", "ascii_image", "bad_img", "blur", "deepfry",
            "memegen", "america", "communism", "pride", "delete", "shatter",
            "fedora", "stringify", "mosiac", "neon", "quantize", "gen_dissolve",
            "petpetgen", "spin_manip", "ice", "molten", "earth", "comic_manip",
-           "slap", "bomb", "bonk", "shake", "flip", "mirror", "lego", "expand")
+           "slap", "bomb", "bonk", "shake", "flip", "mirror", "lego", "expand", "album_cover", "elmo", "tv", "confused", "rain")
 
 
 def flip(image: PILImage) -> PILImage:
@@ -137,6 +139,19 @@ def htiler(image: PILImage) -> PILImage:
     area = (65, 40)
     fim.paste(pfp, area)
     return fim
+
+
+def album_cover(image: PILImage) -> PILImage:
+    pa = Image.open('parental_advisory.jpg').convert("RGBA")
+    pten = 0.10
+    w, h = image.size
+    pa_resized = pa.resize((int(w * 0.18), int(h * 0.12)))
+    newimg = image.resize(((w - int(w * pten * 2)), h - int(h * pten * 2)))
+    image = image.filter(BoxBlur(radius=10))
+    image.paste(newimg, (int(w * pten), int(h * pten)), newimg)
+    image.paste(pa_resized, (int(w * pten) + int(pa_resized.width / 2),
+                h - int(h * pten * 2) - int(h * pten)), pa_resized)
+    return image
 
 
 def jail(image: PILImage) -> PILImage:
@@ -614,6 +629,85 @@ def america(byt: bytes) -> BytesIO:
     return obj
 
 
+def elmo(byt: bytes) -> BytesIO:
+    img = PILManip.static_pil_image(byt).resize((150, 150)).convert('RGBA')
+    elmo_gif = Image.open('app/image/assets/elmo_burn.gif')
+    frames = []
+    for frame in ImageSequence.Iterator(elmo_gif):
+        new_elmo = frame.convert('RGBA')
+        new_elmo.paste(img, (175, 125))
+        frames.append(new_elmo)
+    obj = BytesIO()
+    frames[0].save(obj, format='GIF', append_images=frames[1:], save_all=True, loop=0)
+    return obj
+
+
+def rain(byt: bytes) -> BytesIO:
+    img = PILManip.static_pil_image(byt).resize((330, 330)).convert('RGBA')
+    gif = Image.open('app/image/assets/rain.gif')
+    frames = []
+    for frame in ImageSequence.Iterator(gif):
+        im_c = img.copy()
+        frame = frame.convert('RGBA')
+        mask_im = Image.new('RGBA', frame.size, (255, 255, 255, 175))
+        im_c.paste(frame, (0, 0), mask_im)
+        frames.append(im_c)
+    obj = BytesIO()
+    frames[0].save(
+        obj,
+        format='gif',
+        save_all=True,
+        append_images=frames[1:],
+        loop=0,
+        duration=100,
+        optimize=True)
+    return obj
+
+
+def tv(byt: bytes) -> BytesIO:
+    img = PILManip.static_pil_image(byt).resize((300, 300)).convert('RGBA')
+    gif = Image.open('app/image/assets/tv_static.gif')
+    frames = []
+    for frame in ImageSequence.Iterator(gif):
+        im_c = img.copy()
+        frame = frame.convert('RGBA')
+        mask_im = Image.new('RGBA', frame.size, (255, 255, 255, 175))
+        im_c.paste(frame, (0, 0), mask_im)
+        frames.append(im_c)
+    obj = BytesIO()
+    frames[0].save(
+        obj,
+        format='gif',
+        save_all=True,
+        append_images=frames[1:],
+        loop=0,
+        duration=100,
+        optimize=True)
+    return obj
+
+
+def confused(byt: bytes) -> BytesIO:
+    img = PILManip.static_pil_image(byt).resize((300, 300)).convert('RGBA')
+    gif = Image.open('app/image/assets/math.gif')
+    frames = []
+    for frame in ImageSequence.Iterator(gif):
+        im_c = img.copy()
+        frame = frame.convert('RGBA')
+        mask_im = Image.new('RGBA', frame.size, (255, 255, 255, 50))
+        im_c.paste(frame, (0, 0), mask_im)
+        frames.append(im_c)
+    obj = BytesIO()
+    frames[0].save(
+        obj,
+        format='gif',
+        save_all=True,
+        append_images=frames[1:],
+        loop=0,
+        duration=100,
+        optimize=True)
+    return obj
+
+
 def communism(byt: bytes) -> BytesIO:
     img = PILManip.static_pil_image(byt)
     image = img.convert("RGBA").resize((480, 480), 5)
@@ -636,6 +730,20 @@ def communism(byt: bytes) -> BytesIO:
     return obj
 
 
+def glitch(byt: bytes) -> BytesIO:
+    img = PILManip.static_pil_image(byt)
+    glitcher = ImageGlitcher()
+    gl = glitcher.glitch_image(im, 2, color_offset=True, gif=True)
+    obj = BytesIO()
+    gl[0].save(
+        'm_m.gif',
+        format='gif',
+        save_all=True,
+        append_images=gl[1:],
+        loop=0,
+        duration=100,
+        optimize=True)
+    return obj
 #
 # def petpetgen(byt: bytes) -> BytesIO:
 #     im = Image.open("app/image/assets/petpet.gif")
@@ -822,7 +930,6 @@ def shake(byt: bytes) -> BytesIO:
                    loop=0)
     buffer.seek(0)
     return buffer
-
 
 #
 # def flash(byt: bytes) -> BytesIO:

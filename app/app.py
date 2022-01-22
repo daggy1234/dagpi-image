@@ -27,7 +27,7 @@ app.add_middleware(PrometheusMiddleware)
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_process_time_header)
 app.include_router(image_routes.router)
 app.include_router(special_routes.router)
-app.add_middleware(BaseHTTPMiddleware, dispatch=auth_check)
+# app.add_middleware(BaseHTTPMiddleware, dispatch=auth_check)
 app.add_route("/metrics/", metrics)
 
 
@@ -143,6 +143,7 @@ def custom_openapi():
         version="1.0",
         description="The Number 1 Image generation api",
         routes=app.routes)
+    print("got openapi")
     openapi_schema["components"] = {
         "securitySchemes": {
             "Token": {
@@ -186,11 +187,13 @@ def custom_openapi():
             "url": "https://cdn.dagpi.xyz/dagpib.png"
         }
     }
+    print("so far so good")
     for endpoint in openapi_schema["paths"].keys():
         if endpoint not in ["/", "/image/openapi.json"]:
             openapi_schema["paths"][endpoint]["get"]["security"] = [{
                 "Token": ["Required"]
             }]
+    print("nice")
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 

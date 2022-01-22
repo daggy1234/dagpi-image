@@ -176,6 +176,13 @@ async def hit_image(url: str):
     return Response(img.read(), media_type=f"image/{image_format}")
 
 
+@router.get("/album/", responses=normal_response)
+async def album_image(url: str):
+    byt = await Client.image_bytes(url)
+    img, image_format = await pil(album_cover, byt)
+    return Response(img.read(), media_type=f"image/{image_format}")
+
+
 @router.get("/obama/", responses=normal_response)
 async def obama_image(url: str):
     byt = await Client.image_bytes(url)
@@ -397,6 +404,34 @@ async def night_image(url: str):
 async def america_image(url: str):
     byt = await Client.image_bytes(url)
     img = await byt_to_byt(america, byt)
+    return Response(img.read(), media_type="image/gif")
+
+
+@router.get("/elmo/", responses=gif_response_only)
+async def elmo_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await byt_to_byt(elmo, byt)
+    return Response(img.read(), media_type="image/gif")
+
+
+@router.get("/rain/", responses=gif_response_only)
+async def rain_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await byt_to_byt(rain, byt)
+    return Response(img.read(), media_type="image/gif")
+
+
+@router.get("/tv/", responses=gif_response_only)
+async def tv_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await byt_to_byt(tv, byt)
+    return Response(img.read(), media_type="image/gif")
+
+
+@router.get("/confused/", responses=gif_response_only)
+async def confused_image(url: str):
+    byt = await Client.image_bytes(url)
+    img = await byt_to_byt(confused, byt)
     return Response(img.read(), media_type="image/gif")
 
 
