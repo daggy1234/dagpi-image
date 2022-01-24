@@ -7,7 +7,7 @@ __all__ = ("glitch", "comic_manip_static")
 
 @executor
 @polaroid_deco
-def glitch(img: polaroid.Image) -> polaroid.Image:
+def glitch_static(img: polaroid.Image) -> polaroid.Image:
     img.offset_red(30)
     return img
 

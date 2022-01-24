@@ -8,7 +8,7 @@ class Message(BaseModel):
 
 responses: Dict[Union[str, int], Dict[str, Any]] = {
     "404": {
-        "message": Message,
+        "model": Message,
         "content": {
             "application/json": {
                 "example": ""
@@ -16,64 +16,64 @@ responses: Dict[Union[str, int], Dict[str, Any]] = {
         }
     },
     "415": {
-        "message": Message,
+        "model": Message,
         "content": {
             "application/json": {
                 "example": {
-                    "message": "No image found at your destination"
+                    "model": "No image found at your destination"
                 },
                 "example2": {
-                    "message": "File found was not of Appropriate image type"
+                    "model": "File found was not of Appropriate image type"
                 }
             }
         }
     },
     "422": {
-        "message": Message,
+        "model": Message,
         "content": {
             "application/json": {
                 "example": {
-                    "message": "Unable to process the image due to an Error"
+                    "model": "Unable to process the image due to an Error"
                 }
             }
         }
     },
     "413": {
-        "message": Message,
+        "model": Message,
         "content": {
             "application/json": {
                 "example": {
-                    "message": "Image supplied was too large to be processed"
+                    "model": "Image supplied was too large to be processed"
                 }
             }
         }
     },
     "429": {
-        "message": Message,
+        "model": Message,
         "content": {
             "application/json": {
                 "example": {
-                    "message": "Ratelimited"
+                    "model": "Ratelimited"
                 }
             }
         }
     },
     "403": {
-        "message": Message,
+        "model": Message,
         "content": {
             "application/json": {
                 "example": {
-                    "message": "Unauthorised"
+                    "model": "Unauthorised"
                 }
             }
         }
     },
     "400": {
-        "message": Message,
+        "model": Message,
         "content": {
             "application/json": {
                 "example": {
-                    "message": "Unauthorised"
+                    "model": "Unauthorised"
                 }
             }
         }
@@ -83,7 +83,7 @@ responses: Dict[Union[str, int], Dict[str, Any]] = {
 gif_response_only: Dict[Union[str, int], Dict[str, Any]] = {
     **responses,
     "200": {
-        "message": Message,
+        "model": Message,
         "content": {
             "image/gif": {}
         }
@@ -93,7 +93,7 @@ gif_response_only: Dict[Union[str, int], Dict[str, Any]] = {
 static_response_only: Dict[Union[str, int], Dict[str, Any]] = {
     **responses,
     "200": {
-        "message": Message,
+        "model": Message,
         "content": {
             "image/png": {}
         }
@@ -103,7 +103,7 @@ static_response_only: Dict[Union[str, int], Dict[str, Any]] = {
 normal_response: Dict[Union[str, int], Dict[str, Any]] = {
     **responses,
     "200": {
-        "message": Message,
+        "model": Message,
         "content": {
             "image/gif": {},
             "image/png": {}

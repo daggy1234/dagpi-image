@@ -61,14 +61,14 @@ async def bad_url(_request: Request, _exc: BadUrl):
 
 @app.exception_handler(ParameterError)
 async def param_error(_request: Request, exc: ParameterError):
-    return JSONResponse(status_code=400, content={"message": f"{str(exc)}"})
+    return JSONResponse(status_code=400, content={"message": f'{exc}'})
 
 
 @app.exception_handler(ManipulationError)
 async def manipulation_error(_request: Request, exc: ManipulationError):
     return JSONResponse(
         status_code=422,
-        content={"message": f"Unable to manipulate image: {str(exc)}"},
+        content={"message": f'Unable to manipulate image: {exc}'},
     )
 
 

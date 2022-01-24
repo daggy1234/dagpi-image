@@ -26,7 +26,7 @@ __all__ = ("angel", "ascii_image", "bad_img", "blur", "deepfry",
            "memegen", "america", "communism", "pride", "delete", "shatter",
            "fedora", "stringify", "mosiac", "neon", "quantize", "gen_dissolve",
            "petpetgen", "spin_manip", "ice", "molten", "earth", "comic_manip",
-           "slap", "bomb", "bonk", "shake", "flip", "mirror", "lego", "expand", "album_cover", "elmo", "tv", "confused", "rain")
+           "slap", "bomb", "bonk", "shake", "flip", "mirror", "lego", "expand", "album_cover", "elmo", "tv", "confused", "rain", "glitch")
 
 
 def flip(image: PILImage) -> PILImage:
@@ -142,14 +142,16 @@ def htiler(image: PILImage) -> PILImage:
 
 
 def album_cover(image: PILImage) -> PILImage:
-    pa = Image.open('parental_advisory.jpg').convert("RGBA")
+    image = image.convert('RGBA')
+    pa = Image.open('app/image/assets/parental_advisory.png').convert("RGBA")
     pten = 0.10
     w, h = image.size
-    pa_resized = pa.resize((int(w * 0.18), int(h * 0.12)))
+    mplier_pa = h * 0.15 / pa.height
+    pa_resized = pa.resize((int(mplier_pa * pa.width), int(mplier_pa * pa.height)), resample=Image.BILINEAR)
     newimg = image.resize(((w - int(w * pten * 2)), h - int(h * pten * 2)))
     image = image.filter(BoxBlur(radius=10))
     image.paste(newimg, (int(w * pten), int(h * pten)), newimg)
-    image.paste(pa_resized, (int(w * pten) + int(pa_resized.width / 2),
+    image.paste(pa_resized, (int(w * pten) + int(pa_resized.width / 4),
                 h - int(h * pten * 2) - int(h * pten)), pa_resized)
     return image
 
@@ -639,6 +641,7 @@ def elmo(byt: bytes) -> BytesIO:
         frames.append(new_elmo)
     obj = BytesIO()
     frames[0].save(obj, format='GIF', append_images=frames[1:], save_all=True, loop=0)
+    obj.seek(0)
     return obj
 
 
@@ -661,6 +664,7 @@ def rain(byt: bytes) -> BytesIO:
         loop=0,
         duration=100,
         optimize=True)
+    obj.seek(0)
     return obj
 
 
@@ -683,6 +687,7 @@ def tv(byt: bytes) -> BytesIO:
         loop=0,
         duration=100,
         optimize=True)
+    obj.seek(0)
     return obj
 
 
@@ -705,6 +710,7 @@ def confused(byt: bytes) -> BytesIO:
         loop=0,
         duration=100,
         optimize=True)
+    obj.seek(0)
     return obj
 
 
@@ -730,19 +736,20 @@ def communism(byt: bytes) -> BytesIO:
     return obj
 
 
-def glitch(byt: bytes) -> BytesIO:
+def glitch(byt: bytes, intensity: int) -> BytesIO:
     img = PILManip.static_pil_image(byt)
     glitcher = ImageGlitcher()
-    gl = glitcher.glitch_image(im, 2, color_offset=True, gif=True)
+    gl = glitcher.glitch_image(img, intensity, color_offset=True, gif=True)
     obj = BytesIO()
     gl[0].save(
-        'm_m.gif',
+        obj,
         format='gif',
         save_all=True,
         append_images=gl[1:],
         loop=0,
         duration=100,
         optimize=True)
+    obj.seek(0)
     return obj
 #
 # def petpetgen(byt: bytes) -> BytesIO:
