@@ -274,7 +274,7 @@ async def glitch_image(url: str, intensity: int = 2):
     return Response(img.read(), media_type="image/gif")
 
 
-@router.get("/glitch_static/", responses=static_response_only)
+@router.get("/glitchstatic/", responses=static_response_only)
 async def glitch_image_s(url: str):
     byt = await Client.image_bytes(url)
     img = await glitch_static(byt)
