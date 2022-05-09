@@ -348,8 +348,7 @@ def create_soft_outline(outline, **kwargs):
     arr = np.zeros((outline.height, outline.width))
     for i, frame in enumerate(frames, 1):
         arr += np.array(frame).astype(np.float64)/(2.15**i)
-    amax = np.amax(arr)
-    if amax:
+    if amax := np.amax(arr):
         arr = arr * (215/amax)
         arr = arr.astype(np.uint8)
     else:
@@ -428,8 +427,7 @@ def color_range(color1, color2, steps):
             for cl1, cl2 in zip(color1_lin, color2_lin))
         if sum(color) != 0:
             color = [c * intensity / sum(color) for c in color]
-        color = tuple(to_sRGB(c) for c in color)
-        yield color
+        yield tuple(to_sRGB(c) for c in color)
 
 
 def neon_static_gradient(im, mask, colors, single, gradient_direction, *,
@@ -521,8 +519,7 @@ def create_gradient(im, colors, single, gradient_direction, horizontal,
         2: Image.ROTATE_270,
         3: Image.ROTATE_180
     }
-    rotate = rotate_lookup.get(gradient_direction)
-    if rotate:
+    if rotate := rotate_lookup.get(gradient_direction):
         gradient = gradient.transpose(rotate)
 
     if gradient_direction == 5:
@@ -533,7 +530,7 @@ def create_gradient(im, colors, single, gradient_direction, horizontal,
         gradient = gradient.transpose(Image.FLIP_TOP_BOTTOM)
     elif not single:
         gradient = gradient.transpose(Image.FLIP_LEFT_RIGHT if horizontal else Image.FLIP_TOP_BOTTOM)
-        
+
     return gradient
 
 
@@ -715,15 +712,7 @@ def a_neon(oim, colors, **kwargs):
     if gradient != 2:
         # static/breathing/static gradient
         for im in ImageSequence.Iterator(oim):
-            if not gradient and len(colors) > 1:
-                # swap color per frame to simluate animated
-                # breathing effect
-                color = next(iter_colors)
-            else:
-                # static/static gradient
-                # use all normal colors
-                color = colors
-
+            color = next(iter_colors) if not gradient and len(colors) > 1 else colors
             durations.append(im.info.get('duration', 10))
             frame = neon_static(im,
                                 colors=color,
