@@ -77,7 +77,7 @@ def gif_a_neon(oim, **kwargs):
         with im, outline, Image.new('L', im.size, 0) as mask:
             if soft:
                 # create soft outline
-                mask = create_soft_outline(outline, single, **kwargs)
+                mask = create_soft_outline(outline, **kwargs)
 
             if sharp:
                 # paste sharp outline
@@ -226,7 +226,7 @@ def neon_static(oim, **kwargs):
     with Image.new('L', im.size, (0)) as mask:
         if soft:
             # create soft outline
-            mask = create_soft_outline(outline, single, **kwargs)
+            mask = create_soft_outline(outline, **kwargs)
 
         if sharp:
             # paste sharp outline
@@ -328,24 +328,28 @@ def create_sharp_outline(im, single, **kwargs):
     return countour_outline
 
 
-def create_soft_outline(outline, single, **kwargs):
+def create_soft_outline(outline, **kwargs):
     # multi = kwargs.get('multi')
     # blur to create soft effect
-    brightness = kwargs.get('soft_brightness') or (1.0)
-    radius = kwargs.get('soft_softness') or 13
+    brightness = kwargs.get('soft_brightness') or 2
+    radius = kwargs.get('soft_softness') or int(min(outline.size)//18) or 1
 
     steps = max(int(radius//5), 1)
     step = radius/steps
 
     # blur to create soft effect
     # enhance to brighten soft outline colors
-    frames = (ImageEnhance.Brightness(outline.filter(ImageFilter.GaussianBlur(radius+1-step*i))).enhance(brightness) for i in range(steps))
+    frames = (
+        ImageEnhance.Brightness(
+            outline.filter(ImageFilter.GaussianBlur(radius+1-step*i))
+        ).enhance(brightness)
+        for i in range(steps)
+    )
     arr = np.zeros((outline.height, outline.width))
     for i, frame in enumerate(frames, 1):
-        arr += np.array(frame).astype(np.float64)/i
-    amax = np.amax(arr)
-    if amax:
-        arr = arr/(amax / 200)
+        arr += np.array(frame).astype(np.float64)/(2.15**i)
+    if amax := np.amax(arr):
+        arr = arr * (215/amax)
         arr = arr.astype(np.uint8)
     else:
         arr = np.zeros(arr.shape, dtype=np.uint8)
@@ -423,8 +427,7 @@ def color_range(color1, color2, steps):
             for cl1, cl2 in zip(color1_lin, color2_lin))
         if sum(color) != 0:
             color = [c * intensity / sum(color) for c in color]
-        color = tuple(to_sRGB(c) for c in color)
-        yield color
+        yield tuple(to_sRGB(c) for c in color)
 
 
 def neon_static_gradient(im, mask, colors, single, gradient_direction, *,
@@ -516,8 +519,7 @@ def create_gradient(im, colors, single, gradient_direction, horizontal,
         2: Image.ROTATE_270,
         3: Image.ROTATE_180
     }
-    rotate = rotate_lookup.get(gradient_direction)
-    if rotate:
+    if rotate := rotate_lookup.get(gradient_direction):
         gradient = gradient.transpose(rotate)
 
     if gradient_direction == 5:
@@ -528,7 +530,7 @@ def create_gradient(im, colors, single, gradient_direction, horizontal,
         gradient = gradient.transpose(Image.FLIP_TOP_BOTTOM)
     elif not single:
         gradient = gradient.transpose(Image.FLIP_LEFT_RIGHT if horizontal else Image.FLIP_TOP_BOTTOM)
-        
+
     return gradient
 
 
@@ -710,15 +712,7 @@ def a_neon(oim, colors, **kwargs):
     if gradient != 2:
         # static/breathing/static gradient
         for im in ImageSequence.Iterator(oim):
-            if not gradient and len(colors) > 1:
-                # swap color per frame to simluate animated
-                # breathing effect
-                color = next(iter_colors)
-            else:
-                # static/static gradient
-                # use all normal colors
-                color = colors
-
+            color = next(iter_colors) if not gradient and len(colors) > 1 else colors
             durations.append(im.info.get('duration', 10))
             frame = neon_static(im,
                                 colors=color,
