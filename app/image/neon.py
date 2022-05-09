@@ -77,7 +77,7 @@ def gif_a_neon(oim, **kwargs):
         with im, outline, Image.new('L', im.size, 0) as mask:
             if soft:
                 # create soft outline
-                mask = create_soft_outline(outline, single, **kwargs)
+                mask = create_soft_outline(outline, **kwargs)
 
             if sharp:
                 # paste sharp outline
@@ -226,7 +226,7 @@ def neon_static(oim, **kwargs):
     with Image.new('L', im.size, (0)) as mask:
         if soft:
             # create soft outline
-            mask = create_soft_outline(outline, single, **kwargs)
+            mask = create_soft_outline(outline, **kwargs)
 
         if sharp:
             # paste sharp outline
@@ -328,24 +328,29 @@ def create_sharp_outline(im, single, **kwargs):
     return countour_outline
 
 
-def create_soft_outline(outline, single, **kwargs):
+def create_soft_outline(outline, **kwargs):
     # multi = kwargs.get('multi')
     # blur to create soft effect
-    brightness = kwargs.get('soft_brightness') or (1.0)
-    radius = kwargs.get('soft_softness') or 13
+    brightness = kwargs.get('soft_brightness') or 2
+    radius = kwargs.get('soft_softness') or int(min(outline.size)//18) or 1
 
     steps = max(int(radius//5), 1)
     step = radius/steps
 
     # blur to create soft effect
     # enhance to brighten soft outline colors
-    frames = (ImageEnhance.Brightness(outline.filter(ImageFilter.GaussianBlur(radius+1-step*i))).enhance(brightness) for i in range(steps))
+    frames = (
+        ImageEnhance.Brightness(
+            outline.filter(ImageFilter.GaussianBlur(radius+1-step*i))
+        ).enhance(brightness)
+        for i in range(steps)
+    )
     arr = np.zeros((outline.height, outline.width))
     for i, frame in enumerate(frames, 1):
-        arr += np.array(frame).astype(np.float64)/i
+        arr += np.array(frame).astype(np.float64)/(2.15**i)
     amax = np.amax(arr)
     if amax:
-        arr = arr/(amax / 200)
+        arr = arr * (215/amax)
         arr = arr.astype(np.uint8)
     else:
         arr = np.zeros(arr.shape, dtype=np.uint8)
