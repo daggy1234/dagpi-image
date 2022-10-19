@@ -6,7 +6,7 @@ authors = ["Daggy1234 <arnav.jindal7@gmail.com>"]
 license = "AGPLv3"
 
 [tool.poetry.dependencies]
-python = "^3.8,<3.10"
+python = "^3.8,<3.11"
 Wand = "0.6.6"
 httptools = "0.3.0"
 async-timeout = "4.0.1"
